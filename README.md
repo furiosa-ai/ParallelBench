@@ -21,9 +21,9 @@
     <a href="https://parallelbench.github.io/">
         <img alt="Project" src="https://img.shields.io/static/v1?label=Project&message=Github&color=blue&logo=github-pages">
     </a>
-    <a href="https://arxiv.org/abs/TODO">
+    <!-- <a href="https://arxiv.org/abs/TODO">
         <img alt="arXiv" src="https://img.shields.io/badge/arXiv-TODO-b31b1b.svg">
-    </a>
+    </a> -->
 </p>
 
 <p align="center">
@@ -268,7 +268,7 @@ This project builds upon the work of several fantastic open-source repositories.
 - [RCR](https://github.com/autonomousvision/mdpo)
 - [Score-Entropy-Discrete-Diffusion](https://github.com/louaaron/Score-Entropy-Discrete-Diffusion)
 
-## 📖 Citation
+<!-- ## 📖 Citation
 ```bibtex
 TODO
-```
+``` -->
