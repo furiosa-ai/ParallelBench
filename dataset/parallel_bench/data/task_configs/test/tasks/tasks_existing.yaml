@@ -1,0 +1,14 @@
+
+samsum:
+  type: summary
+  source: samsum
+  metric: summary_score
+  lengths: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  prompt: "Summarize the following conversation. Only output the final result.\n\n{text}\n\nSummary:"
+
+chatgpt-paraphrases:
+  type: paraphrase
+  source: chatgpt-paraphrases
+  metric: paraphrase_score
+  lengths: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  prompt: "Paraphrase the following sentence. Only output the final result.\n\nSentence: {text}\n\nParaphrase:"

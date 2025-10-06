@@ -1,0 +1,7 @@
+shuffle:
+  type: shuffle
+  metric: list_shuffle_score
+  min_length: 6
+  max_length: 15
+  prompt: "Randomly rearrange the order of the following words: {context}. Ensure the sequence is different from the original. Use chain-of-thought to solve it."
+

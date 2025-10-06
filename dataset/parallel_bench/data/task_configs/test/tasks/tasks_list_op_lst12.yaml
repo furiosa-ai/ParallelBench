@@ -1,0 +1,93 @@
+sort:
+  type: sort
+  metric: list_match_score
+  min_length: 12
+  max_length: 12
+  prompt: "Sort the following words in alphabetical order: {context}. Only provide the final answer."
+
+shuffle:
+  type: shuffle
+  metric: list_shuffle_score
+  min_length: 12
+  max_length: 12
+  prompt: "Randomly rearrange the order of the following words: {context}. Ensure the sequence is different from the original. Only provide the final answer."
+
+copy:
+  type: copy
+  metric: list_match_score
+  min_length: 12
+  max_length: 12
+  prompt: "Repeat {context} exactly, preserving every character (brackets, quotes, commas, spaces, order, and case). Only provide the final answer."
+
+reverse:
+  type: reverse
+  metric: list_match_score
+  min_length: 12
+  max_length: 12
+  prompt: "Reverse the order of the following words: {context}. Only provide the final answer."
+
+repeat_each:
+  type: repeat
+  repeat_type: each
+  metric: list_match_score
+  min_length: 1
+  max_length: 12
+  repeat_counts: [2, 3, 4, 5, 6]
+  prompt: "Repeat each item {count} times interleaved, preserving order: {context}. Only provide the final answer."
+
+repeat_list:
+  type: repeat
+  repeat_type: list
+  metric: list_match_score
+  min_length: 1
+  max_length: 12
+  repeat_counts: [2, 3, 4, 5, 6]
+  prompt: "Repeat the entire list {count} times by concatenation: {context}. Only provide the final answer."
+
+insert_index_list:
+  type: insert
+  random_index: false
+  metric: list_match_score
+  min_length: 12
+  max_length: 12
+  prompt: "Insert the word \"{word}\" at index {index} in the list: {context}. Only provide the final answer."
+
+insert_random_list:
+  type: insert
+  random_index: true
+  metric: list_random_insert_score
+  min_length: 12
+  max_length: 12
+  prompt: "Insert the word \"{word}\" at a random position in the list: {context}. Only provide the final answer."
+
+remove_index_list:
+  type: remove
+  random_index: false
+  metric: list_match_score
+  min_length: 12
+  max_length: 12
+  prompt: "Remove the word at index {index} from the list: {context}. Only provide the final answer."
+
+remove_random_list:
+  type: remove
+  random_index: true
+  metric: list_random_remove_score
+  min_length: 12
+  max_length: 12
+  prompt: "Remove a random word from the list: {context}. Only provide the final answer."
+
+replace_index_list:
+  type: replace
+  random_index: false
+  metric: list_match_score
+  min_length: 12
+  max_length: 12
+  prompt: "Replace the word at index {index} from the list with the word \"{word}\": {context}. Only provide the final answer."
+
+replace_random_list:
+  type: replace
+  random_index: true
+  metric: list_random_replace_score
+  min_length: 12
+  max_length: 12
+  prompt: "Replace a random word from the list: {context} with the word \"{word}\". Only provide the final answer."

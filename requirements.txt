@@ -1,0 +1,22 @@
+# conda install conda-forge::openjdk=17
+
+transformers
+accelerate
+datasets
+math_verify
+seaborn
+pandas
+swifter
+wandb
+ujson
+anthropic
+scipy
+toml
+xmltodict
+peft
+omegaconf
+evaluate
+py7zr
+bert_score
+rouge_score
+language_tool_python

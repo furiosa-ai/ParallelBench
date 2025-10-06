@@ -1,0 +1,1156 @@
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 128
+    block_length: 128
+    steps: 128
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: true
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: false
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 32
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    fast_dllm_use_cache: false
+    fast_dllm_dual_cache: true
+    temperature: 0.0
+    max_tokens: 64
+    block_length: 64
+    steps: 64
+    fast_dllm_threshold: null
+    fast_dllm_factor: null
+    remasking: maskgit_plus

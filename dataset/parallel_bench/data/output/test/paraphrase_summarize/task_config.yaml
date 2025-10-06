@@ -1,0 +1,52 @@
+paraphrase_summarize/chatgpt-paraphrases:
+  lengths:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  metric: paraphrase_score
+  name: paraphrase_summarize/chatgpt-paraphrases
+  num_samples: 100
+  prompt: 'Paraphrase the following sentence. Only output the final result.
+
+
+    Sentence: {text}
+
+
+    Paraphrase:'
+  samples_per_length: 100
+  seed: 39617
+  source: chatgpt-paraphrases
+  type: paraphrase
+paraphrase_summarize/samsum:
+  lengths:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  metric: summary_score
+  name: paraphrase_summarize/samsum
+  num_samples: 100
+  prompt: 'Summarize the following conversation. Only output the final result.
+
+
+    {text}
+
+
+    Summary:'
+  samples_per_length: 100
+  seed: 59102
+  source: samsum
+  type: summary

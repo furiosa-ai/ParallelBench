@@ -1,0 +1,14 @@
+
+copy:
+  type: copy
+  metric: list_match_score
+  min_length: 6
+  max_length: 15
+  prompt: "Repeat {context} exactly, preserving every character (brackets, quotes, commas, spaces, order, and case). Only provide the final answer."
+
+reverse:
+  type: reverse
+  metric: list_match_score
+  min_length: 6
+  max_length: 15
+  prompt: "Reverse the order of the following words: {context}. Only provide the final answer."

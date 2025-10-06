@@ -1,0 +1,850 @@
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-7B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: meta-llama/Llama-3.2-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen3-4B-Instruct-2507
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/reverse
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/shuffle
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/replace_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/copy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/sort
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/insert_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_index
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line_n15/remove_random
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/chatgpt-paraphrases
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: paraphrase_summarize/samsum
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/easy
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/medium
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: true
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: words_to_sentence/hard
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/sudoku_n4_12
+  generation:
+    temperature: 0.0
+    max_tokens: 1024
+- skip_metrics: false
+  model:
+    model_name: Qwen/Qwen2.5-3B-Instruct
+    accel_framework: vllm
+  dataset:
+    dataset_name: parallel_bench
+    task: puzzle/latin_square_n4
+  generation:
+    temperature: 0.0
+    max_tokens: 1024

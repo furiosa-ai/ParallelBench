@@ -1,0 +1,45 @@
+
+math_op_l2_plus:
+  type: math_op
+  ops: ["+"]
+  metric: math_op_score
+  num_ops: 2
+  lengths: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+  prompt: "{equation}. Only provide the final answer."
+
+
+math_op_l2_minus:
+  type: math_op
+  ops: ["-"]
+  metric: math_op_score
+  num_ops: 2
+  lengths: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+  prompt: "{equation}. Only provide the final answer."
+
+
+math_op_l2_multiply:
+  type: math_op
+  ops: ["*"]
+  metric: math_op_score
+  num_ops: 2
+  lengths: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+  prompt: "{equation}. Only provide the final answer."
+
+
+math_op_l3:
+  type: math_op
+  metric: math_op_score
+  num_ops: 3
+  min_length: 5
+  lengths: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+  prompt: "{equation}. Only provide the final answer."
+
+
+math_op_l4:
+  type: math_op
+  metric: math_op_score
+  num_ops: 4
+  min_length: 5
+  max_length: 50
+  lengths: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+  prompt: "{equation}. Only provide the final answer."

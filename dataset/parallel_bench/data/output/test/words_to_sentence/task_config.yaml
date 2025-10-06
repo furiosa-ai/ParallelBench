@@ -1,0 +1,152 @@
+words_to_sentence/easy:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/easy
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/medium:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/medium
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/hard:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/hard
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+
+words_to_sentence/easy_n3:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/easy_n3
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/medium_n3:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/medium_n3
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/hard_n3:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/hard_n3
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+
+words_to_sentence/easy_n4:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/easy_n4
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/medium_n4:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/medium_n4
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/hard_n4:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/hard_n4
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+
+words_to_sentence/easy_n5:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/easy_n5
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/medium_n5:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/medium_n5
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/hard_n5:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/hard_n5
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+
+words_to_sentence/easy_n6:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/easy_n6
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/medium_n6:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/medium_n6
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/hard_n6:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/hard_n6
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+
+words_to_sentence/easy_n7:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/easy_n7
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/medium_n7:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/medium_n7
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+words_to_sentence/hard_n7:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/hard_n7
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the words {words}.
+
+
+words_to_sentence/easy_n1:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/easy_n1
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the word {words}.
+
+words_to_sentence/medium_n1:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/medium_n1
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the word {words}.
+
+words_to_sentence/hard_n1:
+  icl_example_count: 0
+  metric: sentence_to_words_score
+  name: words_to_sentence/hard_n1
+  num_samples: 100
+  prompt: Construct a single, coherent sentence using the word {words}.

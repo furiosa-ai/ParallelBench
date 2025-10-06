@@ -1,0 +1,10 @@
+__pycache__
+.vscode
+/wandb/
+/untracked/
+/results/
+/temp/
+/src/
+/logs/
+/hub/
+/artifacts/

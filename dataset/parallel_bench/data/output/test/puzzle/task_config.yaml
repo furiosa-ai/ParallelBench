@@ -1,0 +1,19 @@
+
+puzzle/latin_square_n4:
+  icl_example_count: 1
+  metric: latin_square_score
+  name: puzzle/latin_square_n4
+  num_samples: 100
+  prompt: Generate a Latin square of size {size} with the symbols {symbols}. Only
+    output the final result as CSV.
+  samples_per_length: 100
+  seed: 51291
+  size: 4
+  type: latin_square
+
+puzzle/sudoku_n4_12:
+  icl_example_count: 1
+  metric: sudoku_score
+  name: puzzle/sudoku_4x4_4
+  prompt: 'Fill the positions where the values are 0 in a 4x4 grid with digits 1-4 so that each column, each row, and each of the four 2x2 subgrids that compose the grid contains all of the digits from 1 to 4.\n\nInput:\n{sudoku}\nOutput:\n'
+

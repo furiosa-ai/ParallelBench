@@ -1,0 +1,20 @@
+
+latin_square_n3:
+  type: latin_square
+  metric: latin_square_score
+  size: 3
+  prompt: "Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV without header."
+
+
+latin_square_n4:
+  type: latin_square
+  metric: latin_square_score
+  size: 4
+  prompt: "Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV without header."
+
+
+latin_square_n5:
+  type: latin_square
+  metric: latin_square_score
+  size: 5
+  prompt: "Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV without header."

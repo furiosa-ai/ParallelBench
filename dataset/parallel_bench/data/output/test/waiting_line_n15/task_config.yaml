@@ -1,0 +1,213 @@
+waiting_line_n15/copy:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_match_score
+  min_length: 15
+  name: waiting_line_n15/copy
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    You need to record the following people in the order they arrived:
+
+    {context}
+
+    Please copy the list exactly and provide only the final list.
+
+    '
+  samples_per_length: 100
+  seed: 31940
+  type: copy
+  words: first_last_names.yaml
+waiting_line_n15/insert_index:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_match_score
+  min_length: 15
+  name: waiting_line_n15/insert_index
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    A new person "{word}" is inserted into the line at position {index}:
+
+    {context}
+
+    Please put the new person at the specified position and provide only the final
+    list.
+
+    '
+  random_index: false
+  samples_per_length: 100
+  seed: 49875
+  type: insert
+  words: first_last_names.yaml
+waiting_line_n15/insert_random:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_random_insert_score
+  min_length: 15
+  name: waiting_line_n15/insert_random
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    A new person "{word}" is inserted into the line at a random position:
+
+    {context}
+
+    Please put the new person in the random position and provide only the final list.
+
+    '
+  random_index: true
+  samples_per_length: 100
+  seed: 25751
+  type: insert
+  words: first_last_names.yaml
+waiting_line_n15/remove_index:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_match_score
+  min_length: 15
+  name: waiting_line_n15/remove_index
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    The person at position {index} has left the waiting line:
+
+    {context}
+
+    Please remove the person at the specified position and provide only the final
+    list.
+
+    '
+  random_index: false
+  samples_per_length: 100
+  seed: 46066
+  type: remove
+  words: first_last_names.yaml
+waiting_line_n15/remove_random:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_random_remove_score
+  min_length: 15
+  name: waiting_line_n15/remove_random
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    One person has left the waiting line:
+
+    {context}
+
+    Please remove a random person and provide only the final list.
+
+    '
+  random_index: true
+  samples_per_length: 100
+  seed: 47444
+  type: remove
+  words: first_last_names.yaml
+waiting_line_n15/replace_index:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_match_score
+  min_length: 15
+  name: waiting_line_n15/replace_index
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    The person at position {index} must be replaced with "{word}":
+
+    {context}
+
+    Please replace the person at the specified position with "{word}" and provide
+    only the final list.
+
+    '
+  random_index: false
+  samples_per_length: 100
+  seed: 32235
+  type: replace
+  words: first_last_names.yaml
+waiting_line_n15/replace_random:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_random_replace_score
+  min_length: 15
+  name: waiting_line_n15/replace_random
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    One person in the waiting line must be replaced with "{word}":
+
+    {context}
+
+    Please replace one random person with "{word}" and provide only the final list.'
+  random_index: true
+  samples_per_length: 100
+  seed: 49003
+  type: replace
+  words: first_last_names.yaml
+waiting_line_n15/reverse:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_match_score
+  min_length: 15
+  name: waiting_line_n15/reverse
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    The previous staff member put the waiting line in the wrong order.
+
+    Please reverse the order of the following people in the waiting line to correct
+    it:
+
+    {context}
+
+    Please reverse the order of the list and provide only the final list.
+
+    '
+  samples_per_length: 100
+  seed: 31383
+  type: reverse
+  words: first_last_names.yaml
+waiting_line_n15/shuffle:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_shuffle_score
+  min_length: 15
+  name: waiting_line_n15/shuffle
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    The waiting line should be randomly shuffled to ensure fair service distribution:
+
+    {context}
+
+    Please randomly shuffle the list and provide only the final list.
+
+    Ensure the sequence is different from the original.
+
+    '
+  samples_per_length: 100
+  seed: 30142
+  type: shuffle
+  words: first_last_names.yaml
+waiting_line_n15/sort:
+  icl_example_count: 1
+  max_length: 15
+  metric: list_match_score
+  min_length: 15
+  name: waiting_line_n15/sort
+  num_samples: 100
+  prompt: 'You are managing a waiting line at a customer service desk.
+
+    The following people should be organized alphabetically by last name for efficient
+    processing:
+
+    {context}
+
+    Please sort the list in alphabetical order and provide only the final list.
+
+    '
+  samples_per_length: 100
+  seed: 48898
+  type: sort
+  words: first_last_names.yaml

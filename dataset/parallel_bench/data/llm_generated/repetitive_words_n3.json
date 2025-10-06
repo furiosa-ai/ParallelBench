@@ -1,0 +1,1052 @@
+[
+  {
+    "id": 1,
+    "repetitive_word": "happy",
+    "synonyms_used": ["pleased", "joyful", "delighted"],
+    "input_text": "She was happy with her gift. The good news made her even more happy, and seeing her family made her the most happy she'd been all year.",
+    "target_text": "She was pleased with her gift. The good news made her even more joyful, and seeing her family made her the most delighted she'd been all year."
+  },
+  {
+    "id": 2,
+    "repetitive_word": "important",
+    "synonyms_used": ["crucial", "vital", "significant"],
+    "input_text": "This is an important meeting. The decisions we make are important for the company's future. Please remember how important this is.",
+    "target_text": "This is a crucial meeting. The decisions we make are vital for the company's future. Please remember how significant this is."
+  },
+  {
+    "id": 3,
+    "repetitive_word": "run",
+    "synonyms_used": ["sprint", "jog", "dash"],
+    "input_text": "He had to run to catch the bus. After work, he would run in the park. In a race, you must run as fast as possible.",
+    "target_text": "He had to dash to catch the bus. After work, he would jog in the park. In a race, you must sprint as fast as possible."
+  },
+  {
+    "id": 4,
+    "repetitive_word": "good",
+    "synonyms_used": ["excellent", "great", "fine"],
+    "input_text": "That was a good movie. The acting was good and the plot was also good.",
+    "target_text": "That was an excellent movie. The acting was great and the plot was also fine."
+  },
+  {
+    "id": 5,
+    "repetitive_word": "show",
+    "synonyms_used": ["demonstrate", "display", "reveal"],
+    "input_text": "The data will show a clear trend. Let me show you the chart. The results will show what we have learned.",
+    "target_text": "The data will demonstrate a clear trend. Let me display the chart. The results will reveal what we have learned."
+  },
+  {
+    "id": 6,
+    "repetitive_word": "big",
+    "synonyms_used": ["large", "huge", "enormous"],
+    "input_text": "We have a big problem. The company is facing a big financial challenge, and the consequences could be big.",
+    "target_text": "We have a large problem. The company is facing a huge financial challenge, and the consequences could be enormous."
+  },
+  {
+    "id": 7,
+    "repetitive_word": "make",
+    "synonyms_used": ["create", "build", "produce"],
+    "input_text": "We need to make a new plan. Let's make a prototype first. Our goal is to make the best product on the market.",
+    "target_text": "We need to create a new plan. Let's build a prototype first. Our goal is to produce the best product on the market."
+  },
+  {
+    "id": 8,
+    "repetitive_word": "fast",
+    "synonyms_used": ["quick", "rapid", "swift"],
+    "input_text": "He is a fast runner. The car is very fast. The internet connection needs to be fast for streaming.",
+    "target_text": "He is a quick runner. The car is very rapid. The internet connection needs to be swift for streaming."
+  },
+  {
+    "id": 9,
+    "repetitive_word": "beautiful",
+    "synonyms_used": ["gorgeous", "stunning", "lovely"],
+    "input_text": "The sunset was beautiful. She wore a beautiful dress. What a beautiful painting!",
+    "target_text": "The sunset was gorgeous. She wore a stunning dress. What a lovely painting!"
+  },
+  {
+    "id": 10,
+    "repetitive_word": "use",
+    "synonyms_used": ["utilize", "employ", "apply"],
+    "input_text": "We can use this tool for the job. How do you use this software? We must use our resources wisely.",
+    "target_text": "We can utilize this tool for the job. How do you employ this software? We must apply our resources wisely."
+  },
+  {
+    "id": 11,
+    "repetitive_word": "bad",
+    "synonyms_used": ["terrible", "awful", "horrible"],
+    "input_text": "The weather was bad today. He had a bad headache. The movie review was very bad.",
+    "target_text": "The weather was terrible today. He had an awful headache. The movie review was very horrible."
+  },
+  {
+    "id": 12,
+    "repetitive_word": "idea",
+    "synonyms_used": ["concept", "notion", "thought"],
+    "input_text": "That's a great idea. I have an idea for a new project. Let's brainstorm one more idea.",
+    "target_text": "That's a great concept. I have a notion for a new project. Let's brainstorm one more thought."
+  },
+  {
+    "id": 13,
+    "repetitive_word": "small",
+    "synonyms_used": ["tiny", "little", "minute"],
+    "input_text": "It was just a small mistake. The apartment is very small. Look at that small puppy!",
+    "target_text": "It was just a tiny mistake. The apartment is very little. Look at that minute puppy!"
+  },
+  {
+    "id": 14,
+    "repetitive_word": "explain",
+    "synonyms_used": ["clarify", "describe", "illustrate"],
+    "input_text": "Can you explain this theory? Let me explain the rules again. The teacher will explain the diagram.",
+    "target_text": "Can you clarify this theory? Let me describe the rules again. The teacher will illustrate the diagram."
+  },
+  {
+    "id": 15,
+    "repetitive_word": "look",
+    "synonyms_used": ["glance", "stare", "observe"],
+    "input_text": "He had to look at the document. Don't look directly at the sun. We should look at the evidence carefully.",
+    "target_text": "He had to glance at the document. Don't stare directly at the sun. We should observe the evidence carefully."
+  },
+  {
+    "id": 16,
+    "repetitive_word": "interesting",
+    "synonyms_used": ["fascinating", "engaging", "intriguing"],
+    "input_text": "The book was very interesting. It's an interesting topic for discussion. I found his story interesting.",
+    "target_text": "The book was very fascinating. It's an engaging topic for discussion. I found his story intriguing."
+  },
+  {
+    "id": 17,
+    "repetitive_word": "work",
+    "synonyms_used": ["labor", "toil", "operate"],
+    "input_text": "He has to work late tonight. The machine will work continuously. It takes hard work to succeed.",
+    "target_text": "He has to labor late tonight. The machine will operate continuously. It takes hard toil to succeed."
+  },
+  {
+    "id": 18,
+    "repetitive_word": "different",
+    "synonyms_used": ["various", "distinct", "diverse"],
+    "input_text": "We have many different options. The two paintings are clearly different. People have different opinions on the matter.",
+    "target_text": "We have many various options. The two paintings are clearly distinct. People have diverse opinions on the matter."
+  },
+  {
+    "id": 19,
+    "repetitive_word": "problem",
+    "synonyms_used": ["issue", "challenge", "dilemma"],
+    "input_text": "The main problem is a lack of funding. We are facing a complex problem. Let's solve this problem together.",
+    "target_text": "The main issue is a lack of funding. We are facing a complex challenge. Let's solve this dilemma together."
+  },
+  {
+    "id": 20,
+    "repetitive_word": "amazing",
+    "synonyms_used": ["incredible", "wonderful", "astonishing"],
+    "input_text": "The performance was amazing. You did an amazing job. The view from the top was amazing.",
+    "target_text": "The performance was incredible. You did a wonderful job. The view from the top was astonishing."
+  },
+  {
+    "id": 21,
+    "repetitive_word": "tell",
+    "synonyms_used": ["inform", "narrate", "recount"],
+    "input_text": "Please tell me the story. He will tell the authorities what happened. Can you tell me the time?",
+    "target_text": "Please narrate the story to me. He will inform the authorities what happened. Can you recount the time for me?"
+  },
+  {
+    "id": 22,
+    "repetitive_word": "get",
+    "synonyms_used": ["obtain", "receive", "acquire"],
+    "input_text": "You need to get permission first. I hope to get a good grade. Where did you get that information?",
+    "target_text": "You need to obtain permission first. I hope to receive a good grade. Where did you acquire that information?"
+  },
+  {
+    "id": 23,
+    "repetitive_word": "smart",
+    "synonyms_used": ["intelligent", "clever", "bright"],
+    "input_text": "She is a very smart student. That was a smart move. He's smart enough to solve the puzzle.",
+    "target_text": "She is a very intelligent student. That was a clever move. He's bright enough to solve the puzzle."
+  },
+  {
+    "id": 24,
+    "repetitive_word": "scared",
+    "synonyms_used": ["afraid", "frightened", "terrified"],
+    "input_text": "The loud noise made the child scared. I'm scared of spiders. He was too scared to move.",
+    "target_text": "The loud noise made the child frightened. I'm afraid of spiders. He was too terrified to move."
+  },
+  {
+    "id": 25,
+    "repetitive_word": "begin",
+    "synonyms_used": ["start", "commence", "initiate"],
+    "input_text": "Let's begin the meeting. The show is about to begin. We should begin work immediately.",
+    "target_text": "Let's start the meeting. The show is about to commence. We should initiate work immediately."
+  },
+  {
+    "id": 26,
+    "repetitive_word": "old",
+    "synonyms_used": ["ancient", "aged", "antique"],
+    "input_text": "This is a very old book. The castle is thousands of years old. My grandfather is very old.",
+    "target_text": "This is a very ancient book. The castle is thousands of years old. My grandfather is very aged."
+  },
+  {
+    "id": 27,
+    "repetitive_word": "wrong",
+    "synonyms_used": ["incorrect", "mistaken", "erroneous"],
+    "input_text": "Your answer is wrong. I think you are wrong about that. The map had a wrong calculation.",
+    "target_text": "Your answer is incorrect. I think you are mistaken about that. The map had an erroneous calculation."
+  },
+  {
+    "id": 28,
+    "repetitive_word": "rich",
+    "synonyms_used": ["wealthy", "affluent", "prosperous"],
+    "input_text": "He is a very rich man. The country is rich in natural resources. Her family became rich overnight.",
+    "target_text": "He is a very wealthy man. The country is affluent in natural resources. Her family became prosperous overnight."
+  },
+  {
+    "id": 29,
+    "repetitive_word": "difficult",
+    "synonyms_used": ["challenging", "hard", "tough"],
+    "input_text": "The exam was very difficult. This is a difficult situation. It was difficult to make a decision.",
+    "target_text": "The exam was very challenging. This is a hard situation. It was tough to make a decision."
+  },
+  {
+    "id": 30,
+    "repetitive_word": "quiet",
+    "synonyms_used": ["silent", "peaceful", "tranquil"],
+    "input_text": "The library must be quiet. It was a quiet evening at home. The forest was very quiet.",
+    "target_text": "The library must be silent. It was a peaceful evening at home. The forest was very tranquil."
+  },
+  {
+    "id": 31,
+    "repetitive_word": "brave",
+    "synonyms_used": ["courageous", "fearless", "valiant"],
+    "input_text": "The firefighter was very brave. It was a brave decision to make. The soldiers were brave in battle.",
+    "target_text": "The firefighter was very courageous. It was a fearless decision to make. The soldiers were valiant in battle."
+  },
+  {
+    "id": 32,
+    "repetitive_word": "bright",
+    "synonyms_used": ["luminous", "radiant", "dazzling"],
+    "input_text": "The sun is very bright today. She has a bright smile. The bright lights of the city were beautiful.",
+    "target_text": "The sun is very luminous today. She has a radiant smile. The dazzling lights of the city were beautiful."
+  },
+  {
+    "id": 33,
+    "repetitive_word": "end",
+    "synonyms_used": ["finish", "conclude", "terminate"],
+    "input_text": "This is the end of the road. We must end the project by Friday. The movie will end soon.",
+    "target_text": "This is the finish of the road. We must conclude the project by Friday. The movie will terminate soon."
+  },
+  {
+    "id": 34,
+    "repetitive_word": "true",
+    "synonyms_used": ["accurate", "genuine", "factual"],
+    "input_text": "Is the story true? We need to find the true cause. His apology seemed true.",
+    "target_text": "Is the story factual? We need to find the accurate cause. His apology seemed genuine."
+  },
+  {
+    "id": 35,
+    "repetitive_word": "love",
+    "synonyms_used": ["adore", "cherish", "treasure"],
+    "input_text": "I love this song. They truly love each other. We love spending time with family.",
+    "target_text": "I adore this song. They truly cherish each other. We treasure spending time with family."
+  },
+  {
+    "id": 36,
+    "repetitive_word": "help",
+    "synonyms_used": ["assist", "support", "aid"],
+    "input_text": "Can you help me with this? We need to help the community. Your donation will help a lot.",
+    "target_text": "Can you assist me with this? We need to support the community. Your donation will aid a lot."
+  },
+  {
+    "id": 37,
+    "repetitive_word": "strong",
+    "synonyms_used": ["powerful", "robust", "sturdy"],
+    "input_text": "He is a strong athlete. The coffee is very strong. We need a strong leader.",
+    "target_text": "He is a powerful athlete. The coffee is very robust. We need a sturdy leader."
+  },
+  {
+    "id": 38,
+    "repetitive_word": "sad",
+    "synonyms_used": ["unhappy", "sorrowful", "miserable"],
+    "input_text": "The news made him very sad. It was a sad story. She felt sad after he left.",
+    "target_text": "The news made him very unhappy. It was a sorrowful story. She felt miserable after he left."
+  },
+  {
+    "id": 39,
+    "repetitive_word": "huge",
+    "synonyms_used": ["massive", "enormous", "gigantic"],
+    "input_text": "There was a huge crowd at the concert. The elephant is a huge animal. They made a huge profit this year.",
+    "target_text": "There was a massive crowd at the concert. The elephant is an enormous animal. They made a gigantic profit this year."
+  },
+  {
+    "id": 40,
+    "repetitive_word": "clean",
+    "synonyms_used": ["spotless", "pristine", "tidy"],
+    "input_text": "The room was very clean. Please keep your workspace clean. We need to clean the entire house.",
+    "target_text": "The room was very spotless. Please keep your workspace tidy. We need to make the entire house pristine."
+  },
+  {
+    "id": 41,
+    "repetitive_word": "create",
+    "synonyms_used": ["generate", "produce", "design"],
+    "input_text": "The artist will create a masterpiece. We need to create more jobs. Let's create a new logo for the company.",
+    "target_text": "The artist will produce a masterpiece. We need to generate more jobs. Let's design a new logo for the company."
+  },
+  {
+    "id": 42,
+    "repetitive_word": "dark",
+    "synonyms_used": ["dim", "shadowy", "gloomy"],
+    "input_text": "The room was too dark to see. It was a dark and stormy night. He has dark hair.",
+    "target_text": "The room was too dim to see. It was a shadowy and stormy night. He has gloomy hair."
+  },
+  {
+    "id": 43,
+    "repetitive_word": "delicious",
+    "synonyms_used": ["tasty", "scrumptious", "delectable"],
+    "input_text": "The cake was delicious. What a delicious meal! The fruit was fresh and delicious.",
+    "target_text": "The cake was tasty. What a scrumptious meal! The fruit was fresh and delectable."
+  },
+  {
+    "id": 44,
+    "repetitive_word": "understand",
+    "synonyms_used": ["comprehend", "grasp", "perceive"],
+    "input_text": "I don't understand the question. It's important to understand the risks. Do you understand what I mean?",
+    "target_text": "I don't comprehend the question. It's important to grasp the risks. Do you perceive what I mean?"
+  },
+  {
+    "id": 45,
+    "repetitive_word": "famous",
+    "synonyms_used": ["renowned", "well-known", "celebrated"],
+    "input_text": "She is a famous actress. Paris is famous for its art museums. He became famous overnight.",
+    "target_text": "She is a renowned actress. Paris is well-known for its art museums. He became celebrated overnight."
+  },
+  {
+    "id": 46,
+    "repetitive_word": "funny",
+    "synonyms_used": ["humorous", "comical", "amusing"],
+    "input_text": "The movie was very funny. He told a funny joke. That's a funny-looking hat.",
+    "target_text": "The movie was very humorous. He told a comical joke. That's an amusing-looking hat."
+  },
+  {
+    "id": 47,
+    "repetitive_word": "dangerous",
+    "synonyms_used": ["hazardous", "risky", "perilous"],
+    "input_text": "That is a dangerous chemical. It's a dangerous path to take. The situation is getting dangerous.",
+    "target_text": "That is a hazardous chemical. It's a risky path to take. The situation is getting perilous."
+  },
+  {
+    "id": 48,
+    "repetitive_word": "cold",
+    "synonyms_used": ["chilly", "frigid", "icy"],
+    "input_text": "The weather is very cold. I felt a cold draft. Her hands were cold.",
+    "target_text": "The weather is very chilly. I felt a frigid draft. Her hands were icy."
+  },
+  {
+    "id": 49,
+    "repetitive_word": "nice",
+    "synonyms_used": ["pleasant", "kind", "agreeable"],
+    "input_text": "He is a very nice person. We had a nice time at the party. That was a nice thing to say.",
+    "target_text": "He is a very kind person. We had a pleasant time at the party. That was an agreeable thing to say."
+  },
+  {
+    "id": 50,
+    "repetitive_word": "many",
+    "synonyms_used": ["numerous", "several", "various"],
+    "input_text": "There are many books on the shelf. We have many options to choose from. After many years, he finally returned.",
+    "target_text": "There are numerous books on the shelf. We have several options to choose from. After various years, he finally returned."
+  },
+  {
+    "id": 51,
+    "repetitive_word": "angry",
+    "synonyms_used": ["furious", "irate", "enraged"],
+    "input_text": "The customer was very angry. His words made her angry. He gets angry easily.",
+    "target_text": "The customer was very irate. His words made her enraged. He gets furious easily."
+  },
+  {
+    "id": 52,
+    "repetitive_word": "calm",
+    "synonyms_used": ["serene", "tranquil", "peaceful"],
+    "input_text": "The sea was calm after the storm. She has a calm personality. Please stay calm.",
+    "target_text": "The sea was serene after the storm. She has a peaceful personality. Please stay tranquil."
+  },
+  {
+    "id": 53,
+    "repetitive_word": "change",
+    "synonyms_used": ["alter", "modify", "transform"],
+    "input_text": "We need to change our strategy. The weather can change quickly. Can you change this document?",
+    "target_text": "We need to alter our strategy. The weather can transform quickly. Can you modify this document?"
+  },
+  {
+    "id": 54,
+    "repetitive_word": "cool",
+    "synonyms_used": ["chilly", "frosty", "refreshing"],
+    "input_text": "A cool breeze was blowing. The evening was cool and pleasant. I need a cool drink.",
+    "target_text": "A chilly breeze was blowing. The evening was frosty and pleasant. I need a refreshing drink."
+  },
+  {
+    "id": 55,
+    "repetitive_word": "eager",
+    "synonyms_used": ["keen", "enthusiastic", "anxious"],
+    "input_text": "The students were eager to learn. He was eager to start the new job. She has an eager mind.",
+    "target_text": "The students were keen to learn. He was enthusiastic to start the new job. She has an anxious mind."
+  },
+  {
+    "id": 56,
+    "repetitive_word": "fair",
+    "synonyms_used": ["just", "impartial", "equitable"],
+    "input_text": "The judge made a fair decision. We need a fair system for everyone. He is a fair employer.",
+    "target_text": "The judge made a just decision. We need an equitable system for everyone. He is an impartial employer."
+  },
+  {
+    "id": 57,
+    "repetitive_word": "go",
+    "synonyms_used": ["travel", "proceed", "move"],
+    "input_text": "We need to go now. Where should we go next? Let's go to the park.",
+    "target_text": "We need to move now. Where should we proceed next? Let's travel to the park."
+  },
+  {
+    "id": 58,
+    "repetitive_word": "hard",
+    "synonyms_used": ["difficult", "challenging", "tough"],
+    "input_text": "This is a hard puzzle. The job was harder than I thought. Life can be hard sometimes.",
+    "target_text": "This is a difficult puzzle. The job was more challenging than I thought. Life can be tough sometimes."
+  },
+  {
+    "id": 59,
+    "repetitive_word": "hate",
+    "synonyms_used": ["despise", "detest", "loathe"],
+    "input_text": "I hate waking up early. She seems to hate her job. They hate injustice.",
+    "target_text": "I despise waking up early. She seems to detest her job. They loathe injustice."
+  },
+  {
+    "id": 60,
+    "repetitive_word": "hot",
+    "synonyms_used": ["scorching", "sweltering", "torrid"],
+    "input_text": "The desert is very hot during the day. Be careful, the plate is hot. It was a long, hot summer.",
+    "target_text": "The desert is very scorching during the day. Be careful, the plate is torrid. It was a long, sweltering summer."
+  },
+  {
+    "id": 61,
+    "repetitive_word": "hurt",
+    "synonyms_used": ["injure", "harm", "wound"],
+    "input_text": "Did you hurt your arm? His words hurt her feelings. Be careful not to hurt yourself.",
+    "target_text": "Did you injure your arm? His words harmed her feelings. Be careful not to wound yourself."
+  },
+  {
+    "id": 62,
+    "repetitive_word": "keep",
+    "synonyms_used": ["retain", "preserve", "maintain"],
+    "input_text": "You can keep the book. We must keep this a secret. It's important to keep records.",
+    "target_text": "You can retain the book. We must preserve this a secret. It's important to maintain records."
+  },
+  {
+    "id": 63,
+    "repetitive_word": "lazy",
+    "synonyms_used": ["idle", "slothful", "lethargic"],
+    "input_text": "He felt too lazy to cook. It was a lazy Sunday afternoon. The lazy dog slept all day.",
+    "target_text": "He felt too slothful to cook. It was an idle Sunday afternoon. The lethargic dog slept all day."
+  },
+  {
+    "id": 64,
+    "repetitive_word": "little",
+    "synonyms_used": ["tiny", "small", "minute"],
+    "input_text": "There's a little cat in the garden. I have a little bit of time. Every little detail matters.",
+    "target_text": "There's a small cat in the garden. I have a tiny bit of time. Every minute detail matters."
+  },
+  {
+    "id": 65,
+    "repetitive_word": "move",
+    "synonyms_used": ["shift", "relocate", "transfer"],
+    "input_text": "We need to move the table. Are you going to move to a new city? Let's move this to the agenda.",
+    "target_text": "We need to shift the table. Are you going to relocate to a new city? Let's transfer this to the agenda."
+  },
+  {
+    "id": 66,
+    "repetitive_word": "new",
+    "synonyms_used": ["fresh", "modern", "novel"],
+    "input_text": "I bought a new car. This is a new approach to the problem. She has a new job.",
+    "target_text": "I bought a modern car. This is a novel approach to the problem. She has a fresh job."
+  },
+  {
+    "id": 67,
+    "repetitive_word": "part",
+    "synonyms_used": ["section", "portion", "segment"],
+    "input_text": "This is the best part of the movie. A large part of the budget was cut. He played a small part in the play.",
+    "target_text": "This is the best section of the movie. A large portion of the budget was cut. He played a small segment in the play."
+  },
+  {
+    "id": 68,
+    "repetitive_word": "place",
+    "synonyms_used": ["location", "spot", "venue"],
+    "input_text": "This is a beautiful place. Let's find a place to eat. The conference will be at a new place.",
+    "target_text": "This is a beautiful location. Let's find a spot to eat. The conference will be at a new venue."
+  },
+  {
+    "id": 69,
+    "repetitive_word": "poor",
+    "synonyms_used": ["destitute", "impoverished", "needy"],
+    "input_text": "The family was very poor. He had a poor upbringing. The charity helps poor children.",
+    "target_text": "The family was very destitute. He had an impoverished upbringing. The charity helps needy children."
+  },
+  {
+    "id": 70,
+    "repetitive_word": "right",
+    "synonyms_used": ["correct", "proper", "suitable"],
+    "input_text": "That's the right answer. Is this the right way to do it? You made the right choice.",
+    "target_text": "That's the correct answer. Is this the proper way to do it? You made the suitable choice."
+  },
+  {
+    "id": 71,
+    "repetitive_word": "say",
+    "synonyms_used": ["state", "declare", "utter"],
+    "input_text": "What did you say? He didn't say a word. Let me say this clearly.",
+    "target_text": "What did you utter? He didn't state a word. Let me declare this clearly."
+  },
+  {
+    "id": 72,
+    "repetitive_word": "see",
+    "synonyms_used": ["glimpse", "witness", "observe"],
+    "input_text": "Did you see what happened? I want to see the new exhibit. Let's see if it works.",
+    "target_text": "Did you glimpse what happened? I want to observe the new exhibit. Let's witness if it works."
+  },
+  {
+    "id": 73,
+    "repetitive_word": "slow",
+    "synonyms_used": ["leisurely", "unhurried", "gradual"],
+    "input_text": "The traffic was very slow. It was a slow process. He is a slow walker.",
+    "target_text": "The traffic was very gradual. It was an unhurried process. He is a leisurely walker."
+  },
+  {
+    "id": 74,
+    "repetitive_word": "stop",
+    "synonyms_used": ["cease", "halt", "discontinue"],
+    "input_text": "Please stop making that noise. The rain will stop soon. We had to stop the experiment.",
+    "target_text": "Please cease making that noise. The rain will halt soon. We had to discontinue the experiment."
+  },
+  {
+    "id": 75,
+    "repetitive_word": "story",
+    "synonyms_used": ["tale", "narrative", "account"],
+    "input_text": "He told us a fascinating story. The book contains a collection of short story entries. What is your side of the story?",
+    "target_text": "He told us a fascinating tale. The book contains a collection of short narrative entries. What is your side of the account?"
+  },
+  {
+    "id": 76,
+    "repetitive_word": "stupid",
+    "synonyms_used": ["foolish", "unintelligent", "senseless"],
+    "input_text": "That was a stupid mistake. It was a stupid thing to say. I felt stupid for believing him.",
+    "target_text": "That was a foolish mistake. It was a senseless thing to say. I felt unintelligent for believing him."
+  },
+  {
+    "id": 77,
+    "repetitive_word": "take",
+    "synonyms_used": ["seize", "grab", "capture"],
+    "input_text": "You should take the opportunity. The army will take the city. Please take a seat.",
+    "target_text": "You should seize the opportunity. The army will capture the city. Please grab a seat."
+  },
+  {
+    "id": 78,
+    "repetitive_word": "think",
+    "synonyms_used": ["believe", "consider", "ponder"],
+    "input_text": "I think you are right. Let me think about it. What do you think of this plan?",
+    "target_text": "I believe you are right. Let me ponder it. What do you consider of this plan?"
+  },
+  {
+    "id": 79,
+    "repetitive_word": "tired",
+    "synonyms_used": ["exhausted", "fatigued", "weary"],
+    "input_text": "I am so tired from work. The long journey made them tired. She looked tired and pale.",
+    "target_text": "I am so exhausted from work. The long journey made them fatigued. She looked weary and pale."
+  },
+  {
+    "id": 80,
+    "repetitive_word": "try",
+    "synonyms_used": ["attempt", "endeavor", "strive"],
+    "input_text": "I will try my best. Let's try a different approach. You should try to be on time.",
+    "target_text": "I will endeavor my best. Let's attempt a different approach. You should strive to be on time."
+  },
+  {
+    "id": 81,
+    "repetitive_word": "ugly",
+    "synonyms_used": ["unattractive", "hideous", "grotesque"],
+    "input_text": "It was an ugly building. The monster in the story was ugly. He wore an ugly sweater.",
+    "target_text": "It was an unattractive building. The monster in the story was hideous. He wore a grotesque sweater."
+  },
+  {
+    "id": 82,
+    "repetitive_word": "want",
+    "synonyms_used": ["desire", "crave", "wish"],
+    "input_text": "I want a new phone. What do you want for dinner? They want to travel the world.",
+    "target_text": "I desire a new phone. What do you wish for dinner? They crave to travel the world."
+  },
+  {
+    "id": 83,
+    "repetitive_word": "wonderful",
+    "synonyms_used": ["marvelous", "fantastic", "superb"],
+    "input_text": "We had a wonderful vacation. The food was wonderful. What a wonderful surprise!",
+    "target_text": "We had a marvelous vacation. The food was fantastic. What a superb surprise!"
+  },
+  {
+    "id": 84,
+    "repetitive_word": "ask",
+    "synonyms_used": ["inquire", "question", "request"],
+    "input_text": "I need to ask you something. Can I ask for your help? The police will ask him some questions.",
+    "target_text": "I need to inquire about something. Can I request your help? The police will question him."
+  },
+  {
+    "id": 85,
+    "repetitive_word": "break",
+    "synonyms_used": ["fracture", "shatter", "rupture"],
+    "input_text": "Be careful not to break the glass. He managed to break the record. The dam is about to break.",
+    "target_text": "Be careful not to shatter the glass. He managed to fracture the record. The dam is about to rupture."
+  },
+  {
+    "id": 86,
+    "repetitive_word": "cut",
+    "synonyms_used": ["slice", "sever", "chop"],
+    "input_text": "Please cut the bread. He cut the rope with a knife. We need to cut the budget.",
+    "target_text": "Please slice the bread. He severed the rope with a knife. We need to chop the budget."
+  },
+  {
+    "id": 87,
+    "repetitive_word": "do",
+    "synonyms_used": ["perform", "execute", "accomplish"],
+    "input_text": "I have a lot of work to do. What did you do over the weekend? Let's do this task first.",
+    "target_text": "I have a lot of work to accomplish. What did you perform over the weekend? Let's execute this task first."
+  },
+  {
+    "id": 88,
+    "repetitive_word": "eat",
+    "synonyms_used": ["consume", "devour", "ingest"],
+    "input_text": "What time do you usually eat dinner? The lion will eat the entire prey. It's not healthy to eat too fast.",
+    "target_text": "What time do you usually consume dinner? The lion will devour the entire prey. It's not healthy to ingest too fast."
+  },
+  {
+    "id": 89,
+    "repetitive_word": "fall",
+    "synonyms_used": ["drop", "descend", "plummet"],
+    "input_text": "Leaves fall from the trees in autumn. The temperature will fall tonight. He was afraid he would fall.",
+    "target_text": "Leaves drop from the trees in autumn. The temperature will descend tonight. He was afraid he would plummet."
+  },
+  {
+    "id": 90,
+    "repetitive_word": "fly",
+    "synonyms_used": ["soar", "glide", "hover"],
+    "input_text": "Birds can fly high in the sky. I will fly to London tomorrow. The eagle can fly for hours.",
+    "target_text": "Birds can soar high in the sky. I will glide to London tomorrow. The eagle can hover for hours."
+  },
+  {
+    "id": 91,
+    "repetitive_word": "give",
+    "synonyms_used": ["provide", "offer", "present"],
+    "input_text": "Can you give me that book? They will give a prize to the winner. Let me give you some advice.",
+    "target_text": "Can you provide me with that book? They will present a prize to the winner. Let me offer you some advice."
+  },
+  {
+    "id": 92,
+    "repetitive_word": "know",
+    "synonyms_used": ["realize", "recognize", "understand"],
+    "input_text": "I know the answer. Do you know who he is? It's important to know the rules.",
+    "target_text": "I recognize the answer. Do you realize who he is? It's important to understand the rules."
+  },
+  {
+    "id": 93,
+    "repetitive_word": "leave",
+    "synonyms_used": ["depart", "exit", "vacate"],
+    "input_text": "We have to leave now. Did you leave a message? Please leave the room.",
+    "target_text": "We have to depart now. Did you exit a message? Please vacate the room."
+  },
+  {
+    "id": 94,
+    "repetitive_word": "live",
+    "synonyms_used": ["reside", "inhabit", "dwell"],
+    "input_text": "Where do you live? Many animals live in the forest. I want to live a happy life.",
+    "target_text": "Where do you reside? Many animals inhabit the forest. I want to dwell in a happy life."
+  },
+  {
+    "id": 95,
+    "repetitive_word": "plan",
+    "synonyms_used": ["strategy", "scheme", "blueprint"],
+    "input_text": "We need a solid plan. The architect showed us the plan for the new building. What is your plan for the future?",
+    "target_text": "We need a solid strategy. The architect showed us the blueprint for the new building. What is your scheme for the future?"
+  },
+  {
+    "id": 96,
+    "repetitive_word": "play",
+    "synonyms_used": ["perform", "engage in", "participate in"],
+    "input_text": "The children love to play outside. He will play the main role in the movie. Let's play a game of chess.",
+    "target_text": "The children love to engage in activities outside. He will perform the main role in the movie. Let's participate in a game of chess."
+  },
+  {
+    "id": 97,
+    "repetitive_word": "put",
+    "synonyms_used": ["place", "set", "position"],
+    "input_text": "Please put the book on the table. Where did you put my keys? Let's put this matter to a vote.",
+    "target_text": "Please place the book on the table. Where did you position my keys? Let's set this matter to a vote."
+  },
+  {
+    "id": 98,
+    "repetitive_word": "read",
+    "synonyms_used": ["peruse", "scan", "study"],
+    "input_text": "I like to read books. Can you read this for me? He can read music.",
+    "target_text": "I like to peruse books. Can you scan this for me? He can study music."
+  },
+  {
+    "id": 99,
+    "repetitive_word": "talk",
+    "synonyms_used": ["speak", "converse", "chat"],
+    "input_text": "We need to talk about the project. I heard them talk in the hallway. Let's talk over coffee.",
+    "target_text": "We need to speak about the project. I heard them converse in the hallway. Let's chat over coffee."
+  },
+  {
+    "id": 100,
+    "repetitive_word": "walk",
+    "synonyms_used": ["stroll", "amble", "trek"],
+    "input_text": "I like to walk in the park. It's a long walk to the station. Let's walk instead of driving.",
+    "target_text": "I like to stroll in the park. It's a long trek to the station. Let's amble instead of driving."
+  },
+  {
+    "id": 101,
+    "repetitive_word": "easy",
+    "synonyms_used": ["simple", "effortless", "straightforward"],
+    "input_text": "The first question was very easy. He found the test easy in general. The final part was the most easy of all.",
+    "target_text": "The first question was very simple. He found the test straightforward in general. The final part was the most effortless of all."
+  },
+  {
+    "id": 102,
+    "repetitive_word": "job",
+    "synonyms_used": ["task", "role", "assignment"],
+    "input_text": "He had a difficult job to complete. His main job was to organize the files. This job required a lot of attention.",
+    "target_text": "He had a difficult task to complete. His main role was to organize the files. This assignment required a lot of attention."
+  },
+  {
+    "id": 103,
+    "repetitive_word": "powerful",
+    "synonyms_used": ["mighty", "potent", "dominant"],
+    "input_text": "The king was a powerful ruler. The new engine is very powerful. It was a powerful speech that moved the crowd.",
+    "target_text": "The king was a mighty ruler. The new engine is very potent. It was a dominant speech that moved the crowd."
+  },
+  {
+    "id": 104,
+    "repetitive_word": "answer",
+    "synonyms_used": ["response", "reply", "solution"],
+    "input_text": "I'm still waiting for an answer. Her answer was not what I expected. We need to find the answer to this riddle.",
+    "target_text": "I'm still waiting for a response. Her reply was not what I expected. We need to find the solution to this riddle."
+  },
+  {
+    "id": 105,
+    "repetitive_word": "perfect",
+    "synonyms_used": ["flawless", "ideal", "superb"],
+    "input_text": "She drew a perfect circle. The weather was perfect for a picnic. His performance was absolutely perfect.",
+    "target_text": "She drew a flawless circle. The weather was ideal for a picnic. His performance was absolutely superb."
+  },
+  {
+    "id": 106,
+    "repetitive_word": "quick",
+    "synonyms_used": ["swift", "rapid", "prompt"],
+    "input_text": "He made a quick decision. The fox is a quick animal. We need a quick response to the email.",
+    "target_text": "He made a swift decision. The fox is a rapid animal. We need a prompt response to the email."
+  },
+  {
+    "id": 107,
+    "repetitive_word": "shout",
+    "synonyms_used": ["yell", "scream", "bellow"],
+    "input_text": "There is no need to shout. I heard a loud shout from across the street. He had to shout to be heard over the music.",
+    "target_text": "There is no need to yell. I heard a loud scream from across the street. He had to bellow to be heard over the music."
+  },
+  {
+    "id": 108,
+    "repetitive_word": "strange",
+    "synonyms_used": ["unusual", "odd", "bizarre"],
+    "input_text": "He had a strange look on his face. I heard a strange noise last night. The story she told was very strange.",
+    "target_text": "He had an unusual look on his face. I heard an odd noise last night. The story she told was very bizarre."
+  },
+  {
+    "id": 109,
+    "repetitive_word": "thoughtful",
+    "synonyms_used": ["considerate", "attentive", "caring"],
+    "input_text": "It was very thoughtful of you to bring flowers. He is a thoughtful and quiet person. She gave him a thoughtful gift.",
+    "target_text": "It was very considerate of you to bring flowers. He is an attentive and quiet person. She gave him a caring gift."
+  },
+  {
+    "id": 110,
+    "repetitive_word": "weak",
+    "synonyms_used": ["feeble", "fragile", "frail"],
+    "input_text": "He felt weak after the illness. The bridge structure is weak. Her argument was very weak.",
+    "target_text": "He felt feeble after the illness. The bridge structure is fragile. Her argument was very frail."
+  },
+  {
+    "id": 111,
+    "repetitive_word": "large",
+    "synonyms_used": ["vast", "immense", "colossal"],
+    "input_text": "They live in a large house. A large number of people attended. The project was a large undertaking.",
+    "target_text": "They live in an immense house. A vast number of people attended. The project was a colossal undertaking."
+  },
+  {
+    "id": 112,
+    "repetitive_word": "pretty",
+    "synonyms_used": ["lovely", "charming", "attractive"],
+    "input_text": "She wore a pretty dress to the party. The cottage had a pretty little garden. What a pretty melody!",
+    "target_text": "She wore a lovely dress to the party. The cottage had a charming little garden. What an attractive melody!"
+  },
+  {
+    "id": 113,
+    "repetitive_word": "fear",
+    "synonyms_used": ["terror", "dread", "panic"],
+    "input_text": "His greatest fear was of failure. The sudden blackout caused widespread fear. She had to overcome her fear of heights.",
+    "target_text": "His greatest dread was of failure. The sudden blackout caused widespread panic. She had to overcome her terror of heights."
+  },
+  {
+    "id": 114,
+    "repetitive_word": "joy",
+    "synonyms_used": ["delight", "glee", "elation"],
+    "input_text": "Her face was filled with joy. It was a joy to watch the children play. Winning the championship brought him pure joy.",
+    "target_text": "Her face was filled with delight. It was a glee to watch the children play. Winning the championship brought him pure elation."
+  },
+  {
+    "id": 115,
+    "repetitive_word": "kind",
+    "synonyms_used": ["caring", "compassionate", "gentle"],
+    "input_text": "He had a kind heart. That was a very kind thing to do. She spoke in a kind voice.",
+    "target_text": "He had a caring heart. That was a very compassionate thing to do. She spoke in a gentle voice."
+  },
+  {
+    "id": 116,
+    "repetitive_word": "laugh",
+    "synonyms_used": ["chuckle", "giggle", "snicker"],
+    "input_text": "His joke made everyone laugh. I heard a quiet laugh from the back of the room. She tried not to laugh.",
+    "target_text": "His joke made everyone chuckle. I heard a quiet giggle from the back of the room. She tried not to snicker."
+  },
+  {
+    "id": 117,
+    "repetitive_word": "mean",
+    "synonyms_used": ["cruel", "malicious", "spiteful"],
+    "input_text": "That was a mean thing to say to her. The villain in the story was a mean character. He had a mean streak.",
+    "target_text": "That was a cruel thing to say to her. The villain in the story was a malicious character. He had a spiteful streak."
+  },
+  {
+    "id": 118,
+    "repetitive_word": "need",
+    "synonyms_used": ["require", "necessitate", "demand"],
+    "input_text": "We need more time to finish. The plants need water. This project will need careful planning.",
+    "target_text": "We require more time to finish. The plants demand water. This project will necessitate careful planning."
+  },
+  {
+    "id": 119,
+    "repetitive_word": "push",
+    "synonyms_used": ["shove", "press", "propel"],
+    "input_text": "You have to push the door to open it. Don't push me. The wind will push the boat to shore.",
+    "target_text": "You have to press the door to open it. Don't shove me. The wind will propel the boat to shore."
+  },
+  {
+    "id": 120,
+    "repetitive_word": "rest",
+    "synonyms_used": ["relax", "repose", "unwind"],
+    "input_text": "You look tired, you should get some rest. Let's take a rest before we continue. The doctor told him to rest for a week.",
+    "target_text": "You look tired, you should relax. Let's repose before we continue. The doctor told him to unwind for a week."
+  },
+  {
+    "id": 121,
+    "repetitive_word": "same",
+    "synonyms_used": ["identical", "equivalent", "alike"],
+    "input_text": "We have the same car. The twins wore the same outfits. The results were the same both times.",
+    "target_text": "We have identical cars. The twins wore alike outfits. The results were equivalent both times."
+  },
+  {
+    "id": 122,
+    "repetitive_word": "secret",
+    "synonyms_used": ["confidential", "hidden", "covert"],
+    "input_text": "Can you keep a secret? The location is a closely guarded secret. There was a secret passage behind the bookcase.",
+    "target_text": "Can you keep a confidential matter? The location is a closely guarded hidden detail. There was a covert passage behind the bookcase."
+  },
+  {
+    "id": 123,
+    "repetitive_word": "sharp",
+    "synonyms_used": ["keen", "acute", "pointed"],
+    "input_text": "The knife has a very sharp edge. He has a sharp mind. The bird has a sharp beak.",
+    "target_text": "The knife has a very keen edge. He has an acute mind. The bird has a pointed beak."
+  },
+  {
+    "id": 124,
+    "repetitive_word": "shy",
+    "synonyms_used": ["timid", "bashful", "reserved"],
+    "input_text": "The little girl was very shy around strangers. He's too shy to speak in public. She gave a shy smile.",
+    "target_text": "The little girl was very timid around strangers. He's too bashful to speak in public. She gave a reserved smile."
+  },
+  {
+    "id": 125,
+    "repetitive_word": "sleep",
+    "synonyms_used": ["slumber", "doze", "nap"],
+    "input_text": "I need to get some sleep. The cat likes to sleep in the sun. He began to sleep on the couch.",
+    "target_text": "I need to get some slumber. The cat likes to doze in the sun. He began to nap on the couch."
+  },
+  {
+    "id": 126,
+    "repetitive_word": "smell",
+    "synonyms_used": ["aroma", "scent", "odor"],
+    "input_text": "I love the smell of baking bread. What is that strange smell? The flower has a sweet smell.",
+    "target_text": "I love the aroma of baking bread. What is that strange odor? The flower has a sweet scent."
+  },
+  {
+    "id": 127,
+    "repetitive_word": "soft",
+    "synonyms_used": ["gentle", "pliable", "tender"],
+    "input_text": "The kitten's fur was very soft. She spoke in a soft voice. The clay was soft and easy to shape.",
+    "target_text": "The kitten's fur was very tender. She spoke in a gentle voice. The clay was pliable and easy to shape."
+  },
+  {
+    "id": 128,
+    "repetitive_word": "special",
+    "synonyms_used": ["unique", "distinctive", "exceptional"],
+    "input_text": "This is a very special occasion. The ring has a special design. She has a special talent for music.",
+    "target_text": "This is a very unique occasion. The ring has a distinctive design. She has an exceptional talent for music."
+  },
+  {
+    "id": 129,
+    "repetitive_word": "sure",
+    "synonyms_used": ["certain", "confident", "positive"],
+    "input_text": "Are you sure about that? I am sure I locked the door. He was sure he would win.",
+    "target_text": "Are you certain about that? I am positive I locked the door. He was confident he would win."
+  },
+  {
+    "id": 130,
+    "repetitive_word": "thick",
+    "synonyms_used": ["dense", "heavy", "substantial"],
+    "input_text": "The book is very thick. We walked through a thick forest. She has thick, curly hair.",
+    "target_text": "The book is very substantial. We walked through a dense forest. She has heavy, curly hair."
+  },
+  {
+    "id": 131,
+    "repetitive_word": "thin",
+    "synonyms_used": ["slender", "slim", "lean"],
+    "input_text": "The ice was too thin to walk on. He was a tall, thin man. She cut a thin slice of cake.",
+    "target_text": "The ice was too slim to walk on. He was a tall, lean man. She cut a slender slice of cake."
+  },
+  {
+    "id": 132,
+    "repetitive_word": "tiny",
+    "synonyms_used": ["minute", "minuscule", "microscopic"],
+    "input_text": "I found a tiny spider in the bathroom. The model was a tiny replica of the city. There was a tiny flaw in the diamond.",
+    "target_text": "I found a minuscule spider in the bathroom. The model was a minute replica of the city. There was a microscopic flaw in the diamond."
+  },
+  {
+    "id": 133,
+    "repetitive_word": "trip",
+    "synonyms_used": ["journey", "excursion", "voyage"],
+    "input_text": "We went on a trip to the mountains. The business trip was very successful. It was a long trip to the island.",
+    "target_text": "We went on an excursion to the mountains. The business journey was very successful. It was a long voyage to the island."
+  },
+  {
+    "id": 134,
+    "repetitive_word": "value",
+    "synonyms_used": ["worth", "importance", "significance"],
+    "input_text": "The antique has great monetary value. I understand the value of hard work. He doesn't seem to value our friendship.",
+    "target_text": "The antique has great monetary worth. I understand the importance of hard work. He doesn't seem to see the significance of our friendship."
+  },
+  {
+    "id": 135,
+    "repetitive_word": "wait",
+    "synonyms_used": ["stay", "remain", "linger"],
+    "input_text": "Please wait here for a moment. We had to wait for the train. I will wait until you are ready.",
+    "target_text": "Please stay here for a moment. We had to remain for the train. I will linger until you are ready."
+  },
+  {
+    "id": 136,
+    "repetitive_word": "warm",
+    "synonyms_used": ["balmy", "toasty", "cozy"],
+    "input_text": "The fire kept the room warm. It was a warm summer evening. She gave me a warm smile.",
+    "target_text": "The fire kept the room toasty. It was a balmy summer evening. She gave me a cozy smile."
+  },
+  {
+    "id": 137,
+    "repetitive_word": "watch",
+    "synonyms_used": ["observe", "view", "monitor"],
+    "input_text": "Let's watch a movie tonight. The detective had to watch the suspect. Scientists watch the stars through telescopes.",
+    "target_text": "Let's view a movie tonight. The detective had to monitor the suspect. Scientists observe the stars through telescopes."
+  },
+  {
+    "id": 138,
+    "repetitive_word": "way",
+    "synonyms_used": ["method", "manner", "approach"],
+    "input_text": "There must be another way to solve this. I like the way she sings. His way of thinking is very different.",
+    "target_text": "There must be another method to solve this. I like the manner in which she sings. His approach to thinking is very different."
+  },
+  {
+    "id": 139,
+    "repetitive_word": "wet",
+    "synonyms_used": ["damp", "soggy", "saturated"],
+    "input_text": "My clothes are all wet from the rain. The paint is still wet. Be careful, the floor is wet.",
+    "target_text": "My clothes are all damp from the rain. The paint is still soggy. Be careful, the floor is saturated."
+  },
+  {
+    "id": 140,
+    "repetitive_word": "win",
+    "synonyms_used": ["triumph", "prevail", "succeed"],
+    "input_text": "Everyone wants to win the competition. I hope our team will win. It's not about whether you win or lose.",
+    "target_text": "Everyone wants to triumph in the competition. I hope our team will prevail. It's not about whether you succeed or lose."
+  },
+  {
+    "id": 141,
+    "repetitive_word": "wise",
+    "synonyms_used": ["prudent", "sagacious", "judicious"],
+    "input_text": "My grandmother is a very wise woman. That was a wise decision. He gave me some wise advice.",
+    "target_text": "My grandmother is a very sagacious woman. That was a prudent decision. He gave me some judicious advice."
+  },
+  {
+    "id": 142,
+    "repetitive_word": "worry",
+    "synonyms_used": ["fret", "stress", "agonize"],
+    "input_text": "Don't worry about the small details. I always worry when she is late. There is no need to worry.",
+    "target_text": "Don't fret about the small details. I always stress when she is late. There is no need to agonize."
+  },
+  {
+    "id": 143,
+    "repetitive_word": "write",
+    "synonyms_used": ["compose", "draft", "inscribe"],
+    "input_text": "She likes to write poetry. Please write your name at the top. I need to write an email.",
+    "target_text": "She likes to compose poetry. Please inscribe your name at the top. I need to draft an email."
+  },
+  {
+    "id": 144,
+    "repetitive_word": "young",
+    "synonyms_used": ["youthful", "juvenile", "adolescent"],
+    "input_text": "The team is very young and talented. He is too young to understand. She has a very young spirit.",
+    "target_text": "The team is very youthful and talented. He is too juvenile to understand. She has a very adolescent spirit."
+  },
+  {
+    "id": 145,
+    "repetitive_word": "goal",
+    "synonyms_used": ["objective", "aim", "target"],
+    "input_text": "My main goal is to graduate. We must focus on the project's goal. He scored the winning goal.",
+    "target_text": "My main objective is to graduate. We must focus on the project's aim. He scored the winning target."
+  },
+  {
+    "id": 146,
+    "repetitive_word": "main",
+    "synonyms_used": ["principal", "primary", "chief"],
+    "input_text": "What is the main reason for your visit? The main character was very brave. Let's stick to the main topic.",
+    "target_text": "What is the principal reason for your visit? The primary character was very brave. Let's stick to the chief topic."
+  },
+  {
+    "id": 147,
+    "repetitive_word": "real",
+    "synonyms_used": ["genuine", "authentic", "actual"],
+    "input_text": "Is that a real diamond? We need to solve the real problem. This is a story about a real hero.",
+    "target_text": "Is that a genuine diamond? We need to solve the authentic problem. This is a story about an actual hero."
+  },
+  {
+    "id": 148,
+    "repetitive_word": "serious",
+    "synonyms_used": ["grave", "solemn", "critical"],
+    "input_text": "This is a serious matter. He had a serious look on his face. The patient is in a serious condition.",
+    "target_text": "This is a grave matter. He had a solemn look on his face. The patient is in a critical condition."
+  },
+  {
+    "id": 149,
+    "repetitive_word": "simple",
+    "synonyms_used": ["uncomplicated", "elementary", "basic"],
+    "input_text": "The instructions were very simple. He enjoys a simple life. Let's start with a simple example.",
+    "target_text": "The instructions were very uncomplicated. He enjoys a basic life. Let's start with an elementary example."
+  },
+  {
+    "id": 150,
+    "repetitive_word": "total",
+    "synonyms_used": ["complete", "entire", "absolute"],
+    "input_text": "It was a total disaster. The total cost was higher than expected. I have total confidence in you.",
+    "target_text": "It was a complete disaster. The entire cost was higher than expected. I have absolute confidence in you."
+  }
+]

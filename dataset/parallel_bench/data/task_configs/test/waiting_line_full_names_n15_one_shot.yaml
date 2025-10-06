@@ -1,0 +1,9 @@
+global_config:
+  words: first_last_names.yaml
+  num_samples: 100
+  samples_per_length: 
+    default: 100
+  icl_example_count: 1
+  min_length: 15
+  max_length: 15
+tasks: tasks/tasks_list_op_waiting_line.yaml

@@ -1,0 +1,9 @@
+global_config:
+  words: <ALPHABET_CHARS>
+  num_samples: 100
+  samples_per_length: 
+    repeat_each: 20
+    repeat_list: 20
+    default: 10
+  icl_example_count: 1
+tasks: tasks/tasks_list_op_copy_reverse.yaml

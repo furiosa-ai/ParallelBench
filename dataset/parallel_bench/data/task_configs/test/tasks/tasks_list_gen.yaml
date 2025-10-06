@@ -1,0 +1,8 @@
+
+domino:
+  type: domino
+  random_index: true
+  metric: domino_score
+  min_length: 3
+  max_length: 12
+  prompt: "Create a domino-style sequence of {length} 2-digit numbers, where each number begins with the last digit of the previous one. Start with {start}. Only provide the final answer."

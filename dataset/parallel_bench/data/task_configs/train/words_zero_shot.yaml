@@ -1,0 +1,9 @@
+global_config:
+  seed: 123
+  words: words.txt
+  num_samples: 30000
+  samples_per_length: 
+    repeat_each: 6000
+    repeat_list: 6000
+    default: 3000
+tasks: ../test/tasks/tasks_list_op.yaml
