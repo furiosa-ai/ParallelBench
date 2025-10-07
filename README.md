@@ -21,9 +21,9 @@
     <a href="https://parallelbench.github.io/">
         <img alt="Project" src="https://img.shields.io/static/v1?label=Project&message=Github&color=blue&logo=github-pages">
     </a>
-    <!-- <a href="https://arxiv.org/abs/TODO">
-        <img alt="arXiv" src="https://img.shields.io/badge/arXiv-TODO-b31b1b.svg">
-    </a> -->
+    <a href="https://arxiv.org/abs/2510.04767">
+        <img alt="arXiv" src="https://img.shields.io/badge/arXiv-2510.04767-b31b1b.svg">
+    </a>
 </p>
 
 <p align="center">
@@ -268,7 +268,15 @@ This project builds upon the work of several fantastic open-source repositories.
 - [RCR](https://github.com/autonomousvision/mdpo)
 - [Score-Entropy-Discrete-Diffusion](https://github.com/louaaron/Score-Entropy-Discrete-Diffusion)
 
-<!-- ## 📖 Citation
+## 📖 Citation
 ```bibtex
-TODO
-``` -->
+@misc{kang2025parallelbench,
+      title={ParallelBench: Understanding the Trade-offs of Parallel Decoding in Diffusion LLMs}, 
+      author={Wonjun Kang and Kevin Galim and Seunghyuk Oh and Minjae Lee and Yuchen Zeng and Shuibai Zhang and Coleman Hooper and Yuezhou Hu and Hyung Il Koo and Nam Ik Cho and Kangwook Lee},
+      year={2025},
+      eprint={2510.04767},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2510.04767}, 
+}
+```
