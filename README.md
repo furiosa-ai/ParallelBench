@@ -270,13 +270,10 @@ This project builds upon the work of several fantastic open-source repositories.
 
 ## 📖 Citation
 ```bibtex
-@misc{kang2025parallelbench,
-      title={ParallelBench: Understanding the Trade-offs of Parallel Decoding in Diffusion LLMs}, 
-      author={Wonjun Kang and Kevin Galim and Seunghyuk Oh and Minjae Lee and Yuchen Zeng and Shuibai Zhang and Coleman Hooper and Yuezhou Hu and Hyung Il Koo and Nam Ik Cho and Kangwook Lee},
-      year={2025},
-      eprint={2510.04767},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2510.04767}, 
+@article{kang2025parallelbench,
+  title={ParallelBench: Understanding the Trade-offs of Parallel Decoding in Diffusion LLMs},
+  author={Kang, Wonjun and Galim, Kevin and Oh, Seunghyuk and Lee, Minjae and Zeng, Yuchen and Zhang, Shuibai and Hooper, Coleman and Hu, Yuezhou and Koo, Hyung Il and Cho, Nam Ik and others},
+  journal={arXiv preprint arXiv:2510.04767},
+  year={2025}
 }
 ```
