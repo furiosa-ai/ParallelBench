@@ -1,7 +1,7 @@
 # ParallelBench: Understanding the Tradeoffs of Parallel Decoding in Diffusion LLMs
 
 <p align="center">
-<img src = "docs/banner.png" width="100%" height="auto">
+<img src = "docs/banner.png" width="70%" height="auto">
 </p>
 
 <p align="center">
