@@ -29,33 +29,31 @@
     </a>
 </p>
 
-
-## 🚀 Overview
-<p align="center">
-<img src = "docs/teaser.png" width="100%" height="auto">
-</p>
-Diffusion LLMs (dLLMs) promise faster generation via parallel decoding. However, this speed often comes at the cost of quality, as they ignore token dependencies, an issue that existing benchmarks do not sufficiently capture. To address this issue, we introduce **ParallelBench**, the first benchmark designed to rigorously test this trade-off through realistic tasks that humans and autoregressive (AR) LLMs can easily solve, but which cause dLLMs to collapse as parallelism grows. We release **ParallelBench** to drive research towards truly efficient dLLMs that can overcome this challenge.
-
-<!-- <details>
-<summary>📝 <b>Abstract</b></summary>
-While most autoregressive LLMs are constrained to one-by-one decoding, diffusion LLMs (dLLMs) have attracted growing interest for their potential to dramatically accelerate inference through parallel decoding. Despite this promise, the conditional independence assumption in dLLMs causes parallel decoding to ignore token dependencies, inevitably degrading generation quality when these dependencies are strong. However, existing works largely overlook these inherent challenges, and evaluations on standard benchmarks (e.g., math and coding) are not sufficient to capture the quality degradation caused by parallel decoding. To address this gap, we first provide an information-theoretic analysis of parallel decoding. We then conduct case studies on analytically tractable synthetic list operations from both data distribution and decoding strategy perspectives, offering quantitative insights that highlight the fundamental limitations of parallel decoding. Building on these insights, we propose **ParallelBench**, the first benchmark specifically designed for dLLMs, featuring realistic tasks that are trivial for humans and autoregressive LLMs yet exceptionally challenging for dLLMs under parallel decoding. Using ParallelBench, we systematically analyze both dLLMs and autoregressive LLMs, revealing that: (i) dLLMs under parallel decoding can suffer dramatic quality degradation in real-world scenarios, and (ii) current parallel decoding strategies struggle to adapt their degree of parallelism based on task difficulty, thus failing to achieve meaningful speedup without compromising quality. Our findings underscore the pressing need for innovative decoding methods that can overcome the current speed-quality trade-off. We are releasing our benchmark to help accelerate the development of truly efficient dLLMs.
-</details> -->
-
 ## 📢 Updates
 
 - **Jan 25, 2026** Paper accepted at ICLR 2026!
 - **Oct 6, 2025** ParallelBench release!
 
-## 🌟 Features
+## 🚀 Overview
+<p align="center">
+<img src = "docs/teaser.png" width="100%" height="auto">
+</p>
+
+Diffusion LLMs (dLLMs) promise faster generation via parallel decoding. However, this speed often comes at the cost of quality, as they ignore token dependencies, an issue that existing benchmarks do not sufficiently capture. To address this issue, we introduce **ParallelBench**, the first benchmark designed to rigorously test this trade-off through realistic tasks that humans and autoregressive (AR) LLMs can easily solve, but which cause dLLMs to collapse as parallelism grows. We release **ParallelBench** to drive research towards truly efficient dLLMs that can overcome this challenge.
+
+### Features
 
 - **Information-Theoretic Analysis:**
-Proves that parallel decoding has fundamental error bounds when tokens depend on each other, showing even perfect models struggle as we increase parallelism on tasks requiring strong token coordination.
+We derive error bounds on parallel decoding for tasks with inter-token dependencies. Even an optimal model sees accuracy degrade as parallelism grows.
+<!--  Proves that parallel decoding has fundamental error bounds when tokens depend on each other, showing even perfect models struggle as we increase parallelism on tasks requiring strong token coordination. -->
 
 - **Quantitative Case Studies:**
-Analytically tractable synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas demonstrate fundamental limitations: specific tasks show inevitable quality degradation under parallel decoding.
+Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas pin down exactly where and how parallel decoding breaks.
+<!-- Analytically tractable synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas demonstrate fundamental limitations: specific tasks show inevitable quality degradation under parallel decoding.-->
 
 - **Realistic Benchmark Tasks:**
-17 tasks across Waiting Line, Text Writing, and Puzzles—all trivial for humans and AR LLMs—reveal severe quality degradation in dLLMs under parallel decoding in real-world scenarios.
+17 tasks across three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily, but expose clear quality drops in dLLMs under parallel decoding.
+<!-- 17 tasks across Waiting Line, Text Writing, and Puzzles—all trivial for humans and AR LLMs—reveal severe quality degradation in dLLMs under parallel decoding in real-world scenarios. -->
 
 
 ## ⚙️ Setup
