@@ -4,9 +4,6 @@
 <img src = "docs/banner.png" width="100%" height="auto">
 </p>
 
-<hr> <br>
-
-
 <p align="center">
       <a href="https://scholar.google.com/citations?user=Q-ARWkwAAAAJ&hl=eh" target="_blank">Wonjun Kang</a><sup>*1,5</sup>, 
       <a href="https://scholar.google.com/citations?user=G1EpeWYAAAAJ&hl=en" target="_blank">Kevin Galim</a><sup>*1</sup>, 
