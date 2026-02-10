@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from enum import Enum
 import functools
@@ -9,7 +8,11 @@ import torch
 import torch.nn.functional as F
 
 from model.base_model import BaseModel, DLLMOutput
-from model.model_utils import decode_history, compute_decoding_order_correlation_from_history
+from model.model_utils import (
+    decode_history,
+    compute_decoding_order_correlation_from_history,
+)
+from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
 from utils.utils import insert_import_path
 
@@ -20,9 +23,9 @@ with insert_import_path("src/Score-Entropy-Discrete-Diffusion"):
 
 
 class SeddPredictorType(str, Enum):
-    NONE = 'none'
-    EULER = 'euler'
-    ANALYTIC = 'analytic'
+    NONE = "none"
+    EULER = "euler"
+    ANALYTIC = "analytic"
 
 
 @dataclass
@@ -49,20 +52,23 @@ class SeddGenerationConfig:
     #     return self.max_tokens // self.block_length
 
     def __post_init__(self):
-        assert self.block_length is None or self.block_length == self.max_tokens, "Block length must be equal to max tokens if specified."
+        assert self.block_length is None or self.block_length == self.max_tokens, (
+            "Block length must be equal to max tokens if specified."
+        )
         assert self.temperature == 1.0
 
 
+@ModelRegistry.register(lambda name: "sedd" in name)
 class SeddModel(BaseModel):
     def __init__(self, model_name, accel_framework=None):
-        assert  accel_framework is None
+        assert accel_framework is None
 
         self.device = torch.device("cuda")
         self.model, self.graph, self.noise = load_model(model_name, self.device)
         self.model.eval()
         # self.model = torch.compile(self.model, mode="reduce-overhead", fullgraph=False, dynamic=True)
 
-        self.tokenizer = GPT2TokenizerFast.from_pretrained('gpt2')
+        self.tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
         self.accel_framework = accel_framework
 
@@ -78,7 +84,16 @@ class SeddModel(BaseModel):
             return x
 
         batch_dims = (1, input_ids.shape[1] + gen_config.max_tokens)
-        sampling_fn = sampling.get_pc_sampler(self.graph, self.noise, batch_dims, gen_config.predictor, gen_config.steps, denoise=True, device=self.device, proj_fun=proj_fun)
+        sampling_fn = sampling.get_pc_sampler(
+            self.graph,
+            self.noise,
+            batch_dims,
+            gen_config.predictor,
+            gen_config.steps,
+            denoise=True,
+            device=self.device,
+            proj_fun=proj_fun,
+        )
 
         input_output_ids = sampling_fn(self.model)
         nfe = gen_config.steps
@@ -92,19 +107,27 @@ class SeddModel(BaseModel):
             prompt = "\n\n".join(m["content"] for m in messages) + "\n\n"
         else:
             prompt = messages
-        
-        input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(self.device)
-        gen_config = SeddGenerationConfig(accel_framework=self.accel_framework, **gen_config)
 
-        input_output_ids, nfe, history = self.model_generate(input_ids, gen_config, output_history=output_history)
-        output_ids = input_output_ids[:, input_ids.shape[1]:]
+        input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
+            self.device
+        )
+        gen_config = SeddGenerationConfig(
+            accel_framework=self.accel_framework, **gen_config
+        )
+
+        input_output_ids, nfe, history = self.model_generate(
+            input_ids, gen_config, output_history=output_history
+        )
+        output_ids = input_output_ids[:, input_ids.shape[1] :]
 
         output = self.tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
 
         # assert not (output_history and history is None), "History should not be None if output_history is True."
 
         if history is not None:
-            decoding_order, decoding_order_corrs = compute_decoding_order_correlation_from_history(self.tokenizer, history)
+            decoding_order, decoding_order_corrs = (
+                compute_decoding_order_correlation_from_history(self.tokenizer, history)
+            )
         else:
             decoding_order, decoding_order_corrs = None, None
 

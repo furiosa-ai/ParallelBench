@@ -1,6 +1,6 @@
-
 from dataclasses import dataclass
 from model.base_model import BaseModel, DLLMOutput
+from model.registry import ModelRegistry
 
 
 @dataclass
@@ -10,6 +10,7 @@ class AnthropicGenerationConfig:
 
 
 # export ANTHROPIC_API_KEY='your-api-key-here'
+@ModelRegistry.register(lambda name: name.startswith("claude-"))
 class AnthropicModel(BaseModel):
     def __init__(self, model_name):
         import anthropic
@@ -46,5 +47,5 @@ class AnthropicModel(BaseModel):
             output_ids=None,
             pad_token_id=None,
             nfe=0,
-            history=None
+            history=None,
         )

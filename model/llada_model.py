@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from enum import Enum
 import functools
@@ -10,7 +9,11 @@ import torch.nn.functional as F
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
 from model.base_model import BaseModel, DLLMOutput
-from model.model_utils import decode_history, compute_decoding_order_correlation_from_history
+from model.model_utils import (
+    decode_history,
+    compute_decoding_order_correlation_from_history,
+)
+from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
 from utils.utils import insert_import_path
 
@@ -86,7 +89,7 @@ FAST_DLLM_PATH = "src/Fast_dLLM/llada"
 #     nfe = 0
 #     for num_block in range(num_blocks):
 #         block_mask_index = (x[:, prompt.shape[1] + num_block * block_length: prompt.shape[1] + (num_block + 1) * block_length:] == mask_id)
-        
+
 #         # compute the number of tokens to unmask at each step
 #         num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps)
 #         for i in range(steps):
@@ -105,7 +108,7 @@ FAST_DLLM_PATH = "src/Fast_dLLM/llada"
 
 #             # sample from logits
 #             logits_with_noise = add_gumbel_noise(logits, temperature=temperature)
-            
+
 #             # selected ids
 #             x0 = torch.argmax(logits_with_noise, dim=-1) # b, l
 
@@ -119,8 +122,8 @@ FAST_DLLM_PATH = "src/Fast_dLLM/llada"
 #             elif remasking == 'topk_margin':
 #                 sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
 #                 # Extract top1 and top2 probabilities
-#                 top1_probs = sorted_probs[..., 0] 
-#                 top2_probs = sorted_probs[..., 1] 
+#                 top1_probs = sorted_probs[..., 0]
+#                 top2_probs = sorted_probs[..., 1]
 #                 # Calculate confidence as top1 - top2
 #                 x0_p = top1_probs - top2_probs
 #             elif remasking == 'entropy':
@@ -153,27 +156,26 @@ FAST_DLLM_PATH = "src/Fast_dLLM/llada"
 #     return x, nfe, history
 
 
-
 class LladaRemaskingStrategy(str, Enum):
-    LOW_CONFIDENCE = 'low_confidence'
-    RANDOM = 'random'
-    TOPK_MARGIN = 'topk_margin'
-    ENTROPY = 'entropy'
+    LOW_CONFIDENCE = "low_confidence"
+    RANDOM = "random"
+    TOPK_MARGIN = "topk_margin"
+    ENTROPY = "entropy"
 
     # fast-dllm specific
-    LOW_CONFIDENCE_THRESHOLD = 'low_confidence_threshold'
-    RANDOM_THRESHOLD = 'random_threshold'
-    TOPK_MARGIN_THRESHOLD = 'topk_margin_threshold'
-    ENTROPY_THRESHOLD = 'entropy_threshold'
+    LOW_CONFIDENCE_THRESHOLD = "low_confidence_threshold"
+    RANDOM_THRESHOLD = "random_threshold"
+    TOPK_MARGIN_THRESHOLD = "topk_margin_threshold"
+    ENTROPY_THRESHOLD = "entropy_threshold"
 
-    LOW_CONFIDENCE_FACTOR = 'low_confidence_factor'
-    RANDOM_FACTOR = 'random_factor'
-    TOPK_MARGIN_FACTOR = 'topk_margin_factor'
-    ENTROPY_FACTOR = 'entropy_factor'
+    LOW_CONFIDENCE_FACTOR = "low_confidence_factor"
+    RANDOM_FACTOR = "random_factor"
+    TOPK_MARGIN_FACTOR = "topk_margin_factor"
+    ENTROPY_FACTOR = "entropy_factor"
 
-    LOW_CONFIDENCE_RCR = 'low_confidence_rcr'
+    LOW_CONFIDENCE_RCR = "low_confidence_rcr"
 
-    LOW_CONFIDENCE_REMDM = 'low_confidence_remdm'
+    LOW_CONFIDENCE_REMDM = "low_confidence_remdm"
 
 
 @dataclass
@@ -188,7 +190,9 @@ class LladaGenerationConfig:
     block_length: int = 128
 
     # fast-dllm specific
-    fast_dllm_threshold: float = 0.9  # TODO assert none if not using LOW_CONFIDENCE_THRESHOLD
+    fast_dllm_threshold: float = (
+        0.9  # TODO assert none if not using LOW_CONFIDENCE_THRESHOLD
+    )
     fast_dllm_factor: Optional[float] = None
     fast_dllm_use_cache: bool = False
     fast_dllm_dual_cache: bool = False
@@ -201,26 +205,34 @@ class LladaGenerationConfig:
         return self.max_tokens // self.block_length
 
     def __post_init__(self):
-        assert self.steps is None or self.steps <= self.max_tokens, f"Steps must be less than or equal to max tokens. Got steps={self.steps}, max_tokens={self.max_tokens}"
-        assert self.max_tokens % self.block_length == 0, f"Max tokens must be divisible by block length. Got max_tokens={self.max_tokens}, block_length={self.block_length}"
-        assert self.steps is None or (self.steps % self.num_blocks == 0), f"Steps must be divisible by number of blocks. Got steps={self.steps}, num_blocks={self.num_blocks}"
-        assert self.remasking in list(LladaRemaskingStrategy), f"Remasking must be one of {list(LladaRemaskingStrategy)}, got {self.remasking}"
+        assert self.steps is None or self.steps <= self.max_tokens, (
+            f"Steps must be less than or equal to max tokens. Got steps={self.steps}, max_tokens={self.max_tokens}"
+        )
+        assert self.max_tokens % self.block_length == 0, (
+            f"Max tokens must be divisible by block length. Got max_tokens={self.max_tokens}, block_length={self.block_length}"
+        )
+        assert self.steps is None or (self.steps % self.num_blocks == 0), (
+            f"Steps must be divisible by number of blocks. Got steps={self.steps}, num_blocks={self.num_blocks}"
+        )
+        assert self.remasking in list(LladaRemaskingStrategy), (
+            f"Remasking must be one of {list(LladaRemaskingStrategy)}, got {self.remasking}"
+        )
         assert not (self.accel_framework != "fast_dllm" and self.fast_dllm_use_cache)
 
     def is_mdpo_rcr(self):
         return self.remasking == LladaRemaskingStrategy.LOW_CONFIDENCE_RCR
-    
+
     def is_remdm(self):
         return self.remasking == LladaRemaskingStrategy.LOW_CONFIDENCE_REMDM
 
     def to_generate_kwargs(self):
         gen_kwargs = dict(
-            steps=self.steps, 
+            steps=self.steps,
             gen_length=self.max_tokens,
-            block_length=self.block_length, 
+            block_length=self.block_length,
             temperature=self.temperature,
             alg_temp=self.alg_temp,
-            remasking=self.remasking
+            remasking=self.remasking,
         )
 
         if self.remasking in [
@@ -244,7 +256,9 @@ class LladaGenerationConfig:
             LladaRemaskingStrategy.TOPK_MARGIN_THRESHOLD,
             LladaRemaskingStrategy.ENTROPY_THRESHOLD,
         ]:
-            assert self.fast_dllm_threshold is not None, f"fast_dllm_threshold must be provided for {self.remasking} algorithm"
+            assert self.fast_dllm_threshold is not None, (
+                f"fast_dllm_threshold must be provided for {self.remasking} algorithm"
+            )
             gen_kwargs["threshold"] = self.fast_dllm_threshold
             gen_kwargs["factor"] = None
 
@@ -260,7 +274,9 @@ class LladaGenerationConfig:
             LladaRemaskingStrategy.TOPK_MARGIN_FACTOR,
             LladaRemaskingStrategy.ENTROPY_FACTOR,
         ]:
-            assert self.fast_dllm_factor is not None, f"fast_dllm_factor must be provided for {self.remasking} algorithm"
+            assert self.fast_dllm_factor is not None, (
+                f"fast_dllm_factor must be provided for {self.remasking} algorithm"
+            )
             gen_kwargs["threshold"] = None
             gen_kwargs["factor"] = self.fast_dllm_factor
 
@@ -279,6 +295,11 @@ class LladaGenerationConfig:
 LLADA_MASK_TOKEN_ID = 126336
 
 
+@ModelRegistry.register(
+    lambda name: name
+    in ("GSAI-ML/LLaDA-8B-Instruct", "GSAI-ML/LLaDA-1.5", "hub/llada-1.5-tiny-random")
+    or "llada" in name.lower()
+)
 class LladaModel(BaseModel):
     def __init__(self, model_name, accel_framework=None):
         if accel_framework == "fast_dllm":
@@ -291,17 +312,18 @@ class LladaModel(BaseModel):
 
         if model_name == "llada-tiny_random":
             self.model = model_class.from_config(
-                model_name,)
+                model_name,
+            )
         else:
             self.model = model_class.from_pretrained(
                 model_name,
                 trust_remote_code=True,
                 torch_dtype=torch.bfloat16,
-                device_map="auto"
+                device_map="auto",
             )
 
         self.patch_model_forward(self.model, LLADA_MASK_TOKEN_ID)
-        
+
         self.model.eval()
         # self.model = torch.compile(self.model, mode="reduce-overhead", fullgraph=False, dynamic=True)
 
@@ -318,7 +340,9 @@ class LladaModel(BaseModel):
 
         def wrapped_forward(*args, **kwargs):
             output = fwd_fn(*args, **kwargs)
-            output.logits[:, :, mask_token_id] = -float('Inf')  # cannot sample mask token
+            output.logits[:, :, mask_token_id] = -float(
+                "Inf"
+            )  # cannot sample mask token
             return output
 
         model.__class__.forward = wrapped_forward
@@ -327,21 +351,31 @@ class LladaModel(BaseModel):
         raise NotImplementedError
 
     @measure_time_mem("generate")
-    def model_generate(self, input_ids, gen_config, output_history=False, output0_ids=None):
+    def model_generate(
+        self, input_ids, gen_config, output_history=False, output0_ids=None
+    ):
         with insert_import_path(FAST_DLLM_PATH):
-            from generate import generate as generate_no_cache, generate_with_prefix_cache, generate_with_dual_cache
+            from generate import (
+                generate as generate_no_cache,
+                generate_with_prefix_cache,
+                generate_with_dual_cache,
+            )
 
         gen_kwargs = gen_config.to_generate_kwargs()
 
         if gen_config.is_mdpo_rcr():
-            assert self.accel_framework is None, "MDPO-RCR is not supported with fast-dllm"
+            assert self.accel_framework is None, (
+                "MDPO-RCR is not supported with fast-dllm"
+            )
 
             from model.remasking.llada.mdpo_rcr import generate_dlm as generate
+
             generate_fn = generate
         elif gen_config.is_remdm():
             assert self.accel_framework is None, "ReMDM is not supported with fast-dllm"
 
             from model.remasking.llada.remdm import llada_remdm_sample as generate
+
             generate_fn = functools.partial(generate, tokenizer=self.tokenizer)
         elif self.accel_framework == "fast_dllm":
             if gen_config.fast_dllm_use_cache:
@@ -355,34 +389,73 @@ class LladaModel(BaseModel):
             generate_fn = generate_no_cache
 
         if output0_ids is not None:
-            return generate_fn(self.model, input_ids, mask_id=self.mask_id, **gen_kwargs, output_history=output_history, output0_ids=output0_ids)
+            return generate_fn(
+                self.model,
+                input_ids,
+                mask_id=self.mask_id,
+                **gen_kwargs,
+                output_history=output_history,
+                output0_ids=output0_ids,
+            )
         else:
-            return generate_fn(self.model, input_ids, mask_id=self.mask_id, **gen_kwargs, output_history=output_history)
+            return generate_fn(
+                self.model,
+                input_ids,
+                mask_id=self.mask_id,
+                **gen_kwargs,
+                output_history=output_history,
+            )
 
-    def generate(self, messages, output_prefix=None, gen_config=None, output_history=False):
+    def generate(
+        self, messages, output_prefix=None, gen_config=None, output_history=False
+    ):
         if isinstance(messages, list):
-            prompt = self.tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
+            prompt = self.tokenizer.apply_chat_template(
+                messages, add_generation_prompt=True, tokenize=False
+            )
         else:
             prompt = messages
-        
-        input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(self.model.device)
-        gen_config = LladaGenerationConfig(accel_framework=self.accel_framework, **gen_config)
+
+        input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
+            self.model.device
+        )
+        gen_config = LladaGenerationConfig(
+            accel_framework=self.accel_framework, **gen_config
+        )
 
         if output_prefix is not None:
-            output_prefix = output_prefix.replace(PARALLEL_BENCH_MASK_TOKEN, self.tokenizer.mask_token)
-            output0_ids = self.tokenizer(output_prefix, return_tensors="pt", padding="max_length", max_length=gen_config.max_tokens).input_ids.to(self.model.device)
-            assert output0_ids.shape[1] == gen_config.max_tokens, "output_prefix is too long"
+            output_prefix = output_prefix.replace(
+                PARALLEL_BENCH_MASK_TOKEN, self.tokenizer.mask_token
+            )
+            output0_ids = self.tokenizer(
+                output_prefix,
+                return_tensors="pt",
+                padding="max_length",
+                max_length=gen_config.max_tokens,
+            ).input_ids.to(self.model.device)
+            assert output0_ids.shape[1] == gen_config.max_tokens, (
+                "output_prefix is too long"
+            )
         else:
             output0_ids = None
 
-        input_output_ids, nfe, history = self.model_generate(input_ids, gen_config, output_history=output_history, output0_ids=output0_ids)
-        output_ids = input_output_ids[:, input_ids.shape[1]:]
+        input_output_ids, nfe, history = self.model_generate(
+            input_ids,
+            gen_config,
+            output_history=output_history,
+            output0_ids=output0_ids,
+        )
+        output_ids = input_output_ids[:, input_ids.shape[1] :]
 
         output = self.tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
 
-        assert not (output_history and history is None), "History should not be None if output_history is True."
+        assert not (output_history and history is None), (
+            "History should not be None if output_history is True."
+        )
 
-        decoding_order, decoding_order_corrs = compute_decoding_order_correlation_from_history(self.tokenizer, history)
+        decoding_order, decoding_order_corrs = (
+            compute_decoding_order_correlation_from_history(self.tokenizer, history)
+        )
 
         return DLLMOutput(
             output=output,
