@@ -7,8 +7,8 @@
       <a href="https://scholar.google.com/citations?user=IXJcR1gAAAAJ&hl=en" target="_blank">Seunghyuk Oh</a><sup>*1</sup>, 
       <a href="https://scholar.google.com/citations?user=XJXKp60AAAAJ&hl=en" target="_blank">Minjae Lee</a><sup>1</sup>, 
       <a href="https://yzeng58.github.io/zyc_cv/" target="_blank">Yuchen Zeng</a><sup>2,3</sup>, 
-      <a href="https://scholar.google.com/citations?user=jkXzD7YAAAAJ&hl=en" target="_blank">Shuibai Zhang</a><sup>2</sup>, 
-      <a href="https://scholar.google.com/citations?user=si-368wAAAAJ&hl=en" target="_blank">Coleman Hooper</a><sup>4</sup>, 
+      <a href="https://scholar.google.com/citations?user=jkXzD7YAAAAJ&hl=en" target="_blank">Shuibai Zhang</a><sup>2</sup>,<br>
+      <a href="https://scholar.google.com/citations?user=si-368wAAAAJ&hl=en" target="_blank">Coleman Hooper</a><sup>4</sup>,
       <a href="https://yuezhouhu.github.io/" target="_blank">Yuezhou Hu</a><sup>4</sup>, 
       <a href="https://scholar.google.com/citations?user=Oyy8aDMAAAAJ&hl=en" target="_blank">Hyung Il Koo</a><sup>1</sup>, 
       <a href="https://ece.snu.ac.kr/en/research-faculty/faculty/fulltime?md=view&profid=p041" target="_blank">Nam Ik Cho</a><sup>5</sup>, 
@@ -49,7 +49,6 @@ Analytically tractable synthetic list operations (Copy, Replace, Shuffle) with c
 - **Realistic Benchmark Tasks:**
 17 tasks across Waiting Line, Text Writing, and Puzzles—all trivial for humans and AR LLMs—reveal severe quality degradation in dLLMs under parallel decoding in real-world scenarios.
 
-***
 
 ## ⚙️ Setup
 
@@ -87,36 +86,9 @@ If you need to run the grammar-based evaluations, install the JDK via conda:
 conda install -c conda-forge openjdk=17
 ```
 
-***
 
 ## ⚡ Quickstart
 Here's a simple example of how to load a model and run it on a **ParallelBench** task. For a more in-depth example, see the [`demo.py`](demo.py) script.
-
-<details>
-<summary>📋 <b>View Available Tasks</b></summary>
-
-* 🔄 **Waiting Line**
-    * `waiting_line/copy`
-    * `waiting_line/insert_index`
-    * `waiting_line/insert_random`
-    * `waiting_line/remove_index`
-    * `waiting_line/remove_random`
-    * `waiting_line/replace_index`
-    * `waiting_line/replace_random`
-    * `waiting_line/reverse`
-    * `waiting_line/shuffle`
-    * `waiting_line/sort`
-* ✍️ **Text Writing**
-    * `paraphrase_summarize/chatgpt-paraphrases`
-    * `paraphrase_summarize/samsum`
-    * `words_to_sentence/easy`
-    * `words_to_sentence/medium`
-    * `words_to_sentence/hard`
-* 🧠 **Puzzle**
-    * `puzzle/latin_square_n4`
-    * `puzzle/sudoku_n4_12`
-
-</details>
 
 ```python
 import torch
@@ -163,7 +135,29 @@ metrics = dataset.compute_metrics([response], [sample["label"]])
 print(f"Metrics: {metrics}")
 ```
 
-***
+### Available Tasks
+
+* **Waiting Line**
+    * `waiting_line/copy`
+    * `waiting_line/insert_index`
+    * `waiting_line/insert_random`
+    * `waiting_line/remove_index`
+    * `waiting_line/remove_random`
+    * `waiting_line/replace_index`
+    * `waiting_line/replace_random`
+    * `waiting_line/reverse`
+    * `waiting_line/shuffle`
+    * `waiting_line/sort`
+* **Text Writing**
+    * `paraphrase_summarize/chatgpt-paraphrases`
+    * `paraphrase_summarize/samsum`
+    * `words_to_sentence/easy`
+    * `words_to_sentence/medium`
+    * `words_to_sentence/hard`
+* **Puzzle**
+    * `puzzle/latin_square_n4`
+    * `puzzle/sudoku_n4_12`
+
 
 ## 🛠️ Create Your Own Tasks
 
@@ -176,12 +170,10 @@ PYTHONPATH=. python dataset/parallel_bench/data/task.py --task test/copy_reverse
 This command uses the configurations specified in `dataset/parallel_bench/data/task_configs/`.
 
 
-***
-
 ## 🚀 Running Evaluations
 
 
-### 🔑 Configuration
+### Configuration
 
 Before running the evaluations, you must export the necessary API keys as environment variables.
 
@@ -252,11 +244,10 @@ This section includes the commands for the comparative analysis between our mode
   ```
 
 
-### 📊 Results
+### Results
 
 All evaluation metrics and generated outputs are logged to **Weights & Biases (wandb)**. Please ensure you have configured your API key and project settings.
 
-***
 
 ## 🙏 Acknowledgements
 This project builds upon the work of several fantastic open-source repositories. We extend our sincere thanks to the original authors for their contributions to the community.
