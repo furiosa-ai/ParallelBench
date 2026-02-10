@@ -20,3 +20,4 @@ py7zr
 bert_score
 rouge_score
 language_tool_python
+pytest
