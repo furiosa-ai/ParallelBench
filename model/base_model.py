@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
@@ -5,10 +6,23 @@ from typing import Optional
 import torch
 
 
-class BaseModel:
+class BaseModel(ABC):
     @property
     def num_workers(self):
         return 0
+
+    @abstractmethod
+    def generate(self, messages, **kwargs) -> "DLLMOutput":
+        """Generate output from input messages.
+
+        Args:
+            messages: Input messages in chat format
+            **kwargs: Additional generation parameters (model-specific)
+
+        Returns:
+            DLLMOutput: Generated output with metadata
+        """
+        pass
 
 
 @dataclass
@@ -31,8 +45,12 @@ class DLLMOutput:
     def output_length(self):
         if self.pad_token_id is None:
             return self.output_ids.size(1) if self.output_ids is not None else None
-        
-        return (self.output_ids.squeeze() != self.pad_token_id).sum().item() if self.output_ids is not None else None
+
+        return (
+            (self.output_ids.squeeze() != self.pad_token_id).sum().item()
+            if self.output_ids is not None
+            else None
+        )
 
     def __post_init__(self):
         pass
