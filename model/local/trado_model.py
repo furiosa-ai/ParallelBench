@@ -370,13 +370,13 @@ class TradoModel(BaseModel):
             assert False
             # assert self.accel_framework is None, "MDPO-RCR is not supported with fast-dllm"
 
-            # from model.remasking.llada.mdpo_rcr import generate_dlm as generate
+            # from model.local.remasking.llada.mdpo_rcr import generate_dlm as generate
             # generate_fn = generate
         elif gen_config.is_remdm():
             assert False
             assert self.accel_framework is None, "ReMDM is not supported with fast-dllm"
 
-            from model.remasking.llada.remdm import llada_remdm_sample as generate
+            from model.local.remasking.llada.remdm import llada_remdm_sample as generate
 
             generate_fn = functools.partial(generate, tokenizer=self.tokenizer)
         elif self.accel_framework == "fast_dllm":

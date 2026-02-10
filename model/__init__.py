@@ -1,14 +1,14 @@
 import inspect
 
-from model.anthropic_model import AnthropicModel
+from model.api.anthropic_model import AnthropicModel
 from model.base_model import BaseModel
-from model.dream_model import DreamModel
-from model.llada_model import LladaModel
-from model.mercury_model import MercuryModel
+from model.local.dream_model import DreamModel
+from model.local.llada_model import LladaModel
+from model.api.mercury_model import MercuryModel
 from model.registry import ModelRegistry
-from model.trado_model import TradoModel
-from model.transformers_model import TransformersModel
-from model.vllm_model import vllmModel
+from model.local.trado_model import TradoModel
+from model.local.transformers_model import TransformersModel
+from model.local.vllm_model import vllmModel
 # Defer SeddModel import to avoid circular dependency - it will be registered when first imported
 
 

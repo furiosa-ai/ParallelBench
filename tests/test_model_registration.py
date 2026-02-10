@@ -9,15 +9,15 @@ import pytest
 from model.registry import ModelRegistry
 
 # Import all model modules at module level to trigger decorator registration
-import model.mercury_model
-import model.dream_model
-import model.trado_model
-import model.llada_model
-import model.anthropic_model
+import model.api.mercury_model
+import model.local.dream_model
+import model.local.trado_model
+import model.local.llada_model
+import model.api.anthropic_model
 
 SEDD_AVAILABLE = False
 try:
-    import model.sedd_model
+    import model.local.sedd_model
 
     SEDD_AVAILABLE = True
 except ImportError:
