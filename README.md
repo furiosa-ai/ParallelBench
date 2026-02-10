@@ -44,7 +44,7 @@ While most autoregressive LLMs are constrained to one-by-one decoding, diffusion
 ## 📢 Updates
 
 - **Jan 25, 2026** Paper accepted at ICLR 2026!
-- **Oct 6, 2025** ParallBench release!
+- **Oct 6, 2025** ParallelBench release!
 
 ## 🌟 Features
 
