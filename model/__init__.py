@@ -1,15 +1,26 @@
 import inspect
 
-from model.api.anthropic_model import AnthropicModel
 from model.base_model import BaseModel
-from model.local.dream_model import DreamModel
-from model.local.llada_model import LladaModel
-from model.api.mercury_model import MercuryModel
+# Local models
+from model.local import DreamModel, LladaModel, TradoModel, SeddModel
+# API models
+from model.api import AnthropicModel, MercuryModel
 from model.registry import ModelRegistry
-from model.local.trado_model import TradoModel
 from model.local.transformers_model import TransformersModel
 from model.local.vllm_model import vllmModel
 # Defer SeddModel import to avoid circular dependency - it will be registered when first imported
+
+
+__all__ = [
+    "DreamModel",
+    "LladaModel",
+    "TradoModel",
+    "SeddModel",
+    "AnthropicModel",
+    "MercuryModel",
+    "TransformersModel",
+    "vllmModel",
+]
 
 
 def load_model(model_name: str, **kwargs) -> "BaseModel":

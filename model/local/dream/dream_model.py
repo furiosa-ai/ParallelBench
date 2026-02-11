@@ -175,7 +175,7 @@ class DreamGenerationConfig:
         "Dream-org/Dream-Coder-v0-Instruct-7B",
         "apple/DiffuCoder-7B-Instruct",
         "apple/DiffuCoder-7B-cpGRPO",
-        "hub/dream-v0-instruct-tiny-random",
+
     )
 )
 class DreamModel(BaseModel):

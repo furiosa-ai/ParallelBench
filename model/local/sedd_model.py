@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-import functools
-import numpy as np
 from typing import Optional
 from transformers import GPT2TokenizerFast
 import torch

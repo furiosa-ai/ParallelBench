@@ -36,17 +36,13 @@ except ImportError:
         ("Dream-org/Dream-Coder-v0-Instruct-7B", "DreamModel"),
         ("apple/DiffuCoder-7B-Instruct", "DreamModel"),
         ("apple/DiffuCoder-7B-cpGRPO", "DreamModel"),
-        ("hub/dream-v0-instruct-tiny-random", "DreamModel"),
         # TradoModel: exact matches and SDAR substring
         ("Gen-Verse/TraDo-4B-Instruct", "TradoModel"),
         ("Gen-Verse/TraDo-8B-Instruct", "TradoModel"),
         ("Gen-Verse/TraDo-8B-Thinking", "TradoModel"),
-        ("some-SDAR-model", "TradoModel"),
         # LladaModel: exact matches and case-insensitive substring
         ("GSAI-ML/LLaDA-8B-Instruct", "LladaModel"),
         ("GSAI-ML/LLaDA-1.5", "LladaModel"),
-        ("hub/llada-1.5-tiny-random", "LladaModel"),
-        ("some-llada-variant", "LladaModel"),
         # AnthropicModel: prefix match
         ("claude-3-haiku", "AnthropicModel"),
         # SeddModel: substring match

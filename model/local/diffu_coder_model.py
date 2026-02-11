@@ -12,9 +12,6 @@ from utils.perf_utils import measure_time_mem
 from utils.utils import insert_import_path
 
 
-FAST_DLLM_PATH = "src/Fast_dLLM/dream"
-
-
 class DiffuCoderRemaskingStrategy(str, Enum):
     ORIGIN = 'origin'
     MASKGIT_PLUS = 'maskgit_plus'
@@ -90,9 +87,7 @@ class DiffuCoderGenerationConfig:
 class DiffuCoderModel(BaseModel):
     def __init__(self, model_name, accel_framework=None):
         if accel_framework == "fast_dllm":
-            with insert_import_path(FAST_DLLM_PATH):
-                from model.modeling_dream import DiffuCoderModel as FastDllmDiffuCoderModel
-            self.model = FastDllmDiffuCoderModel.from_pretrained(model_name, torch_dtype=torch.bfloat16, trust_remote_code=True, device_map="auto")
+            raise NotImplementedError("Fast_dLLM DiffuCoder model loading is not implemented yet.")
         elif accel_framework is None:
             self.model = AutoModel.from_pretrained(
                 model_name,
@@ -113,18 +108,9 @@ class DiffuCoderModel(BaseModel):
 
     def patch_model(self, gen_config):
         if self.accel_framework == "fast_dllm":
-            with insert_import_path(FAST_DLLM_PATH):
-                from model.generation_utils import DiffuCoderGenerationMixin as DiffuCoderGenerationMixinWithoutCache
-                from model.generation_utils_block import DiffuCoderGenerationMixin as DiffuCoderGenerationMixinWithCache
-
-            mixin_class = DiffuCoderGenerationMixinWithCache if gen_config.fast_dllm_use_cache else DiffuCoderGenerationMixinWithoutCache
-
-            self.model.diffusion_generate = types.MethodType(mixin_class.diffusion_generate, self.model)
-            self.model._sample = types.MethodType(mixin_class._sample, self.model)
+            raise NotImplementedError("Fast dLLM DiffuCoder model patching is not implemented yet.")
         else:
             pass
-            # self.model.diffusion_generate = types.MethodType(self.model.__class__.diffusion_generate, self.model)
-            # self.model._sample = types.MethodType(self.model.__class__._sample, self.model)
 
         self.model.nfe = 0
         def forward_hook(self, *args, **kwargs):
