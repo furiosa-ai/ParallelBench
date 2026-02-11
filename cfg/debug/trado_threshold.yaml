@@ -1,0 +1,16 @@
+skip_metrics: false
+model:
+  model_name: Gen-Verse/TraDo-4B-Instruct
+  accel_framework: null
+dataset:
+  dataset_name: parallel_bench
+  task: waiting_line/shuffle
+  num_samples: 10
+generation:
+  remasking: low_confidence_threshold
+  temperature: 0.0
+  max_tokens: 32
+  steps: 32
+  block_length: 32
+  alg_threshold: 0.5
+  alg_factor: null
