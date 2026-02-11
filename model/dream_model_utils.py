@@ -111,7 +111,10 @@ def sample_tokens(logits, temperature=0.0, top_p=None, top_k=None, margin_confid
         try:
             x0 = dists.Categorical(probs=probs).sample()
             confidence = torch.gather(probs, -1, x0.unsqueeze(-1)).squeeze(-1)
-        except:
+        except (ValueError, RuntimeError):
+            confidence, x0 = probs.max(dim=-1)
+        except Exception as e:
+            warnings.warn(f"Unexpected exception {e} when sampling tokens, using argmax instead.")
             confidence, x0 = probs.max(dim=-1)
     else:
         confidence, x0 = probs.max(dim=-1)
