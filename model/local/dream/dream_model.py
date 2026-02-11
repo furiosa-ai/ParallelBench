@@ -1,26 +1,22 @@
-from dataclasses import dataclass
-import dataclasses
-from enum import Enum
 import functools
 import types
+from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 
 import torch
-
 from transformers import AutoModel, AutoTokenizer
+
 from model.base_model import BaseModel, DLLMOutput
+from model.generation_config import BaseGenerationConfig
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
 )
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
-from utils.utils import insert_import_path
 
 from .dream_model_utils import sample_block
-
-
-FAST_DLLM_PATH = "src/Fast_dLLM/dream"
 
 
 class DreamRemaskingStrategy(str, Enum):
@@ -44,23 +40,13 @@ class DreamRemaskingStrategy(str, Enum):
 
 
 @dataclass
-class DreamGenerationConfig:
+class DreamGenerationConfig(BaseGenerationConfig):
     accel_framework: Optional[str] = None
 
-    max_tokens: int = 128
-    steps: int = 128
-    block_length: Optional[int] = None
-    temperature: float = 0.0
     remasking: str = "origin"
     top_p: Optional[float] = None
     top_k: Optional[float] = None
     remasking_temperature: float = 0.0
-
-    # fast_dllm specific
-    fast_dllm_use_cache: bool = False
-    fast_dllm_threshold: float = 0.9
-    fast_dllm_factor: Optional[float] = None
-    fast_dllm_dual_cache: bool = False
 
     remdm_number: Optional[int] = None
 
@@ -75,8 +61,8 @@ class DreamGenerationConfig:
             self.top_k = None
 
         if self.accel_framework is None:
-            assert not self.fast_dllm_use_cache, (
-                "fast_dllm_use_cache is only supported in fast_dllm framework"
+            assert not self.use_fast_dllm_cache, (
+                "use_fast_dllm_cache is only supported in fast_dllm framework"
             )
             # assert self.block_length is None
         elif self.accel_framework == "fast_dllm":
@@ -87,12 +73,12 @@ class DreamGenerationConfig:
             #     DreamRemaskingStrategy.CONFIDENCE_THRESHOLD,
             # ], f"Remasking must be one of {list(DreamRemaskingStrategy)}, got {self.remasking}"
 
-            if not self.fast_dllm_use_cache:
+            if not self.use_fast_dllm_cache:
                 assert self.block_length is None, (
-                    "block_length is only supported when fast_dllm_use_cache is True"
+                    "block_length is only supported when use_fast_dllm_cache is True"
                 )
-                assert not self.fast_dllm_dual_cache, (
-                    "fast_dllm_dual_cache is only supported when fast_dllm_use_cache is True"
+                assert not self.use_fast_dllm_dual_cache, (
+                    "use_fast_dllm_dual_cache is only supported when use_fast_dllm_cache is True"
                 )
 
     def to_generate_kwargs(self):
@@ -110,7 +96,7 @@ class DreamGenerationConfig:
         )
 
         if self.accel_framework == "fast_dllm":
-            gen_kwargs["dual_cache"] = self.fast_dllm_dual_cache
+            gen_kwargs["dual_cache"] = self.use_fast_dllm_dual_cache
 
         if self.remasking in [
             DreamRemaskingStrategy.RANDOM,
@@ -128,10 +114,10 @@ class DreamGenerationConfig:
             DreamRemaskingStrategy.ENTROPY_THRESHOLD,
             DreamRemaskingStrategy.CONFIDENCE_THRESHOLD,
         ]:
-            assert self.fast_dllm_threshold is not None, (
-                f"fast_dllm_threshold must be provided for {self.remasking} algorithm"
+            assert self.alg_threshold is not None, (
+                f"alg_threshold must be provided for {self.remasking} algorithm"
             )
-            gen_kwargs["threshold"] = self.fast_dllm_threshold
+            gen_kwargs["threshold"] = self.alg_threshold
             gen_kwargs["factor"] = None
 
             gen_kwargs["alg"] = {
@@ -147,11 +133,11 @@ class DreamGenerationConfig:
             DreamRemaskingStrategy.TOPK_MARGIN_FACTOR,
             DreamRemaskingStrategy.ENTROPY_FACTOR,
         ]:
-            assert self.fast_dllm_factor is not None, (
-                f"fast_dllm_factor must be provided for {self.remasking} algorithm"
+            assert self.alg_factor is not None, (
+                f"alg_factor must be provided for {self.remasking} algorithm"
             )
             gen_kwargs["threshold"] = None
-            gen_kwargs["factor"] = self.fast_dllm_factor
+            gen_kwargs["factor"] = self.alg_factor
 
             gen_kwargs["alg"] = {
                 DreamRemaskingStrategy.ORIGIN_FACTOR: DreamRemaskingStrategy.ORIGIN,
@@ -164,8 +150,6 @@ class DreamGenerationConfig:
 
         return gen_kwargs
 
-    def replace(self, **kwargs):
-        return dataclasses.replace(self, **kwargs)
 
 
 @ModelRegistry.register(
@@ -181,24 +165,14 @@ class DreamGenerationConfig:
 class DreamModel(BaseModel):
     def __init__(self, model_name, accel_framework=None, eps=0):
         if accel_framework == "fast_dllm":
-            with insert_import_path(FAST_DLLM_PATH):
-                from model.modeling_dream import DreamModel as FastDllmDreamModel
-            self.model = FastDllmDreamModel.from_pretrained(
-                model_name,
-                torch_dtype=torch.bfloat16,
-                trust_remote_code=True,
-                device_map="auto",
-            )
-        elif accel_framework is None:
-            self.model = AutoModel.from_pretrained(
+            raise NotImplementedError("Fast-dLLM Dream model loading is not implemented yet.")
+        
+        self.model = AutoModel.from_pretrained(
                 model_name,
                 trust_remote_code=True,
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
-        else:
-            raise ValueError(f"Unsupported acceleration framework: {accel_framework}")
-
         self.model.eval()
 
         self.tokenizer = AutoTokenizer.from_pretrained(
@@ -210,12 +184,6 @@ class DreamModel(BaseModel):
         self.accel_framework = accel_framework
 
     def patch_model(self, gen_config):
-        with insert_import_path(FAST_DLLM_PATH):
-            # from model.generation_utils import DreamGenerationMixin as DreamGenerationMixinWithoutCache
-            from model.generation_utils_block import (
-                DreamGenerationMixin as DreamGenerationMixinBlockWithCache,
-            )
-
         # reset the model methods to the original ones
         self.model.diffusion_generate = types.MethodType(
             self.model.__class__.diffusion_generate, self.model
@@ -226,33 +194,22 @@ class DreamModel(BaseModel):
         gen_kwargs = gen_config.to_generate_kwargs()
 
         if self.accel_framework == "fast_dllm":
-            self.model.diffusion_generate = types.MethodType(
-                DreamGenerationMixinBlockWithCache.diffusion_generate, self.model
+            raise NotImplementedError("Fast-dLLM Dream model patching is not implemented yet.")
+        
+        if (
+            gen_kwargs.get("block_length") is not None
+            or gen_kwargs.get("threshold") is not None
+        ):
+            # if block length is specified, we need to patch the model to use the block length
+            self.model._sample = types.MethodType(
+                functools.partial(
+                    sample_block,
+                    block_length=gen_kwargs["block_length"],
+                    threshold=gen_kwargs.get("threshold"),
+                    factor=gen_kwargs.get("factor"),
+                ),
+                self.model,
             )
-
-            sample_func = DreamGenerationMixinBlockWithCache._sample
-
-            if gen_kwargs.get("factor") is not None:
-                sample_func = functools.partial(
-                    sample_func, factor=gen_kwargs["factor"]
-                )
-
-            self.model._sample = types.MethodType(sample_func, self.model)
-        else:
-            if (
-                gen_kwargs.get("block_length") is not None
-                or gen_kwargs.get("threshold") is not None
-            ):
-                # if block length is specified, we need to patch the model to use the block length
-                self.model._sample = types.MethodType(
-                    functools.partial(
-                        sample_block,
-                        block_length=gen_kwargs["block_length"],
-                        threshold=gen_kwargs.get("threshold"),
-                        factor=gen_kwargs.get("factor"),
-                    ),
-                    self.model,
-                )
 
         self.model.nfe = 0
 

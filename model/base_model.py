@@ -1,12 +1,29 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
 from typing import Optional
 
 import torch
+from transformers import AutoModel, AutoTokenizer
 
 
 class BaseModel(ABC):
+    def __init__(self, model_name, accel_framework=None):
+
+        if accel_framework == "fast_dllm":
+            raise NotImplementedError("Fast dLLM model loading is not implemented yet.")
+        self.accel_framework = accel_framework
+
+        self.model = AutoModel.from_pretrained(
+            model_name,
+            trust_remote_code=True,
+            torch_dtype=torch.bfloat16,
+            device_map="cuda",
+        )
+        self.model.eval()
+
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+
+
     @property
     def num_workers(self):
         return 0

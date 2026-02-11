@@ -6,9 +6,7 @@ import torch
 import torch.distributions as dists
 from torch.nn import functional as F
 from transformers import __version__
-from transformers.generation.configuration_utils import (
-    GenerationConfig
-)
+from transformers.generation.configuration_utils import GenerationConfig
 from transformers.utils import (
     ModelOutput,
     logging,

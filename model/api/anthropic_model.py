@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from model.base_model import BaseModel, DLLMOutput
+from model.generation_config import ApiGenerationConfig
 from model.registry import ModelRegistry
 
 
 @dataclass
-class AnthropicGenerationConfig:
-    max_tokens: int = 128
-    temperature: float = 0.0
+class AnthropicGenerationConfig(ApiGenerationConfig):
+    pass
 
 
 # export ANTHROPIC_API_KEY='your-api-key-here'

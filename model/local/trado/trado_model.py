@@ -1,23 +1,22 @@
+import functools
 from dataclasses import dataclass
 from enum import Enum
-import functools
-import numpy as np
 from typing import Optional
-from transformers import AutoModelForCausalLM, AutoTokenizer
+
 import torch
 import torch.nn.functional as F
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers.cache_utils import DynamicCache
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
 from model.base_model import BaseModel, DLLMOutput
+from model.generation_config import BaseGenerationConfig
 from model.model_utils import (
-    decode_history,
     compute_decoding_order_correlation_from_history,
+    decode_history,
 )
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
-from utils.utils import insert_import_path
-
-from transformers.cache_utils import DynamicCache
 
 
 def top_k_logits(logits, k):
@@ -254,28 +253,13 @@ class TradoRemaskingStrategy(str, Enum):
 
 
 @dataclass
-class TradoGenerationConfig:
+class TradoGenerationConfig(BaseGenerationConfig):
     accel_framework: Optional[str] = None
 
-    max_tokens: int = 128
-    steps: Optional[int] = 128
-    temperature: float = 0.0
     top_p: Optional[float] = None
     top_k: Optional[float] = None
-    # alg_temp: float = 0.0
     remasking: str = "low_confidence"
     block_length: int = 128
-
-    # fast-dllm specific
-    fast_dllm_threshold: float = (
-        0.9  # TODO assert none if not using LOW_CONFIDENCE_THRESHOLD
-    )
-    # fast_dllm_factor: Optional[float] = None
-    # fast_dllm_use_cache: bool = False
-    # fast_dllm_dual_cache: bool = False
-
-    # remdm_steps: Optional[int] = None
-    # remdm_number: Optional[int] = None
 
     @property
     def num_blocks(self):
@@ -294,7 +278,7 @@ class TradoGenerationConfig:
         assert self.remasking in list(TradoRemaskingStrategy), (
             f"Remasking must be one of {list(TradoRemaskingStrategy)}, got {self.remasking}"
         )
-        # assert not (self.accel_framework != "fast_dllm" and self.fast_dllm_use_cache)
+        # assert not (self.accel_framework != "fast_dllm" and self.use_fast_dllm_cache)
         assert self.accel_framework is None
 
     def is_mdpo_rcr(self):
@@ -318,7 +302,7 @@ class TradoGenerationConfig:
             gen_kwargs["remasking_strategy"] = "low_confidence_static"
         elif self.remasking == TradoRemaskingStrategy.LOW_CONFIDENCE_THRESHOLD:
             gen_kwargs["remasking_strategy"] = "low_confidence_dynamic"
-            gen_kwargs["confidence_threshold"] = self.fast_dllm_threshold
+            gen_kwargs["confidence_threshold"] = self.alg_threshold
         else:
             raise ValueError(f"Unsupported remasking strategy: {self.remasking}")
 
@@ -381,8 +365,8 @@ class TradoModel(BaseModel):
             generate_fn = functools.partial(generate, tokenizer=self.tokenizer)
         elif self.accel_framework == "fast_dllm":
             assert False
-            if gen_config.fast_dllm_use_cache:
-                if gen_config.fast_dllm_dual_cache:
+            if gen_config.use_fast_dllm_cache:
+                if gen_config.use_fast_dllm_dual_cache:
                     generate_fn = generate_with_dual_cache
                 else:
                     generate_fn = generate_with_prefix_cache

@@ -1,15 +1,14 @@
+import types
 from dataclasses import dataclass
 from enum import Enum
-import sys
-import types
 from typing import Optional
 
 import torch
-
 from transformers import AutoModel, AutoTokenizer
+
 from model.base_model import BaseModel, DLLMOutput
+from model.generation_config import BaseGenerationConfig
 from utils.perf_utils import measure_time_mem
-from utils.utils import insert_import_path
 
 
 class DiffuCoderRemaskingStrategy(str, Enum):
@@ -23,22 +22,13 @@ class DiffuCoderRemaskingStrategy(str, Enum):
 
 
 @dataclass
-class DiffuCoderGenerationConfig:
+class DiffuCoderGenerationConfig(BaseGenerationConfig):
     accel_framework: Optional[str] = None
 
-    max_tokens: int = 128
-    steps: int = 128
-    temperature: float = 0.0
     remasking: str = "origin"
     top_p: Optional[float] = None
     top_k: Optional[float] = None
     remasking_temperature: float = 0.0
-
-    # fast_dllm specific
-    fast_dllm_use_cache: bool = False
-    fast_dllm_threshold: float = 0.9
-    fast_dllm_block_length: Optional[int] = None
-    fast_dllm_dual_cache: bool = False
 
     def __post_init__(self):
         assert self.steps <= self.max_tokens, f"Steps must be less than or equal to max tokens. Got steps={self.steps}, max_tokens={self.max_tokens}"
@@ -51,17 +41,17 @@ class DiffuCoderGenerationConfig:
                 DiffuCoderRemaskingStrategy.ENTROPY,
             ]
 
-            assert not self.fast_dllm_use_cache, "fast_dllm_use_cache is only supported in fast_dllm framework"
-            assert self.fast_dllm_block_length is None
+            assert not self.use_fast_dllm_cache, "use_fast_dllm_cache is only supported in fast_dllm framework"
+            assert self.block_length is None
         elif self.accel_framework == "fast_dllm":
             assert self.remasking in [
                 DiffuCoderRemaskingStrategy.ENTROPY,
                 DiffuCoderRemaskingStrategy.CONFIDENCE_THRESHOLD,
             ], f"Remasking must be one of {list(DiffuCoderRemaskingStrategy)}, got {self.remasking}"
 
-            if not self.fast_dllm_use_cache:
-                assert self.fast_dllm_block_length is None, "fast_dllm_block_length is only supported when fast_dllm_use_cache is True"
-                assert not self.fast_dllm_dual_cache, "fast_dllm_dual_cache is only supported when fast_dllm_use_cache is True"
+            if not self.use_fast_dllm_cache:
+                assert self.block_length is None, "block_length is only supported when use_fast_dllm_cache is True"
+                assert not self.use_fast_dllm_dual_cache, "use_fast_dllm_dual_cache is only supported when use_fast_dllm_cache is True"
 
     def to_generate_kwargs(self):
         gen_kwargs = dict(
@@ -77,9 +67,9 @@ class DiffuCoderGenerationConfig:
         )
 
         if self.accel_framework == "fast_dllm":
-            gen_kwargs["threshold"] = self.fast_dllm_threshold
-            gen_kwargs["block_length"] = self.fast_dllm_block_length
-            gen_kwargs["dual_cache"] = self.fast_dllm_dual_cache
+            gen_kwargs["threshold"] = self.alg_threshold
+            gen_kwargs["block_length"] = self.block_length
+            gen_kwargs["dual_cache"] = self.use_fast_dllm_dual_cache
 
         return gen_kwargs
 

@@ -1,27 +1,15 @@
 
 from dataclasses import dataclass
-from enum import Enum
-import numpy as np
-from typing import Optional
-from transformers import AutoModel, AutoTokenizer
 import torch
-import torch.nn.functional as F
 
-from model.base_model import BaseModel, DLLMOutput
-from model.model_utils import decode_history
+from model.base_model import  BaseModel, DLLMOutput
+from model.generation_config import ApiGenerationConfig
 from utils.perf_utils import measure_time_mem
-from utils.utils import insert_import_path
 
 
 
 @dataclass
-class vllmGenerationConfig:
-    max_tokens: int
-    temperature: float = 0.0
-
-    def __post_init__(self):
-        pass
-
+class vllmGenerationConfig(ApiGenerationConfig):
     def to_sampling_params(self):
         from vllm import SamplingParams
         assert self.temperature == 0.0, "vllmGenerationConfig only supports temperature=0.0"

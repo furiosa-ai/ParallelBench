@@ -3,15 +3,15 @@ import json
 import os
 
 from model.base_model import BaseModel, DLLMOutput
+from model.generation_config import ApiGenerationConfig
 from model.registry import ModelRegistry
 
 import requests
 
 
 @dataclass
-class MercuryGenerationConfig:
-    max_tokens: int = 128
-    temperature: float = 0.0
+class MercuryGenerationConfig(ApiGenerationConfig):
+    pass
     # presence_penalty: float = 1.5
 
 

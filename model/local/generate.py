@@ -15,11 +15,12 @@
 # SPDX-License-Identifier: Apache-2.0
 # Modified from LLaDA repos: https://github.com/ML-GSAI/LLaDA
 
-import torch
+from typing import List, Optional
+
 import numpy as np
-import torch.nn.functional as F
+import torch
 import torch.distributions as dists
-from transformers import AutoTokenizer
+import torch.nn.functional as F
 
 
 def get_num_transfer_tokens(mask_index, steps):
@@ -64,7 +65,7 @@ def generate(
     output0_ids=None,
     alg_temp=0.0,
     eb_sampler_gamma=None,
-):
+)-> (torch.Tensor, int, Optional[List]):
     """
     Args:
         model: Mask predictor.

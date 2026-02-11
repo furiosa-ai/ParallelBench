@@ -1,23 +1,20 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
-from transformers import GPT2TokenizerFast
+
 import torch
-import torch.nn.functional as F
+from sedd import sampling
+from sedd.load_model import load_model
+from transformers import GPT2TokenizerFast
 
 from model.base_model import BaseModel, DLLMOutput
+from model.generation_config import BaseGenerationConfig
 from model.model_utils import (
-    decode_history,
     compute_decoding_order_correlation_from_history,
+    decode_history,
 )
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
-from utils.utils import insert_import_path
-
-
-with insert_import_path("src/Score-Entropy-Discrete-Diffusion"):
-    from load_model import load_model
-    import sampling
 
 
 class SeddPredictorType(str, Enum):
@@ -27,21 +24,17 @@ class SeddPredictorType(str, Enum):
 
 
 @dataclass
-class SeddGenerationConfig:
+class SeddGenerationConfig(BaseGenerationConfig):
     accel_framework: Optional[str] = None
 
-    max_tokens: int = 128
-    steps: Optional[int] = 128
-    block_length: Optional[int] = None
-    temperature: float = 0.0
     predictor: SeddPredictorType = SeddPredictorType.ANALYTIC
     # block_length: int = 128
 
     # fast-dllm specific
-    # fast_dllm_threshold: float = 0.9  # TODO assert none if not using LOW_CONFIDENCE_THRESHOLD
-    # fast_dllm_factor: Optional[float] = None
-    # fast_dllm_use_cache: bool = False
-    # fast_dllm_dual_cache: bool = False
+    # alg_threshold: float = 0.9  # TODO assert none if not using LOW_CONFIDENCE_THRESHOLD
+    # alg_factor: Optional[float] = None
+    # use_fast_dllm_cache: bool = False
+    # use_fast_dllm_dual_cache: bool = False
 
     # remdm_number: Optional[int] = None
 
@@ -54,6 +47,13 @@ class SeddGenerationConfig:
             "Block length must be equal to max tokens if specified."
         )
         assert self.temperature == 1.0
+
+    def to_generate_kwargs(self) -> dict:
+        return dict(
+            predictor=self.predictor,
+            steps=self.steps,
+            max_tokens=self.max_tokens,
+        )
 
 
 @ModelRegistry.register(lambda name: "sedd" in name)
@@ -75,26 +75,28 @@ class SeddModel(BaseModel):
 
     @measure_time_mem("generate")
     def model_generate(self, input_ids, gen_config, output_history=False):
+        generate_kwargs = gen_config.to_generate_kwargs()
+
         input_locs = torch.arange(len(input_ids[0]), device=input_ids.device)
 
         def proj_fun(x):
             x[:, input_locs] = input_ids
             return x
 
-        batch_dims = (1, input_ids.shape[1] + gen_config.max_tokens)
+        batch_dims = (1, input_ids.shape[1] + generate_kwargs["max_tokens"])
         sampling_fn = sampling.get_pc_sampler(
             self.graph,
             self.noise,
             batch_dims,
-            gen_config.predictor,
-            gen_config.steps,
+            generate_kwargs["predictor"],
+            generate_kwargs["steps"],
             denoise=True,
             device=self.device,
             proj_fun=proj_fun,
         )
 
         input_output_ids = sampling_fn(self.model)
-        nfe = gen_config.steps
+        nfe = generate_kwargs["steps"]
         history = None
 
         return input_output_ids, nfe, history

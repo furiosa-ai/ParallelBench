@@ -1,26 +1,16 @@
 
 from dataclasses import dataclass
-from enum import Enum
-import numpy as np
-from typing import Optional
-from transformers import AutoModel, AutoTokenizer
+
 import torch
-import torch.nn.functional as F
 
 from model.base_model import BaseModel, DLLMOutput
-from model.model_utils import decode_history
+from model.generation_config import BaseGenerationConfig
 from utils.perf_utils import measure_time_mem
-from utils.utils import insert_import_path
-
 
 
 @dataclass
-class TransformersGenerationConfig:
-    max_tokens: int
-    temperature: float = 0.0
-
-    def __post_init__(self):
-        pass
+class TransformersGenerationConfig(BaseGenerationConfig):
+    pass
 
     def to_generate_kwargs(self):
         assert self.temperature == 0.0, "TransformersGenerationConfig only supports temperature=0.0"
