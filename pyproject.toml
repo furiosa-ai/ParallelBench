@@ -8,7 +8,7 @@ dependencies = [
     "sedd",
     "flash-attn",
     "torch==2.8.*",
-    "transformers>=4.45,<5",
+    "transformers==4.53.3",
     "evaluate>=0.4.6",
     "scipy>=1.17.0",
 ]
