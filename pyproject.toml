@@ -1,0 +1,29 @@
+[project]
+name = "parallelbench"
+version = "0.1.0"
+description = "Understanding the Trade-offs of Parallel Decoding in Diffusion LLMs"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "sedd",
+    "flash-attn",
+]
+
+
+[tool.uv.workspace]
+members = [
+    "packages/Score-Entropy-Discrete-Diffusion",
+]
+
+
+[tool.uv.sources]
+sedd = { workspace = true, editable = true }
+
+
+[tool.uv.extra-build-dependencies]
+flash-attn = [
+    { requirement = "torch", match-runtime = true },
+    "ninja>=1.13.0",
+    "packaging",
+]
+
