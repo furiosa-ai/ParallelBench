@@ -5,9 +5,13 @@ from typing import Optional
 import torch
 from transformers import AutoModel, AutoTokenizer
 
+VALID_ACCEL_FRAMEWORKS = {None, "vllm", "transformers", "fast_dllm"}
 
 class BaseModel(ABC):
     def __init__(self, model_name, accel_framework=None):
+
+        if accel_framework not in VALID_ACCEL_FRAMEWORKS:
+            raise ValueError(f"Invalid accel_framework: {accel_framework}. Valid options are: {VALID_ACCEL_FRAMEWORKS}")
 
         if accel_framework == "fast_dllm":
             raise NotImplementedError("Fast dLLM model loading is not implemented yet.")
