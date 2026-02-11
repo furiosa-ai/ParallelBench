@@ -3,10 +3,13 @@ name = "parallelbench"
 version = "0.1.0"
 description = "Understanding the Trade-offs of Parallel Decoding in Diffusion LLMs"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "sedd",
     "flash-attn",
+    "torch==2.8.*",
+    "evaluate>=0.4.6",
+    "scipy>=1.17.0",
 ]
 
 
