@@ -1,0 +1,96 @@
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: origin_threshold
+    temperature: 0.0
+    max_tokens: 32
+    steps: 32
+    block_length: 32
+    alg_threshold: 0.5
+    alg_factor: null
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: random_threshold
+    temperature: 0.0
+    max_tokens: 32
+    steps: 32
+    block_length: 32
+    alg_threshold: 0.5
+    alg_factor: null
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: maskgit_plus_threshold
+    temperature: 0.0
+    max_tokens: 32
+    steps: 32
+    block_length: 32
+    alg_threshold: 0.5
+    alg_factor: null
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: topk_margin_threshold
+    temperature: 0.0
+    max_tokens: 32
+    steps: 32
+    block_length: 32
+    alg_threshold: 0.5
+    alg_factor: null
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: entropy_threshold
+    temperature: 0.0
+    max_tokens: 32
+    steps: 32
+    block_length: 32
+    alg_threshold: 0.5
+    alg_factor: null
+- skip_metrics: false
+  model:
+    model_name: Dream-org/Dream-v0-Instruct-7B
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: low_confidence_threshold
+    temperature: 0.0
+    max_tokens: 32
+    steps: 32
+    block_length: 32
+    alg_threshold: 0.5
+    alg_factor: null
