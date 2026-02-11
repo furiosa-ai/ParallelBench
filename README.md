@@ -45,15 +45,12 @@ Diffusion LLMs (dLLMs) promise faster generation via parallel decoding. However,
 
 - **Information-Theoretic Analysis:**
 We derive error bounds on parallel decoding for tasks with inter-token dependencies. Even an optimal model sees accuracy degrade as parallelism grows.
-<!--  Proves that parallel decoding has fundamental error bounds when tokens depend on each other, showing even perfect models struggle as we increase parallelism on tasks requiring strong token coordination. -->
 
 - **Quantitative Case Studies:**
 Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas pin down exactly where and how parallel decoding breaks.
-<!-- Analytically tractable synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas demonstrate fundamental limitations: specific tasks show inevitable quality degradation under parallel decoding.-->
 
 - **Realistic Benchmark Tasks:**
 17 tasks across three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily, but expose clear quality drops in dLLMs under parallel decoding.
-<!-- 17 tasks across Waiting Line, Text Writing, and Puzzles—all trivial for humans and AR LLMs—reveal severe quality degradation in dLLMs under parallel decoding in real-world scenarios. -->
 
 
 ## ⚙️ Setup
