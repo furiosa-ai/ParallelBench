@@ -1,9 +1,14 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass, field
 from typing import Optional
 
 
-VALID_BASE_STRATEGIES = {"low_confidence", "random", "topk_margin", "entropy"}
+VALID_BASE_STRATEGIES = {
+    "random",
+    "low_confidence",
+    "topk_margin",
+    "entropy"
+}
 
 
 @dataclass

@@ -1,11 +1,7 @@
 import functools
 import types
-from dataclasses import dataclass
-from enum import Enum
+from dataclasses import dataclass, field
 from typing import Optional
-
-import torch
-from transformers import AutoModel, AutoTokenizer
 
 from model.base_model import BaseModel, DLLMOutput
 from model.generation_config import BaseGenerationConfig
@@ -16,42 +12,21 @@ from model.model_utils import (
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
 
+from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_BASE_STRATEGIES
 from .dream_model_utils import sample_block
-
-
-class DreamRemaskingStrategy(str, Enum):
-    RANDOM = "random"
-    ORIGIN = "origin"
-    MASKGIT_PLUS = "maskgit_plus"
-    TOPK_MARGIN = "topk_margin"
-    ENTROPY = "entropy"
-
-    ORIGIN_THRESHOLD = "origin_threshold"
-    MASKGIT_PLUS_THRESHOLD = "maskgit_plus_threshold"
-    TOPK_MARGIN_THRESHOLD = "topk_margin_threshold"
-    ENTROPY_THRESHOLD = "entropy_threshold"
-
-    ORIGIN_FACTOR = "origin_factor"
-    MASKGIT_PLUS_FACTOR = "maskgit_plus_factor"
-    TOPK_MARGIN_FACTOR = "topk_margin_factor"
-    ENTROPY_FACTOR = "entropy_factor"
-
-    CONFIDENCE_THRESHOLD = "confidence_threshold"
 
 
 @dataclass
 class DreamGenerationConfig(BaseGenerationConfig):
-    accel_framework: Optional[str] = None
+    remasking: str = "origin" # Set the default remasking strategy to "origin" for Dream models
+    block_length: int = 128 # Set the default block length for Dream models
 
-    remasking: str = "origin"
     top_p: Optional[float] = None
     top_k: Optional[float] = None
-    remasking_temperature: float = 0.0
 
-    remdm_number: Optional[int] = None
+    valid_base_strategies: set = field(default_factory=lambda: set(DREAM_VALID_BASE_STRATEGIES))
 
     def __post_init__(self):
-        assert self.remdm_number is None, "remdm_number is only supported for LLaDA"
         assert self.steps is None or self.steps <= self.max_tokens, (
             f"Steps must be less than or equal to max tokens. Got steps={self.steps}, max_tokens={self.max_tokens}"
         )
@@ -60,96 +35,17 @@ class DreamGenerationConfig(BaseGenerationConfig):
             self.top_p = None
             self.top_k = None
 
-        if self.accel_framework is None:
-            assert not self.use_fast_dllm_cache, (
-                "use_fast_dllm_cache is only supported in fast_dllm framework"
-            )
-            # assert self.block_length is None
-        elif self.accel_framework == "fast_dllm":
-            pass
-            # assert False
-            # assert self.remasking in [
-            #     DreamRemaskingStrategy.ENTROPY,
-            #     DreamRemaskingStrategy.CONFIDENCE_THRESHOLD,
-            # ], f"Remasking must be one of {list(DreamRemaskingStrategy)}, got {self.remasking}"
-
-            if not self.use_fast_dllm_cache:
-                assert self.block_length is None, (
-                    "block_length is only supported when use_fast_dllm_cache is True"
-                )
-                assert not self.use_fast_dllm_dual_cache, (
-                    "use_fast_dllm_dual_cache is only supported when use_fast_dllm_cache is True"
-                )
-
-    def to_generate_kwargs(self):
-        gen_kwargs = dict(
-            attention_mask=None,
-            max_new_tokens=self.max_tokens,
-            return_dict_in_generate=True,
-            steps=self.steps,
-            temperature=self.temperature,
-            top_p=self.top_p,
-            top_k=self.top_k,
-            alg=self.remasking,
-            alg_temp=self.remasking_temperature,
-            block_length=self.block_length,
-        )
-
-        if self.accel_framework == "fast_dllm":
-            gen_kwargs["dual_cache"] = self.use_fast_dllm_dual_cache
-
-        if self.remasking in [
-            DreamRemaskingStrategy.RANDOM,
-            DreamRemaskingStrategy.ORIGIN,
-            DreamRemaskingStrategy.MASKGIT_PLUS,
-            DreamRemaskingStrategy.TOPK_MARGIN,
-            DreamRemaskingStrategy.ENTROPY,
-        ]:
-            gen_kwargs["threshold"] = None
-            gen_kwargs["factor"] = None
-        elif self.remasking in [
-            DreamRemaskingStrategy.ORIGIN_THRESHOLD,
-            DreamRemaskingStrategy.MASKGIT_PLUS_THRESHOLD,
-            DreamRemaskingStrategy.TOPK_MARGIN_THRESHOLD,
-            DreamRemaskingStrategy.ENTROPY_THRESHOLD,
-            DreamRemaskingStrategy.CONFIDENCE_THRESHOLD,
-        ]:
-            assert self.alg_threshold is not None, (
-                f"alg_threshold must be provided for {self.remasking} algorithm"
-            )
-            gen_kwargs["threshold"] = self.alg_threshold
-            gen_kwargs["factor"] = None
-
-            gen_kwargs["alg"] = {
-                DreamRemaskingStrategy.ORIGIN_THRESHOLD: DreamRemaskingStrategy.ORIGIN,
-                DreamRemaskingStrategy.MASKGIT_PLUS_THRESHOLD: DreamRemaskingStrategy.MASKGIT_PLUS,
-                DreamRemaskingStrategy.CONFIDENCE_THRESHOLD: DreamRemaskingStrategy.MASKGIT_PLUS,
-                DreamRemaskingStrategy.TOPK_MARGIN_THRESHOLD: DreamRemaskingStrategy.TOPK_MARGIN,
-                DreamRemaskingStrategy.ENTROPY_THRESHOLD: DreamRemaskingStrategy.ENTROPY,
-            }[self.remasking]
-        elif self.remasking in [
-            DreamRemaskingStrategy.ORIGIN_FACTOR,
-            DreamRemaskingStrategy.MASKGIT_PLUS_FACTOR,
-            DreamRemaskingStrategy.TOPK_MARGIN_FACTOR,
-            DreamRemaskingStrategy.ENTROPY_FACTOR,
-        ]:
-            assert self.alg_factor is not None, (
-                f"alg_factor must be provided for {self.remasking} algorithm"
-            )
-            gen_kwargs["threshold"] = None
-            gen_kwargs["factor"] = self.alg_factor
-
-            gen_kwargs["alg"] = {
-                DreamRemaskingStrategy.ORIGIN_FACTOR: DreamRemaskingStrategy.ORIGIN,
-                DreamRemaskingStrategy.MASKGIT_PLUS_FACTOR: DreamRemaskingStrategy.MASKGIT_PLUS,
-                DreamRemaskingStrategy.TOPK_MARGIN_FACTOR: DreamRemaskingStrategy.TOPK_MARGIN,
-                DreamRemaskingStrategy.ENTROPY_FACTOR: DreamRemaskingStrategy.ENTROPY,
-            }[self.remasking]
-        else:
-            raise ValueError(f"Unsupported remasking strategy: {self.remasking}")
-
-        return gen_kwargs
-
+    def to_generation_kwargs(self):
+        gen_kwargs = super().to_generation_kwargs()
+        gen_length = gen_kwargs.pop("gen_length")
+        return {
+            **gen_kwargs,
+            "max_new_tokens": gen_length,
+            "return_dict_in_generate": True,
+            "attention_mask": None,
+            "top_p": self.top_p,
+            "top_k": self.top_k,
+        }
 
 
 @ModelRegistry.register(
@@ -164,23 +60,10 @@ class DreamGenerationConfig(BaseGenerationConfig):
 )
 class DreamModel(BaseModel):
     def __init__(self, model_name, accel_framework=None, eps=0):
-        if accel_framework == "fast_dllm":
-            raise NotImplementedError("Fast-dLLM Dream model loading is not implemented yet.")
-        
-        self.model = AutoModel.from_pretrained(
-                model_name,
-                trust_remote_code=True,
-                torch_dtype=torch.bfloat16,
-                device_map="auto",
-            )
-        self.model.eval()
-
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, trust_remote_code=True
-        )
+        super().__init__(model_name, accel_framework)
 
         self.eps = eps
-        self.mask_id = 151666
+        self.mask_id = DREAM_MASK_TOKEN_ID
         self.accel_framework = accel_framework
 
     def patch_model(self, gen_config):
@@ -191,11 +74,11 @@ class DreamModel(BaseModel):
         self.model._sample = types.MethodType(self.model.__class__._sample, self.model)
         self.model.forward = types.MethodType(self.model.__class__.forward, self.model)
 
-        gen_kwargs = gen_config.to_generate_kwargs()
+        gen_kwargs = gen_config.to_generation_kwargs()
 
         if self.accel_framework == "fast_dllm":
             raise NotImplementedError("Fast-dLLM Dream model patching is not implemented yet.")
-        
+
         if (
             gen_kwargs.get("block_length") is not None
             or gen_kwargs.get("threshold") is not None
@@ -220,9 +103,6 @@ class DreamModel(BaseModel):
 
         self.model.forward = types.MethodType(forward_hook, self.model)
 
-    def fill(self, prompt, suffix, gen_config=None):
-        raise NotImplementedError
-
     @property
     def _is_diffucoder(self):
         return self.model.name_or_path.lower() in (
@@ -231,19 +111,18 @@ class DreamModel(BaseModel):
         )
 
     @measure_time_mem("generate")
-    def model_generate(self, input_ids, gen_config, output_history):
+    def _generate(self, input_ids, gen_config, output_history):
         self.patch_model(gen_config)
 
         gen_kwargs = dict(
-            **gen_config.to_generate_kwargs(),
+            **gen_config.to_generation_kwargs(),
             output_history=output_history,
         )
 
-        if self._is_diffucoder:
-            gen_kwargs["eps"] = 1e-12
-
         if self.eps is not None:
             gen_kwargs["eps"] = self.eps
+        elif self._is_diffucoder:
+            gen_kwargs["eps"] = DIFFUCODER_EPS
 
         return self.model.diffusion_generate(input_ids, **gen_kwargs), self.model.nfe
 
@@ -262,7 +141,7 @@ class DreamModel(BaseModel):
             accel_framework=self.accel_framework, **gen_config
         )
 
-        model_output, nfe = self.model_generate(
+        model_output, nfe = self._generate(
             input_ids, gen_config, output_history=output_history
         )
         output_ids = model_output.sequences[:, input_ids.shape[1] :]

@@ -163,11 +163,11 @@ def sample_block(
     # pad input_ids to max_length
     x = F.pad(input_ids, (0, max_length - input_ids.shape[1]), value=mask_token_id)
     gen_length = max_length - input_ids.shape[1]
-    
+
     # Handle block configuration
     if block_length is None:
         block_length = gen_length  # Default: single block (original behavior)
-    
+
     assert gen_length % block_length == 0, f"gen_length ({gen_length}) must be divisible by block_length ({block_length})"
     num_blocks = gen_length // block_length
     
@@ -194,19 +194,21 @@ def sample_block(
         tok_idx = None
         attention_mask = "full"
 
-    if alg == "confidence_threshold":
-        assert threshold is not None, "threshold must be provided for confidence_threshold algorithm"
+    if alg == "low_confidence_threshold":
+        assert (
+            threshold is not None
+        ), "threshold must be provided for low_confidence_threshold algorithm"
         alg = "maskgit_plus"
     else:
         pass
-        # assert threshold is None, "threshold should not be provided for non-confidence_threshold algorithms"
+        # assert threshold is None, "threshold should not be provided for non-low_confidence_threshold algorithms"
 
     # Process each block
     for num_block in range(num_blocks):
-        
+
         current_block_start = input_ids.shape[1] + num_block * block_length
         current_block_end = current_block_start + block_length
-            
+
         i = 0
         while True:
             mask_index = torch.full((1, x.shape[1]), False, dtype=torch.bool, device=x.device)
@@ -274,7 +276,7 @@ def sample_block(
 
                         _, select_index = torch.topk(full_confidence[j], k=top_i)
                         transfer_index[j, select_index] = True
-                    
+
                     x[transfer_index] = x_[transfer_index]
                 elif threshold is not None:
                     x_ = torch.zeros_like(x, device=self.device, dtype=torch.long) + mask_token_id
@@ -282,9 +284,9 @@ def sample_block(
 
                     current_transfer_tokens = (x[:, current_block_start:current_block_end] == mask_token_id).sum()
                     transfer_index = torch.zeros_like(x_, device=x.device, dtype=torch.bool)
-                    
+
                     selected_confidence, select_index = torch.topk(full_confidence, current_transfer_tokens)
-                    
+
                     select_index = select_index.to(x.device)
                     transfer_index[0, select_index[0]] = True
                     for k in range(1, current_transfer_tokens):
@@ -310,7 +312,7 @@ def sample_block(
                         x_ = torch.zeros_like(x, device=self.device, dtype=torch.long) + mask_token_id
                         x_[mask_index] = x0.clone()
                         row_indices = torch.arange(x.size(0), device=self.device).unsqueeze(1).expand_as(transfer_index)
-                        
+
                         x[row_indices,transfer_index] = x_[row_indices,transfer_index]
                     i += 1
 
@@ -320,7 +322,6 @@ def sample_block(
             if (x[:, current_block_start:current_block_end] == mask_token_id).sum() == 0:
                 break
 
-    
     if return_dict_in_generate:
         return DreamModelOutput(
             sequences=x,
