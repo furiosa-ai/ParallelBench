@@ -454,12 +454,12 @@ def get_transfer_index(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if remasking == "low_confidence":
+    if remasking.startswith("low_confidence"):
         # get probabilities of selected ids (confidence)
         # x0_p = torch.squeeze(
         #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
         pass
-    elif remasking == "topk_margin":
+    elif remasking.startswith("topk_margin"):
         x0_p = None
         sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
         # Extract top1 and top2 probabilities
@@ -467,12 +467,12 @@ def get_transfer_index(
         top2_probs = sorted_probs[..., 1]
         # Calculate confidence as top1 - top2
         x0_p = top1_probs - top2_probs
-    elif remasking == "entropy":
+    elif remasking.startswith("entropy"):
         x0_p = None
         epsilon = 1e-10
         log_probs = torch.log(p + epsilon)
         x0_p = torch.sum(p * log_probs, dim=-1)
-    elif remasking == "random":
+    elif remasking.startswith("random"):
         x0_p = None
         x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
     else:
@@ -529,23 +529,23 @@ def get_transfer_index_dynamic(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if remasking == "low_confidence":
+    if remasking.startswith("low_confidence"):
         # get probabilities of selected ids (confidence)
         # x0_p = torch.squeeze(
         #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
         pass
-    elif remasking == "topk_margin":
+    elif remasking.startswith("topk_margin"):
         sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
         # Extract top1 and top2 probabilities
         top1_probs = sorted_probs[..., 0]
         top2_probs = sorted_probs[..., 1]
         # Calculate confidence as top1 - top2
         x0_p = top1_probs - top2_probs
-    elif remasking == "entropy":
+    elif remasking.startswith("entropy"):
         epsilon = 1e-10
         log_probs = torch.log(p + epsilon)
         x0_p = torch.sum(p * log_probs, dim=-1)
-    elif remasking == "random":
+    elif remasking.startswith("random"):
         x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
     else:
         raise NotImplementedError(remasking)
