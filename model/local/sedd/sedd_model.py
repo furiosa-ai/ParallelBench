@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 import torch
 from sedd import sampling
@@ -25,30 +24,16 @@ class SeddPredictorType(str, Enum):
 
 @dataclass
 class SeddGenerationConfig(BaseGenerationConfig):
-    accel_framework: Optional[str] = None
-
     predictor: SeddPredictorType = SeddPredictorType.ANALYTIC
-    # block_length: int = 128
 
-    # fast-dllm specific
-    # alg_threshold: float = 0.9  # TODO assert none if not using LOW_CONFIDENCE_THRESHOLD
-    # alg_factor: Optional[float] = None
-    # use_fast_dllm_cache: bool = False
-    # use_fast_dllm_dual_cache: bool = False
-
-    # remdm_number: Optional[int] = None
-
-    # @property
-    # def num_blocks(self):
-    #     return self.max_tokens // self.block_length
 
     def __post_init__(self):
         assert self.block_length is None or self.block_length == self.max_tokens, (
             "Block length must be equal to max tokens if specified."
         )
-        assert self.temperature == 1.0
+        assert self.temperature == 1.0, "Temperature must be 1.0 for SEDD models."
 
-    def to_generate_kwargs(self) -> dict:
+    def to_generation_kwargs(self) -> dict:
         return dict(
             predictor=self.predictor,
             steps=self.steps,
@@ -64,18 +49,15 @@ class SeddModel(BaseModel):
         self.device = torch.device("cuda")
         self.model, self.graph, self.noise = load_model(model_name, self.device)
         self.model.eval()
-        # self.model = torch.compile(self.model, mode="reduce-overhead", fullgraph=False, dynamic=True)
 
         self.tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
         self.accel_framework = accel_framework
 
-    def fill(self, prompt, suffix, gen_config=None):
-        raise NotImplementedError
 
     @measure_time_mem("generate")
-    def model_generate(self, input_ids, gen_config, output_history=False):
-        generate_kwargs = gen_config.to_generate_kwargs()
+    def _generate(self, input_ids, gen_config, output_history=False):
+        generate_kwargs = gen_config.to_generation_kwargs()
 
         input_locs = torch.arange(len(input_ids[0]), device=input_ids.device)
 
@@ -103,7 +85,6 @@ class SeddModel(BaseModel):
 
     def generate(self, messages, gen_config=None, output_history=False):
         if isinstance(messages, list):
-            # prompt = self.tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
             prompt = "\n\n".join(m["content"] for m in messages) + "\n\n"
         else:
             prompt = messages
@@ -115,14 +96,12 @@ class SeddModel(BaseModel):
             accel_framework=self.accel_framework, **gen_config
         )
 
-        input_output_ids, nfe, history = self.model_generate(
+        input_output_ids, nfe, history = self._generate(
             input_ids, gen_config, output_history=output_history
         )
         output_ids = input_output_ids[:, input_ids.shape[1] :]
 
         output = self.tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
-
-        # assert not (output_history and history is None), "History should not be None if output_history is True."
 
         if history is not None:
             decoding_order, decoding_order_corrs = (

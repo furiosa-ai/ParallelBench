@@ -1,0 +1,39 @@
+- skip_metrics: false
+  model:
+    model_name: louaaron/sedd-medium
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/copy
+    num_samples: 10
+  generation:
+    max_tokens: 32
+    steps: 32
+    predictor: none
+    temperature: 1.0
+- skip_metrics: false
+  model:
+    model_name: louaaron/sedd-medium
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/copy
+    num_samples: 10
+  generation:
+    max_tokens: 32
+    steps: 32
+    predictor: euler
+    temperature: 1.0
+- skip_metrics: false
+  model:
+    model_name: louaaron/sedd-medium
+    accel_framework: null
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/copy
+    num_samples: 10
+  generation:
+    max_tokens: 32
+    steps: 32
+    predictor: analytic
+    temperature: 1.0
