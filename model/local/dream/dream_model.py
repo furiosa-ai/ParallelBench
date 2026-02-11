@@ -2,7 +2,6 @@ from dataclasses import dataclass
 import dataclasses
 from enum import Enum
 import functools
-import sys
 import types
 from typing import Optional
 
@@ -10,7 +9,6 @@ import torch
 
 from transformers import AutoModel, AutoTokenizer
 from model.base_model import BaseModel, DLLMOutput
-from model.dream_model_utils import sample_block
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
@@ -18,6 +16,8 @@ from model.model_utils import (
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
 from utils.utils import insert_import_path
+
+from .dream_model_utils import sample_block
 
 
 FAST_DLLM_PATH = "src/Fast_dLLM/dream"

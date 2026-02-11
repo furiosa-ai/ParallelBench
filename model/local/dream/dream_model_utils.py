@@ -1,7 +1,6 @@
 import warnings
-import copy
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import torch
 import torch.distributions as dists
@@ -12,7 +11,6 @@ from transformers.generation.configuration_utils import (
 )
 from transformers.utils import (
     ModelOutput,
-    is_torchdynamo_compiling,
     logging,
 )
 
