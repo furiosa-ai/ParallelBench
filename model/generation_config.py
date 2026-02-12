@@ -50,7 +50,7 @@ class BaseGenerationConfig(ABC):
         if self.max_tokens % self.block_length != 0:
             raise ValueError("max_tokens must be divisible by block_length")
 
-        # Vaidate fast_dllm cache usage
+        # Validate fast_dllm cache usage
         if self.accel_framework != "fast_dllm":
             if self.use_fast_dllm_cache:
                 raise ValueError(

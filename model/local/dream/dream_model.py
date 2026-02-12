@@ -3,7 +3,7 @@ import types
 from dataclasses import dataclass, field
 from typing import Optional
 
-from model.base_model import BaseModel, DLLMOutput
+from model.base_model import LocalModel, DLLMOutput
 from model.generation_config import BaseGenerationConfig
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
@@ -57,7 +57,7 @@ class DreamGenerationConfig(BaseGenerationConfig):
         "apple/DiffuCoder-7B-cpGRPO",
     ) or "dream" in name.lower()
 )
-class DreamModel(BaseModel):
+class DreamModel(LocalModel):
     def __init__(self, model_name, accel_framework=None, eps=0):
         super().__init__(model_name, accel_framework)
 

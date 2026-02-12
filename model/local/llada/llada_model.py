@@ -5,7 +5,7 @@ import torch
 from transformers import PreTrainedModel
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
-from model.base_model import BaseModel, DLLMOutput
+from model.base_model import LocalModel, DLLMOutput
 from model.generation_config import BaseGenerationConfig
 from model.local.generate import generate
 from model.model_utils import (
@@ -86,7 +86,7 @@ class LladaGenerationConfig(BaseGenerationConfig):
     in ("GSAI-ML/LLaDA-8B-Instruct", "GSAI-ML/LLaDA-1.5")
     or "llada" in name.lower()
 )
-class LladaModel(BaseModel):
+class LladaModel(LocalModel):
     def __init__(self, model_name: str, accel_framework: Optional[str]=None):
         """Initialize the LladaModel.
 

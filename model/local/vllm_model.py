@@ -1,15 +1,16 @@
-
 from dataclasses import dataclass
+
 import torch
 
-from model.base_model import  BaseModel, DLLMOutput
-from model.generation_config import ApiGenerationConfig
+from model.base_model import BaseModel, DLLMOutput
 from utils.perf_utils import measure_time_mem
 
 
-
 @dataclass
-class vllmGenerationConfig(ApiGenerationConfig):
+class vllmGenerationConfig:
+    max_tokens: int = 128
+    temperature: float = 0.0
+
     def to_sampling_params(self):
         from vllm import SamplingParams
         assert self.temperature == 0.0, "vllmGenerationConfig only supports temperature=0.0"

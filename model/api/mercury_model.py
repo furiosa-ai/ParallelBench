@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import json
 import os
 
-from model.base_model import BaseModel, DLLMOutput
+from model.base_model import ApiModel, DLLMOutput
 from model.generation_config import ApiGenerationConfig
 from model.registry import ModelRegistry
 
@@ -16,7 +16,7 @@ class MercuryGenerationConfig(ApiGenerationConfig):
 
 
 @ModelRegistry.register(lambda name: name in ("mercury", "mercury-coder"))
-class MercuryModel(BaseModel):
+class MercuryModel(ApiModel):
     def __init__(self, model_name):
         assert model_name in ("mercury", "mercury-coder")
 

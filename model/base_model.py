@@ -3,15 +3,43 @@ from dataclasses import dataclass
 from typing import Optional
 
 import torch
-from transformers import AutoModel, AutoTokenizer
 
 VALID_ACCEL_FRAMEWORKS = {None, "vllm", "transformers", "fast_dllm"}
 
+
 class BaseModel(ABC):
+    """Abstract base class for all models (API and local)."""
+
+    @abstractmethod
+    def generate(self, messages, **kwargs) -> "DLLMOutput":
+        """Generate output from input messages.
+
+        Args:
+            messages: Input messages in chat format
+            **kwargs: Additional generation parameters (model-specific)
+
+        Returns:
+            DLLMOutput: Generated output with metadata
+        """
+        pass
+
+
+class ApiModel(BaseModel):
+    """Base class for API-backed models (no local weight loading)."""
+    pass
+
+
+class LocalModel(BaseModel):
+    """Base class for local models that load weights via transformers."""
+
     def __init__(self, model_name, accel_framework=None):
+        from transformers import AutoModel, AutoTokenizer
 
         if accel_framework not in VALID_ACCEL_FRAMEWORKS:
-            raise ValueError(f"Invalid accel_framework: {accel_framework}. Valid options are: {VALID_ACCEL_FRAMEWORKS}")
+            raise ValueError(
+                f"Invalid accel_framework: {accel_framework}. "
+                f"Valid options are: {VALID_ACCEL_FRAMEWORKS}"
+            )
 
         if accel_framework == "fast_dllm":
             raise NotImplementedError("Fast dLLM model loading is not implemented yet.")
@@ -26,19 +54,6 @@ class BaseModel(ABC):
         self.model.eval()
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-
-    @abstractmethod
-    def generate(self, messages, **kwargs) -> "DLLMOutput":
-        """Generate output from input messages.
-
-        Args:
-            messages: Input messages in chat format
-            **kwargs: Additional generation parameters (model-specific)
-
-        Returns:
-            DLLMOutput: Generated output with metadata
-        """
-        pass
 
 
 @dataclass

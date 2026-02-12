@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from model.base_model import BaseModel, DLLMOutput
+from model.base_model import ApiModel, DLLMOutput
 from model.generation_config import ApiGenerationConfig
 from model.registry import ModelRegistry
 
@@ -10,7 +10,7 @@ class AnthropicGenerationConfig(ApiGenerationConfig):
 
 
 @ModelRegistry.register(lambda name: name.startswith("claude-"))
-class AnthropicModel(BaseModel):
+class AnthropicModel(ApiModel):
     def __init__(self, model_name):
         import anthropic
 

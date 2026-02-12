@@ -8,6 +8,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
 from model.base_model import BaseModel, DLLMOutput
+# TradoModel loads AutoModelForCausalLM directly (not AutoModel),
+# so it inherits BaseModel instead of LocalModel.
 from model.generation_config import BaseGenerationConfig
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,

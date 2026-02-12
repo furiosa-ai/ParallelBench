@@ -1,6 +1,4 @@
-import inspect
-
-from model.base_model import BaseModel
+from model.base_model import ApiModel, BaseModel, LocalModel
 # Local models
 from model.local import DreamModel, LladaModel, TradoModel, SeddModel
 # API models
@@ -8,7 +6,6 @@ from model.api import AnthropicModel, MercuryModel
 from model.registry import ModelRegistry
 from model.local.transformers_model import TransformersModel
 from model.local.vllm_model import vllmModel
-# Defer SeddModel import to avoid circular dependency - it will be registered when first imported
 
 
 __all__ = [
@@ -42,7 +39,6 @@ def load_model(model_name: str, **kwargs) -> "BaseModel":
     Raises:
         ValueError: If model_name is not supported.
     """
-    # Pop accel_framework first to avoid passing to models that don't accept it
     accel_framework = kwargs.pop("accel_framework", None)
 
     # Try registry first
@@ -52,12 +48,10 @@ def load_model(model_name: str, **kwargs) -> "BaseModel":
         model_class = None
 
     if model_class:
-        # Check if model accepts accel_framework parameter
-        sig = inspect.signature(model_class.__init__)
-        if "accel_framework" in sig.parameters:
-            return model_class(model_name, accel_framework=accel_framework, **kwargs)
-        else:
+        # API models don't accept accel_framework
+        if issubclass(model_class, ApiModel):
             return model_class(model_name, **kwargs)
+        return model_class(model_name, accel_framework=accel_framework, **kwargs)
     elif accel_framework == "vllm":
         return vllmModel(model_name, **kwargs)
     elif accel_framework == "transformers":
