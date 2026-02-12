@@ -36,9 +36,6 @@ class vllmModel(BaseModel):
 
         self.model = LLM(model=model_name, dtype=torch.bfloat16, max_model_len=max_model_len)
 
-    def fill(self, prompt, suffix, gen_config=None):
-        raise NotImplementedError
-
     @measure_time_mem("generate")
     def generate(self, messages, gen_config=None, output_history=False):
         sampling_params = vllmGenerationConfig(**gen_config).to_sampling_params()

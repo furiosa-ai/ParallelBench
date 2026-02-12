@@ -33,9 +33,6 @@ class TransformersModel(BaseModel):
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.chat_template_kwargs = chat_template_kwargs or {}
 
-    def fill(self, prompt, suffix, gen_config=None):
-        raise NotImplementedError
-
     @measure_time_mem("generate")
     def generate(self, messages, gen_config=None, output_history=False):
         generate_kwargs = TransformersGenerationConfig(**gen_config).to_generate_kwargs()
