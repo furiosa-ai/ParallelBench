@@ -15,7 +15,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Modified from LLaDA repos: https://github.com/ML-GSAI/LLaDA
 
-from typing import List, Optional
+import warnings
+from typing import Optional
 
 import numpy as np
 import torch
@@ -65,7 +66,7 @@ def generate(
     output0_ids=None,
     alg_temp=0.0,
     eb_sampler_gamma=None,
-)-> (torch.Tensor, int, Optional[List]):
+) -> tuple[torch.Tensor, int, Optional[list]]:
     """
     Args:
         model: Mask predictor.
@@ -449,7 +450,10 @@ def get_transfer_index(
         try:
             x0 = dists.Categorical(probs=p).sample()
             x0_p = torch.gather(p, -1, x0.unsqueeze(-1)).squeeze(-1)
-        except:
+        except (ValueError, RuntimeError):
+            x0_p, x0 = p.max(dim=-1)
+        except Exception as e:
+            warnings.warn(f"Unexpected exception {e} when sampling tokens, using argmax instead.")
             x0_p, x0 = p.max(dim=-1)
     else:
         x0_p, x0 = p.max(dim=-1)
@@ -524,7 +528,10 @@ def get_transfer_index_dynamic(
         try:
             x0 = dists.Categorical(probs=p).sample()
             x0_p = torch.gather(p, -1, x0.unsqueeze(-1)).squeeze(-1)
-        except:
+        except (ValueError, RuntimeError):
+            x0_p, x0 = p.max(dim=-1)
+        except Exception as e:
+            warnings.warn(f"Unexpected exception {e} when sampling tokens, using argmax instead.")
             x0_p, x0 = p.max(dim=-1)
     else:
         x0_p, x0 = p.max(dim=-1)

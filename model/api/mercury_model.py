@@ -1,12 +1,12 @@
-from dataclasses import dataclass
 import json
 import os
+from dataclasses import dataclass
+
+import requests
 
 from model.base_model import ApiModel, DLLMOutput
 from model.generation_config import ApiGenerationConfig
 from model.registry import ModelRegistry
-
-import requests
 
 
 @dataclass
@@ -21,7 +21,14 @@ class MercuryModel(ApiModel):
         assert model_name in ("mercury", "mercury-coder")
 
         self.model_name = model_name
-        self.api_key = os.environ["INCEPTION_API_KEY"]
+
+        api_key = os.environ.get("INCEPTION_API_KEY")
+        if api_key is None:
+            raise EnvironmentError(
+                "INCEPTION_API_KEY environment variable is not set. "
+                "Copy .env.example to .env and fill in your key."
+            )
+        self.api_key = api_key
 
     def generate(self, messages, gen_config=None, output_history=False):
         gen_config = MercuryGenerationConfig(**gen_config)
@@ -41,16 +48,32 @@ class MercuryModel(ApiModel):
                 "diffusing": True,
             },
         )
+        response.raise_for_status()
 
-        output_json_lines = response.content.decode()
-        output_json_lines = (
-            "{" + output_json_lines.split("{", 1)[1].rsplit("}", 1)[0] + "}"
-        )
-        output_json_lines = output_json_lines.split("\n\ndata: ")
+        try:
+            output_json_lines = response.content.decode()
+            output_json_lines = (
+                "{" + output_json_lines.split("{", 1)[1].rsplit("}", 1)[0] + "}"
+            )
+            output_json_lines = output_json_lines.split("\n\ndata: ")
+            output_full = [json.loads(o) for o in output_json_lines if o.strip()]
+        except (IndexError, json.JSONDecodeError) as e:
+            raise ValueError(
+                f"Failed to parse Mercury API SSE response: {e}"
+            ) from e
 
-        output_full = [json.loads(o) for o in output_json_lines if o.strip()]
-        history = [o["choices"][0]["delta"].get("content") for o in output_full]
+        history = [
+            o["choices"][0]["delta"].get("content")
+            for o in output_full
+            if o.get("choices")
+        ]
         history = [h for h in history if h is not None]
+
+        if not history:
+            raise ValueError(
+                "Mercury API returned no content in the response. "
+                "Check the request parameters and API status."
+            )
         output = history[-1]
 
         return DLLMOutput(
