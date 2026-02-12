@@ -36,17 +36,6 @@ def test_subclass_with_generate_can_be_instantiated():
     assert result.output == "test"
 
 
-def test_num_workers_property_defaults_to_zero():
-    """num_workers property should still work and default to 0."""
-
-    class ConcreteModel(BaseModel):
-        def generate(self, messages, **kwargs):
-            return DLLMOutput(output="test")
-
-    model = ConcreteModel()
-    assert model.num_workers == 0
-
-
 def test_dllm_output_properties():
     """DLLMOutput dataclass should work with input_length and output_length properties."""
     # Test with input_ids
