@@ -61,8 +61,8 @@ class TestModelRegistry:
         with pytest.raises(ValueError, match="No model class found"):
             ModelRegistry.get_model_class("non_existent_model")
 
-    def test_multiple_registrations_first_matching_wins(self):
-        """Test that multiple registrations work and first matching wins (registration order)."""
+    def test_multiple_registrations_ambiguous_raises_error(self):
+        """Test that multiple matching registrations raise ValueError."""
         from model.registry import ModelRegistry
 
         @ModelRegistry.register(matcher=lambda name: "test" in name)
@@ -73,11 +73,8 @@ class TestModelRegistry:
         class SecondModel:
             pass
 
-        # First matching should win
-        retrieved_class = ModelRegistry.get_model_class("test_model")
-        assert retrieved_class is FirstModel, (
-            "First registered matching class should win"
-        )
+        with pytest.raises(ValueError, match="Ambiguous model name"):
+            ModelRegistry.get_model_class("test_model")
 
     def test_get_model_class_returns_class_not_instance(self):
         """Test that get_model_class() returns the CLASS, not an instance."""
