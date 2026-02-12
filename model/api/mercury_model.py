@@ -11,8 +11,8 @@ import requests
 
 @dataclass
 class MercuryGenerationConfig(ApiGenerationConfig):
-    pass
     # presence_penalty: float = 1.5
+    pass
 
 
 @ModelRegistry.register(lambda name: name in ("mercury", "mercury-coder"))
@@ -22,26 +22,6 @@ class MercuryModel(BaseModel):
 
         self.model_name = model_name
         self.api_key = os.environ["INCEPTION_API_KEY"]
-
-    def fill(self, prompt, suffix, gen_config=None):
-        gen_config = MercuryGenerationConfig(**gen_config)
-
-        response = requests.post(
-            "https://api.inceptionlabs.ai/v1/fim/completions",
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}",
-            },
-            json={
-                "model": self.model_name,
-                "prompt": prompt,
-                "suffix": suffix,
-                "max_tokens": gen_config.max_tokens,
-                "temperature": gen_config.temperature,
-            },
-        )
-
-        return response.json()["choices"][0]["message"]["content"]
 
     def generate(self, messages, gen_config=None, output_history=False):
         gen_config = MercuryGenerationConfig(**gen_config)

@@ -9,7 +9,6 @@ class AnthropicGenerationConfig(ApiGenerationConfig):
     pass
 
 
-# export ANTHROPIC_API_KEY='your-api-key-here'
 @ModelRegistry.register(lambda name: name.startswith("claude-"))
 class AnthropicModel(BaseModel):
     def __init__(self, model_name):
@@ -18,9 +17,6 @@ class AnthropicModel(BaseModel):
         self.model_name = model_name
 
         self.client = anthropic.Anthropic()
-
-    def fill(self, prompt, suffix, gen_config=None):
-        raise NotImplementedError("AnthropicModel does not support fill method.")
 
     def generate(self, messages, gen_config=None, output_history=False):
         gen_config = AnthropicGenerationConfig(**gen_config)
