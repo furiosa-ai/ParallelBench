@@ -46,8 +46,9 @@ class ModelRegistry:
         """
         Get the model class for a given model name.
 
-        Iterates through registered (matcher, class) pairs in registration order
-        and returns the first class whose matcher returns True.
+        Iterates through all registered (matcher, class) pairs and collects
+        every class whose matcher returns True. Raises an error if multiple
+        classes match to prevent ambiguous dispatch.
 
         Args:
             model_name: The name of the model to look up.
@@ -56,13 +57,25 @@ class ModelRegistry:
             The registered model class (not an instance).
 
         Raises:
-            ValueError: If no matcher matches the given model name.
+            ValueError: If no matcher matches the given model name, or if
+                        multiple matchers match (ambiguous).
         """
-        for matcher, model_class in cls._registry:
-            if matcher(model_name):
-                return model_class
+        matched_classes = [
+            model_class
+            for matcher, model_class in cls._registry
+            if matcher(model_name)
+        ]
 
-        raise ValueError(f"No model class found for model name: {model_name}")
+        if len(matched_classes) > 1:
+            matched_names = [c.__name__ for c in matched_classes]
+            raise ValueError(
+                f"Ambiguous model name '{model_name}': matched multiple model classes: {matched_names}"
+            )
+
+        if not matched_classes:
+            raise ValueError(f"No model class found for model name: {model_name}")
+
+        return matched_classes[0]
 
     @classmethod
     def clear(cls) -> None:
