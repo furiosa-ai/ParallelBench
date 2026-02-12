@@ -10,14 +10,14 @@ from model.registry import ModelRegistry
 
 # Import all model modules at module level to trigger decorator registration
 import model.api.mercury_model
-import model.local.dream_model
-import model.local.trado_model
-import model.local.llada_model
+import model.local.dream.dream_model
+import model.local.trado.trado_model
+import model.local.llada.llada_model
 import model.api.anthropic_model
 
 SEDD_AVAILABLE = False
 try:
-    import model.local.sedd_model
+    import model.local.sedd.sedd_model
 
     SEDD_AVAILABLE = True
 except ImportError:
