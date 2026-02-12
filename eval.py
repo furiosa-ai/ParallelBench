@@ -185,17 +185,14 @@ class Evaluator:
             self.tokenizer.mask_token_id = LLADA_MASK_TOKEN_ID
 
         for output in outputs:
-            if output.get("decoding_order", None) is None or True:
-                decoding_order, decoding_order_corrs = (
-                    compute_decoding_order_correlation_from_history(
-                        self.tokenizer, output.get("history", [])
-                    )
+            decoding_order, decoding_order_corrs = (
+                compute_decoding_order_correlation_from_history(
+                    self.tokenizer, output.get("history", [])
                 )
-                output.update(
-                    {"decoding_order": decoding_order, **decoding_order_corrs}
-                )
-            else:
-                return None
+            )
+            output.update(
+                {"decoding_order": decoding_order, **decoding_order_corrs}
+            )
 
         return outputs
 
