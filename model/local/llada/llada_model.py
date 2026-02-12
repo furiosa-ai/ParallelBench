@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Optional, Union
 
 import torch
+from fast_dllm.llada.model.modeling_llada import LLaDAModelLM as FastLLaDAModelLM
 from transformers import AutoModel, PreTrainedModel
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
@@ -11,7 +12,6 @@ from model.local.generate import generate
 from model.local.generate_rcr import generate_rcr
 from model.local.generate_remdm import generate_remdm
 from model.local.llada.constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_BASE_STRATEGIES
-from model.local.llada.fast_dllm import LLaDAModelLM as FastLLaDAModelLM
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
