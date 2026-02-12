@@ -9,6 +9,7 @@ from model.local.vllm_model import vllmModel
 
 
 __all__ = [
+    "LocalModel",
     "DreamModel",
     "LladaModel",
     "TradoModel",
