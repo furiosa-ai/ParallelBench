@@ -6,9 +6,10 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "sedd",
+    "fast-dllm",
     "flash-attn",
     "torch==2.8.*",
-    "transformers==4.53.3",
+    "transformers==4.*",
     "evaluate>=0.4.6",
     "scipy>=1.17.0",
     "anthropic>=0.79.0",
@@ -19,11 +20,13 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "packages/Score-Entropy-Discrete-Diffusion",
+    "packages/fast-dllm",
 ]
 
 
 [tool.uv.sources]
 sedd = { workspace = true, editable = true }
+fast-dllm = { workspace = true, editable = true }
 
 
 [tool.uv.extra-build-dependencies]

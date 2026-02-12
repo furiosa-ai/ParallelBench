@@ -12,8 +12,8 @@ requires-python = ">=3.9"
 dependencies = [
     "torch>=2.0.0",
     "einops>=0.7.0",
-    "omegaconf>=2.3.0",
-    "hydra-core>=1.3.0",
+    "omegaconf",
+    "hydra-core",
     "transformers>=4.30.0",
     "huggingface-hub>=0.20.0",
     "accelerate>=0.25.0",
