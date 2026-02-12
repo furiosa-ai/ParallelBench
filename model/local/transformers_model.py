@@ -4,13 +4,12 @@ from dataclasses import dataclass
 import torch
 
 from model.base_model import BaseModel, DLLMOutput
-from model.generation_config import BaseGenerationConfig
+from model.generation_config import ARGenerationConfig
 from utils.perf_utils import measure_time_mem
 
 
 @dataclass
-class TransformersGenerationConfig(BaseGenerationConfig):
-    pass
+class TransformersGenerationConfig(ARGenerationConfig):
 
     def to_generate_kwargs(self):
         assert self.temperature == 0.0, "TransformersGenerationConfig only supports temperature=0.0"

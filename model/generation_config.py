@@ -13,12 +13,18 @@ VALID_BASE_STRATEGIES = {
 
 @dataclass
 class BaseGenerationConfig(ABC):
+    """Common generation config shared by all model types."""
     accel_framework: Optional[str] = None
-    remasking: Optional[str] = None
     max_tokens: int = 128
+    temperature: float = 0.0
+
+
+@dataclass
+class DllmGenerationConfig(BaseGenerationConfig):
+    """Generation config for discrete diffusion language models (dLLMs)."""
+    remasking: Optional[str] = None
     steps: Optional[int] = 128
     block_length: Optional[int] = None
-    temperature: float = 0.0
     alg_temp: float = 0.0
     alg_threshold: Optional[float] = None
     alg_factor: Optional[float] = None
@@ -32,12 +38,11 @@ class BaseGenerationConfig(ABC):
 
     @property
     def num_blocks(self):
-        assert isinstance(self.max_tokens, int) and self.max_tokens > 0
-        assert isinstance(self.block_length, int) and self.block_length > 0
-        try:
-            return self.max_tokens // self.block_length
-        except ZeroDivisionError:
-            raise ValueError("block_length must be greater than 0")
+        if not isinstance(self.max_tokens, int) or self.max_tokens <= 0:
+            raise ValueError("max_tokens must be a positive integer")
+        if not isinstance(self.block_length, int) or self.block_length <= 0:
+            raise ValueError("block_length must be a positive integer")
+        return self.max_tokens // self.block_length
 
     def _validate_dllm_gen_configs(self):
         if self.steps is not None:
@@ -105,6 +110,12 @@ class BaseGenerationConfig(ABC):
             threshold=self.alg_threshold,
             factor=self.alg_factor,
         )
+
+
+@dataclass
+class ARGenerationConfig(BaseGenerationConfig):
+    """Generation config for autoregressive models."""
+    pass
 
 
 @dataclass
