@@ -27,11 +27,6 @@ class BaseModel(ABC):
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
-
-    @property
-    def num_workers(self):
-        return 0
-
     @abstractmethod
     def generate(self, messages, **kwargs) -> "DLLMOutput":
         """Generate output from input messages.
