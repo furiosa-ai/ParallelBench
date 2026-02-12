@@ -1,16 +1,17 @@
 # seed
 # no_grad
 
-
 import argparse
+import gzip
 import json
 import os
 from pathlib import Path
-import torch
-from tqdm import tqdm
-import yaml
+
 import pandas as pd
-import gzip
+import torch
+import yaml
+from dotenv import load_dotenv
+from tqdm import tqdm
 
 from utils.logger import create_logger
 from utils.perf_utils import pop_perf_stats
@@ -173,8 +174,9 @@ class Evaluator:
         print(metrics)
 
     def _update_decoding_order(self, outputs):
-        from model.model_utils import compute_decoding_order_correlation_from_history
         from model.local.llada_model import LLADA_MASK_TOKEN_ID
+
+        from model.model_utils import compute_decoding_order_correlation_from_history
 
         self.tokenizer = resource_manager.load_tokenizer(
             pretrained_model_name_or_path=self.model_cfg["model_name"]
@@ -275,4 +277,5 @@ def parse_cfg():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main(*parse_cfg())
