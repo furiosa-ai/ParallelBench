@@ -1,7 +1,6 @@
-import time
 import wandb
 
-from utils.constants import WANDB_PROJECT_NAME, WANDB_TEAM_NAME
+from utils.constants import WANDB_ENTITY, WANDB_PROJECT
 
 
 class Logger:
@@ -132,5 +131,5 @@ def create_logger(logger_type, cfg, resume=False, run_prefix=None, **kwargs):
         "none": NoLogger,
     }[logger_type]
 
-    logger = logger_class(project=WANDB_PROJECT_NAME, entity=WANDB_TEAM_NAME, name=run_name, config=cfg, resume=resume, **kwargs)
+    logger = logger_class(project=WANDB_PROJECT, entity=WANDB_ENTITY, name=run_name, config=cfg, resume=resume, **kwargs)
     return logger

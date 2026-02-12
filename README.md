@@ -183,15 +183,18 @@ This command uses the configurations specified in `dataset/parallel_bench/data/t
 
 ### 🔑 Configuration
 
-Before running the evaluations, you must export the necessary API keys as environment variables.
+Before running the evaluations, copy the example environment file and fill in your API keys:
 
 ```bash
-# For logging results
-export WANDB_API_KEY="your_weights_and_biases_key"
+cp .env.example .env
+```
 
-# For commercial model APIs
-export ANTHROPIC_API_KEY="your_anthropic_key"      # For Haiku
-export INCEPTION_API_KEY="your_mercury_model_key"  # For Mercury
+Then edit `.env` with your actual keys. The keys will be loaded automatically via `python-dotenv`.
+
+For logging results, log in to Weights & Biases:
+
+```bash
+uv run wandb login
 ```
 
 All experiments are launched using the `run_all.py` script. The general command structure is:
