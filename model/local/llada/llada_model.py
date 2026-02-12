@@ -2,22 +2,22 @@ from dataclasses import dataclass, field
 from typing import Optional, Union
 
 import torch
-from transformers import PreTrainedModel
+from transformers import AutoModel, PreTrainedModel
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
 from model.base_model import DLLMOutput, LocalModel
 from model.generation_config import DllmGenerationConfig
 from model.local.generate import generate
+from model.local.generate_rcr import generate_rcr
+from model.local.generate_remdm import generate_remdm
+from model.local.llada.constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_BASE_STRATEGIES
+from model.local.llada.fast_dllm import LLaDAModelLM as FastLLaDAModelLM
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
 )
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
-
-from .constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_BASE_STRATEGIES
-from .remasking_rcr import generate_rcr
-from .remasking_remdm import generate_remdm
 
 
 @dataclass
@@ -94,7 +94,9 @@ class LladaModel(LocalModel):
             model_name (str): The name of the model to load.
             accel_framework (Optional[str]): The acceleration framework to use. Defaults to None.
         """
-        super().__init__(model_name, accel_framework)
+        model_class = FastLLaDAModelLM if accel_framework == "fast_dllm" else AutoModel
+
+        super().__init__(model_name, model_class=model_class, accel_framework=accel_framework)
 
         self.patch_model_forward(self.model, LLADA_MASK_TOKEN_ID)
         self.tokenizer.mask_token_id = LLADA_MASK_TOKEN_ID
@@ -139,10 +141,6 @@ class LladaModel(LocalModel):
         Returns:
             Tuple[torch.Tensor, int, Optional[dict]]: A tuple containing the generated token IDs, the number of forward evaluations (NFE), and optionally the generation history if output_history is True.
         """
-        if self.accel_framework == "fast_dllm":
-            # FIXME: implement fast dLLM generation
-            raise NotImplementedError("Fast dLLM LLADA generation is not implemented yet.")
-
         gen_kwargs = gen_config.to_generation_kwargs()
 
         gen_kwargs.update({

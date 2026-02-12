@@ -1,0 +1,34 @@
+- skip_metrics: false
+  model:
+    model_name: GSAI-ML/LLaDA-8B-Instruct
+    accel_framework: fast_dllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: random
+    temperature: 0.0
+    max_tokens: 32
+    steps: 8
+    block_length: 32
+    alg_threshold: null
+    alg_factor: null
+    use_fast_dllm_cache: True
+- skip_metrics: false
+  model:
+    model_name: GSAI-ML/LLaDA-8B-Instruct
+    accel_framework: fast_dllm
+  dataset:
+    dataset_name: parallel_bench
+    task: waiting_line/shuffle
+    num_samples: 10
+  generation:
+    remasking: random
+    temperature: 0.0
+    max_tokens: 32
+    steps: 8
+    block_length: 32
+    alg_threshold: null
+    alg_factor: null
+    use_fast_dllm_dual_cache: True

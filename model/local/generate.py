@@ -49,9 +49,24 @@ def get_num_transfer_tokens(mask_index, steps):
 
     return num_transfer_tokens
 
-
 @torch.no_grad()
 def generate(
+    *args,
+    use_fast_dllm_cache:bool=False,
+    use_fast_dllm_dual_cache:bool=False,
+    **kwargs,
+):
+    if use_fast_dllm_cache:
+        return generate_with_prefix_cache(*args, **kwargs)
+
+    elif use_fast_dllm_dual_cache:
+        return generate_with_dual_cache(*args, **kwargs)
+
+    return generate_with_no_cache(*args, **kwargs)
+
+
+@torch.no_grad()
+def generate_with_no_cache(
     model,
     prompt,
     steps=128,
@@ -172,6 +187,7 @@ def generate_with_prefix_cache(
     factor=None,
     output_history=False,
     alg_temp=0.0,
+    **kwargs,
 ):
     """
     Args:
@@ -184,7 +200,7 @@ def generate_with_prefix_cache(
         cfg_scale: Unsupervised classifier-free guidance scale.
         remasking: Remasking strategy. 'low_confidence' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
-    """
+    """    
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
     x[:, : prompt.shape[1]] = prompt.clone()
 

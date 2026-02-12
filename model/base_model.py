@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, Union, List, Dict
-
+from transformers import AutoModel, AutoTokenizer
 import torch
 
 VALID_ACCEL_FRAMEWORKS = {None, "vllm", "transformers", "fast_dllm"}
@@ -35,20 +35,17 @@ class ApiModel(BaseModel):
 class LocalModel(BaseModel):
     """Base class for local models that load weights via transformers."""
 
-    def __init__(self, model_name, accel_framework=None):
-        from transformers import AutoModel, AutoTokenizer
-
+    def __init__(self, model_name, model_class=AutoModel, accel_framework=None, ):
         if accel_framework not in VALID_ACCEL_FRAMEWORKS:
             raise ValueError(
                 f"Invalid accel_framework: {accel_framework}. "
                 f"Valid options are: {VALID_ACCEL_FRAMEWORKS}"
             )
 
-        if accel_framework == "fast_dllm":
-            raise NotImplementedError("Fast dLLM model loading is not implemented yet.")
         self.accel_framework = accel_framework
+        self.is_fast_dllm = self.accel_framework == "fast_dllm"
 
-        self.model = AutoModel.from_pretrained(
+        self.model = model_class.from_pretrained(
             model_name,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
