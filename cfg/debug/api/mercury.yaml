@@ -1,0 +1,10 @@
+skip_metrics: false
+model:
+  model_name: mercury
+dataset:
+  dataset_name: parallel_bench
+  task: waiting_line_n15/reverse
+  num_samples: 10
+generation:
+  temperature: 0.0
+  max_tokens: 128
