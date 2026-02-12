@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union, List, Dict
 
 import torch
 
@@ -11,13 +11,16 @@ class BaseModel(ABC):
     """Abstract base class for all models (API and local)."""
 
     @abstractmethod
-    def generate(self, messages, **kwargs) -> "DLLMOutput":
+    def generate(
+        self, messages: Union[List[str], str], gen_config: Dict=None, output_prefix: Optional[torch.tensor]=None, output_history: bool=False
+    ) -> "DLLMOutput":
         """Generate output from input messages.
 
         Args:
             messages: Input messages in chat format
-            **kwargs: Additional generation parameters (model-specific)
-
+            gen_config: Generation configuration dictionary passed to the model-specific GenerationConfig
+            output_prefix: Prefix token tensor to prepend to the generated output
+            output_history: If True, return intermediate decoding states in history field of DLLMOutput
         Returns:
             DLLMOutput: Generated output with metadata
         """
@@ -49,7 +52,7 @@ class LocalModel(BaseModel):
             model_name,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
-            device_map="cuda",
+            device_map="auto",
         )
         self.model.eval()
 
@@ -82,6 +85,3 @@ class DLLMOutput:
             if self.output_ids is not None
             else None
         )
-
-    def __post_init__(self):
-        pass

@@ -6,8 +6,8 @@ from sedd import sampling
 from sedd.load_model import load_model
 from transformers import GPT2TokenizerFast
 
-from model.base_model import BaseModel, DLLMOutput
-from model.generation_config import BaseGenerationConfig
+from model.base_model import DLLMOutput, LocalModel
+from model.generation_config import DllmGenerationConfig
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
@@ -23,7 +23,7 @@ class SeddPredictorType(str, Enum):
 
 
 @dataclass
-class SeddGenerationConfig(BaseGenerationConfig):
+class SeddGenerationConfig(DllmGenerationConfig):
     predictor: SeddPredictorType = SeddPredictorType.ANALYTIC
 
 
@@ -42,7 +42,7 @@ class SeddGenerationConfig(BaseGenerationConfig):
 
 
 @ModelRegistry.register(lambda name: "sedd" in name.lower())
-class SeddModel(BaseModel):
+class SeddModel(LocalModel):
     def __init__(self, model_name, accel_framework=None):
         assert accel_framework is None
 

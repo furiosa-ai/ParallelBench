@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import torch
 from transformers import PreTrainedModel
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
-from model.base_model import LocalModel, DLLMOutput
-from model.generation_config import BaseGenerationConfig
+from model.base_model import DLLMOutput, LocalModel
+from model.generation_config import DllmGenerationConfig
 from model.local.generate import generate
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
@@ -21,7 +21,7 @@ from .remasking_remdm import generate_remdm
 
 
 @dataclass
-class LladaGenerationConfig(BaseGenerationConfig):
+class LladaGenerationConfig(DllmGenerationConfig):
     remasking: str = "low_confidence" # Set the default remasking strategy
     block_length: int = 128 # Set the default block length
 
@@ -123,7 +123,13 @@ class LladaModel(LocalModel):
         model.__class__.forward = wrapped_forward
 
     @measure_time_mem("generate")
-    def _generate(self, input_ids: torch.Tensor, gen_config: LladaGenerationConfig, output_history: bool=False, output0_ids: Optional[torch.Tensor]=None) -> (torch.Tensor, int, Optional[dict]):
+    def _generate(
+        self,
+        input_ids: torch.Tensor,
+        gen_config: LladaGenerationConfig,
+        output_history: bool = False,
+        output0_ids: Optional[torch.Tensor] = None,
+    ) -> tuple[torch.Tensor, int, Optional[list]]:
         """Internal generation method that handles the actual generation logic based on the acceleration framework.
         Args:
             input_ids (torch.Tensor): The input token IDs for generation.
@@ -138,7 +144,7 @@ class LladaModel(LocalModel):
             raise NotImplementedError("Fast dLLM LLADA generation is not implemented yet.")
 
         gen_kwargs = gen_config.to_generation_kwargs()
-        
+
         gen_kwargs.update({
             "model": self.model,
             "prompt": input_ids,
@@ -146,7 +152,7 @@ class LladaModel(LocalModel):
             "output_history": output_history,
             "output0_ids": output0_ids,
         })
-        
+
         if gen_config.is_remdm_remasking:
             return generate_remdm(**gen_kwargs)
         elif gen_config.is_rcr_remasking:
@@ -156,7 +162,7 @@ class LladaModel(LocalModel):
 
     def generate(
         self,
-        messages: Union[List[str], str],
+        messages: Union[list[str], str],
         output_prefix:torch.Tensor=None,
         gen_config:dict=None,
         output_history:bool=False
@@ -170,7 +176,7 @@ class LladaModel(LocalModel):
         Returns:
             DLLMOutput: Generated output with metadata.
         """
-        
+
         if isinstance(messages, list):
             prompt = self.tokenizer.apply_chat_template(
                 messages, add_generation_prompt=True, tokenize=False
@@ -215,7 +221,7 @@ class LladaModel(LocalModel):
         assert not (output_history and history is None), (
             "History should not be None if output_history is True."
         )
-        
+
         decoding_order, decoding_order_corrs = (
             compute_decoding_order_correlation_from_history(self.tokenizer, history)
         )

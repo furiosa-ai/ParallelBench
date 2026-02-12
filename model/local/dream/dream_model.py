@@ -3,8 +3,8 @@ import types
 from dataclasses import dataclass, field
 from typing import Optional
 
-from model.base_model import LocalModel, DLLMOutput
-from model.generation_config import BaseGenerationConfig
+from model.base_model import DLLMOutput, LocalModel
+from model.generation_config import DllmGenerationConfig
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
@@ -17,7 +17,7 @@ from .dream_model_utils import sample_block
 
 
 @dataclass
-class DreamGenerationConfig(BaseGenerationConfig):
+class DreamGenerationConfig(DllmGenerationConfig):
     remasking: str = "origin" # Set the default remasking strategy to "origin" for Dream models
     block_length: int = 128 # Set the default block length for Dream models
 
@@ -63,7 +63,6 @@ class DreamModel(LocalModel):
 
         self.eps = eps
         self.mask_id = DREAM_MASK_TOKEN_ID
-        self.accel_framework = accel_framework
 
     def patch_model(self, gen_config):
         # reset the model methods to the original ones
@@ -125,7 +124,7 @@ class DreamModel(LocalModel):
 
         return self.model.diffusion_generate(input_ids, **gen_kwargs), self.model.nfe
 
-    def generate(self, messages, gen_config=None, output_history=None):
+    def generate(self, messages, output_prefix=None, gen_config=None, output_history=False):
         if isinstance(messages, list):
             prompt = self.tokenizer.apply_chat_template(
                 messages, add_generation_prompt=True, tokenize=False

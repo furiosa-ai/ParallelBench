@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import Optional
 
 import torch
@@ -7,10 +6,8 @@ import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
-from model.base_model import BaseModel, DLLMOutput
-# TradoModel loads AutoModelForCausalLM directly (not AutoModel),
-# so it inherits BaseModel instead of LocalModel.
-from model.generation_config import BaseGenerationConfig
+from model.base_model import DLLMOutput, LocalModel
+from model.generation_config import DllmGenerationConfig
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
@@ -18,11 +15,12 @@ from model.model_utils import (
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
 
+from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_BASE_STRATEGIES
 from .trado_model_utils import block_diffusion_generate
-from .constants import TRADO_VALID_BASE_STRATEGIES, TRADO_MASK_TOKEN_ID
+
 
 @dataclass
-class TradoGenerationConfig(BaseGenerationConfig):
+class TradoGenerationConfig(DllmGenerationConfig):
     remasking: str = "low_confidence"
     block_length: int = 128
 
@@ -62,7 +60,7 @@ class TradoGenerationConfig(BaseGenerationConfig):
     or "trado" in name.lower()
     or "sdar" in name.lower()
 )
-class TradoModel(BaseModel):
+class TradoModel(LocalModel):
     def __init__(self, model_name, accel_framework=None):
         # Use AutoModelForCausalLM to load the model
         self.model = AutoModelForCausalLM.from_pretrained(
