@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import Optional, Union, List
+from dataclasses import dataclass, field
+from typing import List, Optional, Union
 
 import torch
 from transformers import PreTrainedModel
@@ -14,7 +14,10 @@ from model.model_utils import (
 )
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
-from .constants import LLADA_MASK_TOKEN_ID
+
+from .constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_BASE_STRATEGIES
+from .remasking_rcr import generate_rcr
+from .remasking_remdm import generate_remdm
 
 
 @dataclass
@@ -22,6 +25,61 @@ class LladaGenerationConfig(BaseGenerationConfig):
     remasking: str = "low_confidence" # Set the default remasking strategy
     block_length: int = 128 # Set the default block length
 
+    valid_base_strategies: set = field(default_factory=lambda: set(LLADA_VALID_BASE_STRATEGIES))
+
+    # ReMDM
+    remdm_steps: Optional[int] = None
+    remdm_number: Optional[int] = None
+
+    # RCR
+    rcr_overtime_conf: Optional[bool] = None
+
+    def _validate_remasking(self):
+        super()._validate_remasking()
+
+        self.is_remdm_remasking = self.remasking == "remdm"
+        self.is_rcr_remasking = self.remasking == "rcr"
+
+        if self.is_remdm_remasking:
+            assert self.remdm_steps is not None and self.remdm_steps >= 0, \
+                "remdm_steps must be specified and non-negative for ReMDM remasking."
+            assert self.remdm_number is not None and self.remdm_number > 0, \
+                "remdm_number must be specified and positive for ReMDM remasking."
+
+            assert self.alg_temp == 0.0, \
+                "alg_temp must be 0.0 for ReMDM remasking."
+            assert self.alg_threshold is None, \
+                "alg_threshold should not be set for ReMDM remasking."
+            assert self.alg_factor is None, \
+                "alg_factor should not be set for ReMDM remasking."
+
+        if self.is_rcr_remasking:
+            assert (
+                self.rcr_overtime_conf is not None and isinstance(self.rcr_overtime_conf, bool)
+            ), "overtime_conf must be specified for RCR remasking and be a boolean."
+            
+            assert self.temperature == 0.0, "temperature must be 0.0 for RCR remasking."
+            assert self.alg_temp == 0.0, "alg_temp must be 0.0 for RCR remasking."
+            assert (
+                self.alg_threshold is None
+            ), "alg_threshold should not be set for RCR remasking."
+            assert self.alg_factor is None, "alg_factor should not be set for RCR remasking."
+
+    def to_generation_kwargs(self):
+        gen_kwargs = super().to_generation_kwargs()
+
+        if self.is_remdm_remasking:
+            gen_kwargs.update({
+                "remdm_steps": self.remdm_steps,
+                "remdm_number": self.remdm_number,
+            })
+
+        if self.is_rcr_remasking:
+            gen_kwargs.update({
+                "overtime_conf": self.rcr_overtime_conf,
+            })
+
+        return gen_kwargs
 
 @ModelRegistry.register(
     lambda name: name
@@ -80,15 +138,21 @@ class LladaModel(BaseModel):
             raise NotImplementedError("Fast dLLM LLADA generation is not implemented yet.")
 
         gen_kwargs = gen_config.to_generation_kwargs()
+        
+        gen_kwargs.update({
+            "model": self.model,
+            "prompt": input_ids,
+            "mask_id": self.mask_id,
+            "output_history": output_history,
+            "output0_ids": output0_ids,
+        })
+        
+        if gen_config.is_remdm_remasking:
+            return generate_remdm(**gen_kwargs)
+        elif gen_config.is_rcr_remasking:
+            return generate_rcr(**gen_kwargs)
 
-        return generate(
-            self.model,
-            input_ids,
-            mask_id=self.mask_id,
-            **gen_kwargs,
-            output_history=output_history,
-            output0_ids=output0_ids,
-        )
+        return generate(**gen_kwargs)
 
     def generate(
         self,
