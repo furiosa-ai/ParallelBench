@@ -57,7 +57,8 @@ class TradoGenerationConfig(BaseGenerationConfig):
         "Gen-Verse/TraDo-8B-Instruct",
         "Gen-Verse/TraDo-8B-Thinking",
     )
-    or "SDAR" in name
+    or "trado" in name.lower()
+    or "sdar" in name.lower()
 )
 class TradoModel(BaseModel):
     def __init__(self, model_name, accel_framework=None):

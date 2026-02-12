@@ -41,7 +41,7 @@ class SeddGenerationConfig(BaseGenerationConfig):
         )
 
 
-@ModelRegistry.register(lambda name: "sedd" in name)
+@ModelRegistry.register(lambda name: "sedd" in name.lower())
 class SeddModel(BaseModel):
     def __init__(self, model_name, accel_framework=None):
         assert accel_framework is None

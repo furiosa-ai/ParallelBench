@@ -55,8 +55,7 @@ class DreamGenerationConfig(BaseGenerationConfig):
         "Dream-org/Dream-Coder-v0-Instruct-7B",
         "apple/DiffuCoder-7B-Instruct",
         "apple/DiffuCoder-7B-cpGRPO",
-
-    )
+    ) or "dream" in name.lower()
 )
 class DreamModel(BaseModel):
     def __init__(self, model_name, accel_framework=None, eps=0):
