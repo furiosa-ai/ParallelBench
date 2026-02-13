@@ -3,6 +3,8 @@ import types
 from dataclasses import dataclass, field
 from typing import Optional
 
+from transformers import AutoModel
+
 from model.base_model import DLLMOutput, LocalModel
 from model.generation_config import DllmGenerationConfig
 from model.model_utils import (
@@ -12,7 +14,7 @@ from model.model_utils import (
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
 
-from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_BASE_STRATEGIES
+from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_STRATEGIES
 from .dream_model_utils import sample_block
 
 
@@ -24,7 +26,7 @@ class DreamGenerationConfig(DllmGenerationConfig):
     top_p: Optional[float] = None
     top_k: Optional[float] = None
 
-    valid_base_strategies: set = field(default_factory=lambda: set(DREAM_VALID_BASE_STRATEGIES))
+    valid_strategies: set = field(default_factory=lambda: set(DREAM_VALID_STRATEGIES))
 
     def __post_init__(self):
         assert self.steps is None or self.steps <= self.max_tokens, (
@@ -59,7 +61,7 @@ class DreamGenerationConfig(DllmGenerationConfig):
 )
 class DreamModel(LocalModel):
     def __init__(self, model_name, accel_framework=None, eps=0):
-        super().__init__(model_name, accel_framework)
+        super().__init__(model_name, model_class=AutoModel, accel_framework=accel_framework)
 
         self.eps = eps
         self.mask_id = DREAM_MASK_TOKEN_ID

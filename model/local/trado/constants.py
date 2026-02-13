@@ -1,2 +1,5 @@
 TRADO_MASK_TOKEN_ID = 151669
-TRADO_VALID_BASE_STRATEGIES = {"low_confidence"}
+TRADO_VALID_STRATEGIES = {
+    "low_confidence",
+    "low_confidence_threshold",
+}

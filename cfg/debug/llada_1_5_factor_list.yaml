@@ -5,57 +5,9 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
-  generation:
-    remasking: random_factor
-    temperature: 0.0
-    max_tokens: 32
-    steps: 8
-    block_length: 32
-    alg_threshold: null
-    alg_factor: 0.9
-- skip_metrics: false
-  model:
-    model_name: GSAI-ML/LLaDA-8B-Instruct
-    accel_framework: null
-  dataset:
-    dataset_name: parallel_bench
-    task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: low_confidence_factor
-    temperature: 0.0
-    max_tokens: 32
-    steps: 8
-    block_length: 32
-    alg_threshold: null
-    alg_factor: 0.9
-- skip_metrics: false
-  model:
-    model_name: GSAI-ML/LLaDA-8B-Instruct
-    accel_framework: null
-  dataset:
-    dataset_name: parallel_bench
-    task: waiting_line/shuffle
-    num_samples: 10
-  generation:
-    remasking: topk_margin_factor
-    temperature: 0.0
-    max_tokens: 32
-    steps: 8
-    block_length: 32
-    alg_threshold: null
-    alg_factor: 0.9
-- skip_metrics: false
-  model:
-    model_name: GSAI-ML/LLaDA-8B-Instruct
-    accel_framework: null
-  dataset:
-    dataset_name: parallel_bench
-    task: waiting_line/shuffle
-    num_samples: 10
-  generation:
-    remasking: entropy_factor
     temperature: 0.0
     max_tokens: 32
     steps: 8

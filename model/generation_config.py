@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 
-VALID_BASE_STRATEGIES = {
+DEFAULT_VALID_STRATEGIES = {
     "random",
     "low_confidence",
     "topk_margin",
@@ -30,7 +30,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
     alg_factor: Optional[float] = None
     use_fast_dllm_cache: bool = False
     use_fast_dllm_dual_cache: bool = False
-    valid_base_strategies: set = field(default_factory=lambda: set(VALID_BASE_STRATEGIES))
+    valid_strategies: set = field(default_factory=lambda: set(DEFAULT_VALID_STRATEGIES))
 
     def __post_init__(self):
         self._validate_dllm_gen_configs()
@@ -68,8 +68,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
                 )
 
     def _validate_remasking(self):
-        base = self.remasking.removesuffix("_threshold").removesuffix("_factor")
-        if base not in self.valid_base_strategies:
+        if self.remasking not in self.valid_strategies:
             raise ValueError(f"Unsupported remasking strategy: {self.remasking}")
 
         self.is_threshold_remasking = self.remasking.endswith("_threshold")

@@ -5,7 +5,7 @@ model:
 dataset:
   dataset_name: parallel_bench
   task: waiting_line_n15/reverse
-  num_samples: 10
+  num_samples: 25
 generation:
   temperature: 0.0
   max_tokens: 1024

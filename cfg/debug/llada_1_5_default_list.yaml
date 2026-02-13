@@ -5,7 +5,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: random
     temperature: 0.0
@@ -21,7 +21,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: low_confidence
     temperature: 0.0
@@ -37,7 +37,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: topk_margin
     temperature: 0.0
@@ -53,7 +53,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: entropy
     temperature: 0.0

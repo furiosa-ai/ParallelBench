@@ -12,5 +12,3 @@ uv run run_all.py eval.py --device 0 1 --cfg cfg/debug/llada_1_5_factor_list.yam
 uv run run_all.py eval.py --device 0 1 --cfg cfg/debug/sedd_default_list.yaml
 uv run eval.py --cfg cfg/debug/trado_default.yaml
 uv run eval.py --cfg cfg/debug/trado_threshold.yaml
-
-

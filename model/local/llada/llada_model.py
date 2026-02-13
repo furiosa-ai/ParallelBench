@@ -11,7 +11,7 @@ from model.generation_config import DllmGenerationConfig
 from model.local.generate import generate
 from model.local.generate_rcr import generate_rcr
 from model.local.generate_remdm import generate_remdm
-from model.local.llada.constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_BASE_STRATEGIES
+from model.local.llada.constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_STRATEGIES
 from model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
@@ -25,7 +25,7 @@ class LladaGenerationConfig(DllmGenerationConfig):
     remasking: str = "low_confidence" # Set the default remasking strategy
     block_length: int = 128 # Set the default block length
 
-    valid_base_strategies: set = field(default_factory=lambda: set(LLADA_VALID_BASE_STRATEGIES))
+    valid_strategies: set = field(default_factory=lambda: set(LLADA_VALID_STRATEGIES))
 
     # ReMDM
     remdm_steps: Optional[int] = None

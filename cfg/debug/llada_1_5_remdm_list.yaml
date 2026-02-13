@@ -5,7 +5,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: remdm
     temperature: 0.0

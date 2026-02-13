@@ -15,7 +15,7 @@ from model.model_utils import (
 from model.registry import ModelRegistry
 from utils.perf_utils import measure_time_mem
 
-from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_BASE_STRATEGIES
+from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_STRATEGIES
 from .trado_model_utils import block_diffusion_generate
 
 
@@ -27,7 +27,7 @@ class TradoGenerationConfig(DllmGenerationConfig):
     top_p: Optional[float] = None
     top_k: Optional[float] = None
     
-    valid_base_strategies: set = field(default_factory=lambda: set(TRADO_VALID_BASE_STRATEGIES))
+    valid_strategies: set = field(default_factory=lambda: set(TRADO_VALID_STRATEGIES))
 
 
     def to_generation_kwargs(self):
@@ -38,13 +38,9 @@ class TradoGenerationConfig(DllmGenerationConfig):
             "temperature": self.temperature,
             "top_k": self.top_k if self.top_k is not None else 0.0,
             "top_p": self.top_p if self.top_p is not None else 1.0,
+            "threshold": self.alg_threshold if self.alg_threshold is not None else 0.85,
+            "remasking": self.remasking,
         }
-
-        if self.remasking.endswith("_threshold"):
-            gen_kwargs["remasking"] = "low_confidence_dynamic"
-            gen_kwargs["confidence_threshold"] = self.alg_threshold
-        else:
-            gen_kwargs["remasking"] = "low_confidence_static"
 
         return gen_kwargs
 

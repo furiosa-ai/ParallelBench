@@ -170,7 +170,7 @@ def sample_block(
 
     assert gen_length % block_length == 0, f"gen_length ({gen_length}) must be divisible by block_length ({block_length})"
     num_blocks = gen_length // block_length
-    
+
     if steps is not None:
         assert steps % num_blocks == 0, f"steps ({steps}) must be divisible by num_blocks ({num_blocks})"
         steps_per_block = steps // num_blocks
@@ -198,7 +198,7 @@ def sample_block(
         assert (
             threshold is not None
         ), "threshold must be provided for low_confidence_threshold algorithm"
-        alg = "maskgit_plus"
+        alg = "low_confidence"
     else:
         pass
         # assert threshold is None, "threshold should not be provided for non-low_confidence_threshold algorithms"
@@ -235,7 +235,7 @@ def sample_block(
             else:
                 mask_logits = logits[mask_index]
 
-                if alg == 'maskgit_plus':
+                if alg == "low_confidence":
                     confidence, x0 = sample_tokens(mask_logits, temperature=temperature, top_p=top_p, top_k=top_k)
                 elif alg == 'topk_margin':
                     confidence, x0 = sample_tokens(mask_logits, temperature=temperature, top_p=top_p, top_k=top_k, margin_confidence=True)

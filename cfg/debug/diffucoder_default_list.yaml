@@ -5,7 +5,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: origin
     temperature: 0.0
@@ -21,7 +21,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: random
     temperature: 0.0
@@ -37,9 +37,9 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
-    remasking: maskgit_plus
+    remasking: low_confidence
     temperature: 0.0
     max_tokens: 32
     steps: 32
@@ -53,7 +53,7 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: topk_margin
     temperature: 0.0
@@ -69,25 +69,9 @@
   dataset:
     dataset_name: parallel_bench
     task: waiting_line/shuffle
-    num_samples: 10
+    num_samples: 25
   generation:
     remasking: entropy
-    temperature: 0.0
-    max_tokens: 32
-    steps: 32
-    block_length: 32
-    alg_threshold: null
-    alg_factor: null
-- skip_metrics: false
-  model:
-    model_name: apple/DiffuCoder-7B-Instruct
-    accel_framework: null
-  dataset:
-    dataset_name: parallel_bench
-    task: waiting_line/shuffle
-    num_samples: 10
-  generation:
-    remasking: low_confidence
     temperature: 0.0
     max_tokens: 32
     steps: 32
