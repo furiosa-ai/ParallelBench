@@ -39,6 +39,11 @@ We are currently working to support **new models** and implement **advanced unma
 - [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
 
 **Advanced Unmasking Strategies**
+
+- [WINO](https://github.com/Feng-Hong/WINO-DLLM?tab=readme-ov-file)
+- [DUS](https://github.com/omerlux/DUS)
+- [APD](https://github.com/danielmisrael/apd)
+- [SlowFast Sampling](https://github.com/LiangrunFlora/Slow-Fast-Sampling)
 - [EB-Sampler](https://arxiv.org/abs/2505.24857v1)
 - [KLASS](https://github.com/shkim0116/KLASS)
 - [Uncode](https://github.com/NEUIR/Uncode?tab=readme-ov-file) (formerly, PC-Sampler)
