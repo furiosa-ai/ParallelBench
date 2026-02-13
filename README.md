@@ -1,5 +1,8 @@
 # ParallelBench: Understanding the Tradeoffs of Parallel Decoding in Diffusion LLMs
 
+<p align="center">
+<img src = "docs/banner.png" width="70%" height="auto">
+</p>
 
 <p align="center">
       <a href="https://scholar.google.com/citations?user=Q-ARWkwAAAAJ&hl=eh" target="_blank">Wonjun Kang</a><sup>*1,5</sup>, 
@@ -7,8 +10,8 @@
       <a href="https://scholar.google.com/citations?user=IXJcR1gAAAAJ&hl=en" target="_blank">Seunghyuk Oh</a><sup>*1</sup>, 
       <a href="https://scholar.google.com/citations?user=XJXKp60AAAAJ&hl=en" target="_blank">Minjae Lee</a><sup>1</sup>, 
       <a href="https://yzeng58.github.io/zyc_cv/" target="_blank">Yuchen Zeng</a><sup>2,3</sup>, 
-      <a href="https://scholar.google.com/citations?user=jkXzD7YAAAAJ&hl=en" target="_blank">Shuibai Zhang</a><sup>2</sup>, 
-      <a href="https://scholar.google.com/citations?user=si-368wAAAAJ&hl=en" target="_blank">Coleman Hooper</a><sup>4</sup>, 
+      <a href="https://scholar.google.com/citations?user=jkXzD7YAAAAJ&hl=en" target="_blank">Shuibai Zhang</a><sup>2</sup>,<br>
+      <a href="https://scholar.google.com/citations?user=si-368wAAAAJ&hl=en" target="_blank">Coleman Hooper</a><sup>4</sup>,
       <a href="https://yuezhouhu.github.io/" target="_blank">Yuezhou Hu</a><sup>4</sup>, 
       <a href="https://scholar.google.com/citations?user=Oyy8aDMAAAAJ&hl=en" target="_blank">Hyung Il Koo</a><sup>1</sup>, 
       <a href="https://ece.snu.ac.kr/en/research-faculty/faculty/fulltime?md=view&profid=p041" target="_blank">Nam Ik Cho</a><sup>5</sup>, 
@@ -18,38 +21,51 @@
     <sup>1</sup>FuriosaAI, <sup>2</sup>UW-Madison, <sup>3</sup>Microsoft Research, <sup>4</sup>UC Berkeley, <sup>5</sup>Seoul National University, <sup>6</sup>KRAFTON AI
    </p>
 <p align="center">
-    <a href="https://parallelbench.github.io/">
-        <img alt="Project" src="https://img.shields.io/static/v1?label=Project&message=Github&color=blue&logo=github-pages">
-    </a>
-    <a href="https://arxiv.org/abs/2510.04767">
-        <img alt="arXiv" src="https://img.shields.io/badge/arXiv-2510.04767-b31b1b.svg">
-    </a>
+    <a href="https://parallelbench.github.io/"><img alt="Project" src="https://img.shields.io/static/v1?label=Project&message=Github&color=blue&logo=github-pages"></a>
+    <a href="https://arxiv.org/abs/2510.04767"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2510.04767-b31b1b.svg"></a>
 </p>
 
+
+## 🔔 Updates
+
+- **Jan 25, 2026** Paper accepted at ICLR 2026! 🎉
+- **Oct 6, 2025** ParallelBench release!
+
+## 🗺️ Roadmap
+We are currently working to support **new models** and implement **advanced unmasking methods**. If you are conducting dLLM research and would like to **contribute new models or methods**, please open an issue.
+
+**New Models**
+- [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
+- [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
+
+**Advanced Unmasking Strategies**
+
+- [WINO](https://github.com/Feng-Hong/WINO-DLLM?tab=readme-ov-file)
+- [DUS](https://github.com/omerlux/DUS)
+- [APD](https://github.com/danielmisrael/apd)
+- [SlowFast Sampling](https://github.com/LiangrunFlora/Slow-Fast-Sampling)
+- [EB-Sampler](https://arxiv.org/abs/2505.24857v1)
+- [KLASS](https://github.com/shkim0116/KLASS)
+- [Uncode](https://github.com/NEUIR/Uncode?tab=readme-ov-file) (formerly, PC-Sampler)
+
+## 🔎 Overview
 <p align="center">
-<img src = "docs/benchmark.png" width="100%" height="auto">
+<img src = "docs/teaser.png" width="100%" height="auto">
 </p>
 
-## 🚀 Overview
 Diffusion LLMs (dLLMs) promise faster generation via parallel decoding. However, this speed often comes at the cost of quality, as they ignore token dependencies, an issue that existing benchmarks do not sufficiently capture. To address this issue, we introduce **ParallelBench**, the first benchmark designed to rigorously test this trade-off through realistic tasks that humans and autoregressive (AR) LLMs can easily solve, but which cause dLLMs to collapse as parallelism grows. We release **ParallelBench** to drive research towards truly efficient dLLMs that can overcome this challenge.
 
-<details>
-<summary>📝 <b>Abstract</b></summary>
-While most autoregressive LLMs are constrained to one-by-one decoding, diffusion LLMs (dLLMs) have attracted growing interest for their potential to dramatically accelerate inference through parallel decoding. Despite this promise, the conditional independence assumption in dLLMs causes parallel decoding to ignore token dependencies, inevitably degrading generation quality when these dependencies are strong. However, existing works largely overlook these inherent challenges, and evaluations on standard benchmarks (e.g., math and coding) are not sufficient to capture the quality degradation caused by parallel decoding. To address this gap, we first provide an information-theoretic analysis of parallel decoding. We then conduct case studies on analytically tractable synthetic list operations from both data distribution and decoding strategy perspectives, offering quantitative insights that highlight the fundamental limitations of parallel decoding. Building on these insights, we propose **ParallelBench**, the first benchmark specifically designed for dLLMs, featuring realistic tasks that are trivial for humans and autoregressive LLMs yet exceptionally challenging for dLLMs under parallel decoding. Using ParallelBench, we systematically analyze both dLLMs and autoregressive LLMs, revealing that: (i) dLLMs under parallel decoding can suffer dramatic quality degradation in real-world scenarios, and (ii) current parallel decoding strategies struggle to adapt their degree of parallelism based on task difficulty, thus failing to achieve meaningful speedup without compromising quality. Our findings underscore the pressing need for innovative decoding methods that can overcome the current speed-quality trade-off. We are releasing our benchmark to help accelerate the development of truly efficient dLLMs.
-</details>
-
-## 🌟 Features
+### Features
 
 - **Information-Theoretic Analysis:**
-Proves that parallel decoding has fundamental error bounds when tokens depend on each other, showing even perfect models struggle as we increase parallelism on tasks requiring strong token coordination.
+We derive error bounds on parallel decoding for tasks with inter-token dependencies. Even an optimal model sees accuracy degrade as parallelism grows.
 
 - **Quantitative Case Studies:**
-Analytically tractable synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas demonstrate fundamental limitations: specific tasks show inevitable quality degradation under parallel decoding.
+Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas pin down exactly where and how parallel decoding breaks.
 
 - **Realistic Benchmark Tasks:**
-17 tasks across Waiting Line, Text Writing, and Puzzles—all trivial for humans and AR LLMs—reveal severe quality degradation in dLLMs under parallel decoding in real-world scenarios.
+17 tasks across three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily, but expose clear quality drops in dLLMs under parallel decoding.
 
-***
 
 ## ⚙️ Setup
 
@@ -82,41 +98,14 @@ uv pip install vllm  # optional for LLM evaluation
 ```
 
 ### 4. Install Java (Optional)
-If you need to run the grammar-based evaluations, install the JDK via conda:
+If you need to run the **grammar-based** evaluations, install the JDK via conda:
 ```bash
 conda install -c conda-forge openjdk=17
 ```
 
-***
 
 ## ⚡ Quickstart
 Here's a simple example of how to load a model and run it on a **ParallelBench** task. For a more in-depth example, see the [`demo.py`](demo.py) script.
-
-<details>
-<summary>📋 <b>View Available Tasks</b></summary>
-
-* 🔄 **Waiting Line**
-    * `waiting_line/copy`
-    * `waiting_line/insert_index`
-    * `waiting_line/insert_random`
-    * `waiting_line/remove_index`
-    * `waiting_line/remove_random`
-    * `waiting_line/replace_index`
-    * `waiting_line/replace_random`
-    * `waiting_line/reverse`
-    * `waiting_line/shuffle`
-    * `waiting_line/sort`
-* ✍️ **Text Writing**
-    * `paraphrase_summarize/chatgpt-paraphrases`
-    * `paraphrase_summarize/samsum`
-    * `words_to_sentence/easy`
-    * `words_to_sentence/medium`
-    * `words_to_sentence/hard`
-* 🧠 **Puzzle**
-    * `puzzle/latin_square_n4`
-    * `puzzle/sudoku_n4_12`
-
-</details>
 
 ```python
 import torch
@@ -163,7 +152,52 @@ metrics = dataset.compute_metrics([response], [sample["label"]])
 print(f"Metrics: {metrics}")
 ```
 
-***
+## 🎯 Evaluation Coverage
+
+### Tasks
+
+* **Waiting Line**
+    * `waiting_line/copy`
+    * `waiting_line/insert_index`
+    * `waiting_line/insert_random`
+    * `waiting_line/remove_index`
+    * `waiting_line/remove_random`
+    * `waiting_line/replace_index`
+    * `waiting_line/replace_random`
+    * `waiting_line/reverse`
+    * `waiting_line/shuffle`
+    * `waiting_line/sort`
+* **Text Writing**
+    * `paraphrase_summarize/chatgpt-paraphrases`
+    * `paraphrase_summarize/samsum`
+    * `words_to_sentence/easy`
+    * `words_to_sentence/medium`
+    * `words_to_sentence/hard`
+* **Puzzle**
+    * `puzzle/latin_square_n4`
+    * `puzzle/sudoku_n4_12`
+ 
+### Models
+
+For additional models and unmasking methods, please refer to the [Roadmap](https://github.com/furiosa-ai/ParallelBench/#%EF%B8%8F-roadmap) section.
+
+* LLaDA Family ([LLaDA 1.x](https://github.com/ML-GSAI/LLaDA))
+* Dream Family ([Dream](https://github.com/DreamLM/Dream), [DiffuCoder](https://github.com/apple/ml-diffucoder))
+* SDAR Family ([SDAR](https://github.com/JetAstra/SDAR), [TraDo](https://github.com/Gen-Verse/dLLM-RL))
+
+### Unmasking Methods
+
+* Top-k methods:
+    * Random
+    * Confidence
+    * Entropy
+    * Margin
+* Advanced methods:
+    * Threshold-based
+    * Factor-based
+    * [RCR](https://github.com/Gen-Verse/dLLM-RL)
+    * [ReMDM](https://github.com/kuleshov-group/remdm)
+
 
 ## 🛠️ Create Your Own Tasks
 
@@ -217,12 +251,10 @@ class CustomModel(LocalModel):
 
 See `model/local/example/` for a working example.
 
-***
-
 ## 🚀 Running Evaluations
 
 
-### 🔑 Configuration
+### Configuration
 
 Before running the evaluations, copy the example environment file and fill in your API keys:
 
@@ -296,11 +328,10 @@ This section includes the commands for the comparative analysis between our mode
   ```
 
 
-### 📊 Results
+### Results
 
 All evaluation metrics and generated outputs are logged to **Weights & Biases (wandb)**. Please ensure you have configured your API key and project settings.
 
-***
 
 ## 🙏 Acknowledgements
 This project builds upon the work of several fantastic open-source repositories. We extend our sincere thanks to the original authors for their contributions to the community.
