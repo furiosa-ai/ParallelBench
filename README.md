@@ -25,12 +25,25 @@
     <a href="https://arxiv.org/abs/2510.04767"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2510.04767-b31b1b.svg"></a>
 </p>
 
-## 📢 Updates
 
-- **Jan 25, 2026** Paper accepted at ICLR 2026!
+## 🔔 Updates
+
+- **Jan 25, 2026** Paper accepted at ICLR 2026! 🎉
 - **Oct 6, 2025** ParallelBench release!
 
-## 🚀 Overview
+## 🗺️ Roadmap
+We are currently working on supporting **new models** and implementing **advanced unmasking methods**. If you are conducting DLLM research and would like to **contribute new models or methods**, please open an issue.
+
+**New Models**
+- [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
+- [LLaDA MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA 2.x](https://github.com/inclusionAI/LLaDA2.X)
+
+**Advanced Unmasking Strategies**
+- [EB-Sampler](https://arxiv.org/abs/2505.24857v1)
+- [KLASS](https://github.com/shkim0116/KLASS)
+- [Uncode](https://github.com/NEUIR/Uncode?tab=readme-ov-file) (formerly, PC-Sampler)
+
+## 🔎 Overview
 <p align="center">
 <img src = "docs/teaser.png" width="100%" height="auto">
 </p>
