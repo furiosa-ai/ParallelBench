@@ -32,7 +32,7 @@
 - **Oct 6, 2025** ParallelBench release!
 
 ## 🗺️ Roadmap
-We are currently working on supporting **new models** and implementing **advanced unmasking methods**. If you are conducting DLLM research and would like to **contribute new models or methods**, please open an issue.
+We are currently working to support **new models** and implement **advanced unmasking methods**. If you are conducting dLLM research and would like to **contribute new models or methods**, please open an issue.
 
 **New Models**
 - [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
