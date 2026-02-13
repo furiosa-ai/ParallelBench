@@ -147,7 +147,9 @@ metrics = dataset.compute_metrics([response], [sample["label"]])
 print(f"Metrics: {metrics}")
 ```
 
-### Available Tasks
+## 🎯 Evaluation Coverage
+
+### Tasks
 
 * **Waiting Line**
     * `waiting_line/copy`
@@ -169,6 +171,27 @@ print(f"Metrics: {metrics}")
 * **Puzzle**
     * `puzzle/latin_square_n4`
     * `puzzle/sudoku_n4_12`
+ 
+### Models
+
+For additional models and unmasking methods, please refer to the [Roadmap](https://github.com/furiosa-ai/ParallelBench/#%EF%B8%8F-roadmap) section.
+
+* LLaDA Family ([LLaDA 1.x](https://github.com/ML-GSAI/LLaDA))
+* Dream Family ([Dream](https://github.com/DreamLM/Dream), [DiffuCoder](https://github.com/apple/ml-diffucoder))
+* SDAR Family ([SDAR](https://github.com/JetAstra/SDAR), [TraDo](https://github.com/Gen-Verse/dLLM-RL))
+
+### Unmasking Methods
+
+* Top-k methods:
+    * Random
+    * Confidence
+    * Entropy
+    * Margin
+* Advanced methods:
+    * Threshold-based
+    * Factor-based
+    * [RCR](https://github.com/Gen-Verse/dLLM-RL)
+    * [ReMDM](https://github.com/kuleshov-group/remdm)
 
 
 ## 🛠️ Create Your Own Tasks
