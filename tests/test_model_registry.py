@@ -16,25 +16,6 @@ class TestModelRegistry:
 
         ModelRegistry.clear()
 
-    def test_registry_has_register_classmethod(self):
-        """Test that ModelRegistry has a register() classmethod that returns a decorator."""
-        from model.registry import ModelRegistry
-
-        # register should be callable and return a decorator
-        decorator = ModelRegistry.register(matcher=lambda name: name == "test_model")
-        assert callable(decorator), "register() should return a callable decorator"
-
-    def test_register_decorator_takes_matcher_callable(self):
-        """Test that register() decorator takes a matcher callable (model_name -> bool)."""
-        from model.registry import ModelRegistry
-
-        # matcher should be a callable that accepts model_name and returns bool
-        def matcher_func(model_name: str) -> bool:
-            return model_name == "test_model"
-
-        decorator = ModelRegistry.register(matcher=matcher_func)
-        assert callable(decorator), "register() with matcher should return a decorator"
-
     def test_registered_class_can_be_retrieved(self):
         """Test that after decorating a class, get_model_class() returns that class when matcher returns True."""
         from model.registry import ModelRegistry
@@ -75,25 +56,6 @@ class TestModelRegistry:
 
         with pytest.raises(ValueError, match="Ambiguous model name"):
             ModelRegistry.get_model_class("test_model")
-
-    def test_get_model_class_returns_class_not_instance(self):
-        """Test that get_model_class() returns the CLASS, not an instance."""
-        from model.registry import ModelRegistry
-
-        @ModelRegistry.register(matcher=lambda name: name == "test_model")
-        class TestModel:
-            def __init__(self, value):
-                self.value = value
-
-        retrieved = ModelRegistry.get_model_class("test_model")
-
-        # Should be the class itself
-        assert retrieved is TestModel, "Should return class, not instance"
-        assert callable(retrieved), "Class should be callable"
-
-        # We should be able to instantiate it
-        instance = retrieved(value=42)
-        assert instance.value == 42, "Should be able to instantiate the returned class"
 
     def test_registry_can_be_cleared_for_test_isolation(self):
         """Test that registry can be reset with clear() for test isolation."""

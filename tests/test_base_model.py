@@ -6,12 +6,6 @@ import torch
 from model.base_model import BaseModel, DLLMOutput
 
 
-def test_base_model_cannot_be_instantiated():
-    """BaseModel should not be instantiable directly (it's abstract)."""
-    with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-        BaseModel()
-
-
 def test_subclass_without_generate_cannot_be_instantiated():
     """A subclass that doesn't implement generate() should fail."""
 

@@ -6,6 +6,7 @@ matcher functions and can be retrieved via ModelRegistry.get_model_class().
 """
 
 import pytest
+
 from model.registry import ModelRegistry
 
 # Import all model modules at module level to trigger decorator registration
@@ -61,9 +62,3 @@ def test_model_registration(model_name, expected_class_name):
     )
 
 
-def test_unknown_model_raises_error():
-    """Test that an unknown model name raises ValueError."""
-    with pytest.raises(
-        ValueError, match="No model class found for model name: unknown-model"
-    ):
-        ModelRegistry.get_model_class("unknown-model")

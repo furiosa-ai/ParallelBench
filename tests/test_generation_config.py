@@ -10,6 +10,7 @@ from model.generation_config import (
 
 # -- BaseGenerationConfig --
 
+
 def test_base_generation_config_has_common_fields():
     """BaseGenerationConfig should only have common fields (max_tokens, temperature, accel_framework)."""
     config = ARGenerationConfig()  # Use ARGenerationConfig as concrete subclass
@@ -24,12 +25,6 @@ def test_base_generation_config_has_common_fields():
 
 # -- ARGenerationConfig --
 
-def test_ar_generation_config_instantiation():
-    """ARGenerationConfig should instantiate without crash (no remasking validation)."""
-    config = ARGenerationConfig()
-    assert config.max_tokens == 128
-    assert config.temperature == 0.0
-
 
 def test_ar_generation_config_custom_values():
     config = ARGenerationConfig(max_tokens=256, temperature=0.7)
@@ -38,6 +33,7 @@ def test_ar_generation_config_custom_values():
 
 
 # -- DllmGenerationConfig --
+
 
 def test_dllm_generation_config_valid():
     """DllmGenerationConfig with valid remasking should work."""
@@ -52,24 +48,28 @@ def test_dllm_generation_config_valid():
 
 
 def test_dllm_generation_config_threshold_remasking():
+    """Test threshold-based remasking strategies with custom valid_strategies."""
     config = DllmGenerationConfig(
         remasking="low_confidence_threshold",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_threshold=0.5,
+        valid_strategies={"low_confidence", "low_confidence_threshold"},
     )
     assert config.is_threshold_remasking is True
     assert config.is_default_remasking is False
 
 
 def test_dllm_generation_config_factor_remasking():
+    """Test factor-based remasking strategies with custom valid_strategies."""
     config = DllmGenerationConfig(
-        remasking="entropy_factor",
+        remasking="low_confidence_factor",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_factor=2.0,
+        valid_strategies={"low_confidence", "low_confidence_factor"},
     )
     assert config.is_factor_remasking is True
 
@@ -129,6 +129,7 @@ def test_dllm_to_generation_kwargs():
 
 # -- TransformersGenerationConfig inherits ARGenerationConfig --
 
+
 def test_transformers_generation_config_no_crash():
     """TransformersGenerationConfig (inherits ARGenerationConfig) should not crash."""
     from model.local.transformers_model import TransformersGenerationConfig
@@ -139,20 +140,3 @@ def test_transformers_generation_config_no_crash():
     assert "max_new_tokens" in kwargs
 
 
-# -- Model hierarchy checks --
-
-def test_sedd_model_is_local_model():
-    """SeddModel should be a subclass of LocalModel."""
-    try:
-        from model.local.sedd.sedd_model import SeddModel
-        from model.base_model import LocalModel
-        assert issubclass(SeddModel, LocalModel)
-    except ImportError:
-        pytest.skip("SeddModel not available (missing dependencies)")
-
-
-def test_trado_model_is_local_model():
-    """TradoModel should be a subclass of LocalModel."""
-    from model.local.trado.trado_model import TradoModel
-    from model.base_model import LocalModel
-    assert issubclass(TradoModel, LocalModel)

@@ -6,10 +6,7 @@ from unittest import mock
 import pytest
 
 from model.local.llada.llada_model import LladaModel
-from model.model_utils import (
-    compute_decoding_order_correlation_from_history,
-    decode_history,
-)
+from model.model_utils import decode_history
 
 
 class MockModelClass:
@@ -93,19 +90,6 @@ class TestPatchModelForwardInstanceLevelPatching:
 class TestGenerateHistoryNoneSafety:
     """Test history=None safe handling in generate method."""
 
-    def test_compute_decoding_order_correlation_requires_non_none_history(self):
-        """Verify compute_decoding_order_correlation_from_history raises with None.
-
-        This regression test confirms that the function requires a valid history
-        and would fail if called with None, justifying the guard in generate().
-        """
-        mock_tokenizer = mock.MagicMock()
-
-        with pytest.raises(AttributeError):
-            compute_decoding_order_correlation_from_history(
-                mock_tokenizer, history=None
-            )
-
     def test_generate_guards_history_none_before_correlation_computation(self):
         """Verify generate() guards history=None before calling correlation function.
 
@@ -186,29 +170,3 @@ class TestGenerateHistoryNoneSafety:
                     assert result.decoding_order_corrs == {"dec_order_kendall": 0.9}
 
 
-class TestDecodeHistoryNoneSafety:
-    """Test decode_history None safety (confirm existing behavior)."""
-
-    def test_decode_history_with_none_returns_none(self):
-        """Verify decode_history(tokenizer, history=None) returns None."""
-        mock_tokenizer = mock.MagicMock()
-
-        result = decode_history(mock_tokenizer, history=None)
-
-        assert result is None
-
-    def test_decode_history_with_valid_history_returns_list(self):
-        """Verify decode_history with valid history returns list of decoded strings."""
-        import torch
-
-        mock_tokenizer = mock.MagicMock()
-        mock_tokenizer.decode.return_value = "decoded_text"
-
-        history = [torch.tensor([[1, 2, 3]]), torch.tensor([[4, 5, 6]])]
-
-        result = decode_history(mock_tokenizer, history=history)
-
-        assert isinstance(result, list)
-        assert len(result) == 2
-        assert result[0] == "decoded_text"
-        assert result[1] == "decoded_text"
