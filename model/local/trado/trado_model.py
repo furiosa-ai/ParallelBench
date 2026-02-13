@@ -21,8 +21,9 @@ from .trado_model_utils import block_diffusion_generate
 
 @dataclass
 class TradoGenerationConfig(DllmGenerationConfig):
-    remasking: str = "low_confidence"
+    remasking: str = "low_confidence_threshold"
     block_length: int = 128
+    alg_threshold: Optional[float] = 0.85
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None

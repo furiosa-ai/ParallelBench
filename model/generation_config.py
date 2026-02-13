@@ -33,11 +33,13 @@ class DllmGenerationConfig(BaseGenerationConfig):
     valid_strategies: set = field(default_factory=lambda: set(DEFAULT_VALID_STRATEGIES))
 
     def __post_init__(self):
+        if self.block_length is None: 
+            self.block_length = self.max_tokens
         self._validate_dllm_gen_configs()
         self._validate_remasking()
 
     @property
-    def num_blocks(self):
+    def num_blocks(self):        
         if not isinstance(self.max_tokens, int) or self.max_tokens <= 0:
             raise ValueError("max_tokens must be a positive integer")
         if not isinstance(self.block_length, int) or self.block_length <= 0:

@@ -29,6 +29,8 @@ class DreamGenerationConfig(DllmGenerationConfig):
     valid_strategies: set = field(default_factory=lambda: set(DREAM_VALID_STRATEGIES))
 
     def __post_init__(self):
+        super().__post_init__()
+        
         assert self.steps is None or self.steps <= self.max_tokens, (
             f"Steps must be less than or equal to max tokens. Got steps={self.steps}, max_tokens={self.max_tokens}"
         )
@@ -40,8 +42,10 @@ class DreamGenerationConfig(DllmGenerationConfig):
     def to_generation_kwargs(self):
         gen_kwargs = super().to_generation_kwargs()
         gen_length = gen_kwargs.pop("gen_length")
+        remasking = gen_kwargs.pop("remasking", None)
         return {
             **gen_kwargs,
+            "alg": remasking,
             "max_new_tokens": gen_length,
             "return_dict_in_generate": True,
             "attention_mask": None,
