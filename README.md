@@ -25,12 +25,25 @@
     <a href="https://arxiv.org/abs/2510.04767"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2510.04767-b31b1b.svg"></a>
 </p>
 
-## 📢 Updates
 
-- **Jan 25, 2026** Paper accepted at ICLR 2026!
+## 🔔 Updates
+
+- **Jan 25, 2026** Paper accepted at ICLR 2026! 🎉
 - **Oct 6, 2025** ParallelBench release!
 
-## 🚀 Overview
+## 🗺️ Roadmap
+We are currently working to support **new models** and implement **advanced unmasking methods**. If you are conducting dLLM research and would like to **contribute new models or methods**, please open an issue.
+
+**New Models**
+- [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
+- [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
+
+**Advanced Unmasking Strategies**
+- [EB-Sampler](https://arxiv.org/abs/2505.24857v1)
+- [KLASS](https://github.com/shkim0116/KLASS)
+- [Uncode](https://github.com/NEUIR/Uncode?tab=readme-ov-file) (formerly, PC-Sampler)
+
+## 🔎 Overview
 <p align="center">
 <img src = "docs/teaser.png" width="100%" height="auto">
 </p>
@@ -134,7 +147,9 @@ metrics = dataset.compute_metrics([response], [sample["label"]])
 print(f"Metrics: {metrics}")
 ```
 
-### Available Tasks
+## 🎯 Evaluation Coverage
+
+### Tasks
 
 * **Waiting Line**
     * `waiting_line/copy`
@@ -156,6 +171,27 @@ print(f"Metrics: {metrics}")
 * **Puzzle**
     * `puzzle/latin_square_n4`
     * `puzzle/sudoku_n4_12`
+ 
+### Models
+
+For additional models and unmasking methods, please refer to the [Roadmap](https://github.com/furiosa-ai/ParallelBench/#%EF%B8%8F-roadmap) section.
+
+* LLaDA Family ([LLaDA 1.x](https://github.com/ML-GSAI/LLaDA))
+* Dream Family ([Dream](https://github.com/DreamLM/Dream), [DiffuCoder](https://github.com/apple/ml-diffucoder))
+* SDAR Family ([SDAR](https://github.com/JetAstra/SDAR), [TraDo](https://github.com/Gen-Verse/dLLM-RL))
+
+### Unmasking Methods
+
+* Top-k methods:
+    * Random
+    * Confidence
+    * Entropy
+    * Margin
+* Advanced methods:
+    * Threshold-based
+    * Factor-based
+    * [RCR](https://github.com/Gen-Verse/dLLM-RL)
+    * [ReMDM](https://github.com/kuleshov-group/remdm)
 
 
 ## 🛠️ Create Your Own Tasks
