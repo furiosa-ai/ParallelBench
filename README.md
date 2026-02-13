@@ -36,7 +36,7 @@ We are currently working to support **new models** and implement **advanced unma
 
 **New Models**
 - [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
-- [LLaDA MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA 2.x](https://github.com/inclusionAI/LLaDA2.X)
+- [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
 
 **Advanced Unmasking Strategies**
 - [EB-Sampler](https://arxiv.org/abs/2505.24857v1)
