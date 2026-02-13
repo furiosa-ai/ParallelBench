@@ -175,6 +175,47 @@ PYTHONPATH=. python dataset/parallel_bench/data/task.py --task test/copy_reverse
 
 This command uses the configurations specified in `dataset/parallel_bench/data/task_configs/`.
 
+***
+
+## 🧩 Adding Custom Models
+
+You can integrate your own diffusion LLM by following the example in `model/local/example/`. This directory contains:
+
+- **`example_model.py`**: Template for implementing a custom model class that inherits from `LocalModel`
+- **`constants.py`**: Example constants such as mask token IDs and valid remasking strategies
+
+### Implementation Steps
+
+1. **Define Generation Config**: Extend `DllmGenerationConfig` to include model-specific parameters
+2. **Implement Model Class**: Create a class that inherits from `LocalModel` and implements the `generate()` method
+3. **Register Your Model**: Use the `@ModelRegistry.register()` decorator with a name pattern matcher
+
+Example structure:
+
+```python
+from model.base_model import DLLMOutput, LocalModel
+from model.generation_config import DllmGenerationConfig
+from model.registry import ModelRegistry
+
+@dataclass
+class CustomGenerationConfig(DllmGenerationConfig):
+    custom_param: str = "default_value"
+    
+    def to_generation_kwargs(self):
+        gen_kwargs = super().to_generation_kwargs()
+        gen_kwargs.update({"custom_param": self.custom_param})
+        return gen_kwargs
+
+@ModelRegistry.register(
+    lambda name: name.startswith("your-model-prefix")
+)
+class CustomModel(LocalModel):
+    def generate(self, messages, output_prefix=None, gen_config=None, output_history=False):
+        # Your generation logic here
+        return DLLMOutput(...)
+```
+
+See `model/local/example/` for a working example.
 
 ***
 
