@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional, Union
+import types
 
 import torch
 from fast_dllm.llada.model.modeling_llada import LLaDAModelLM as FastLLaDAModelLM
@@ -22,8 +23,8 @@ from utils.perf_utils import measure_time_mem
 
 @dataclass
 class LladaGenerationConfig(DllmGenerationConfig):
-    remasking: str = "low_confidence" # Set the default remasking strategy
-    block_length: int = 128 # Set the default block length
+    remasking: str = "low_confidence"  # Set the default remasking strategy
+    block_length: int = 128  # Set the default block length
 
     valid_strategies: set = field(default_factory=lambda: set(LLADA_VALID_STRATEGIES))
 
@@ -41,53 +42,62 @@ class LladaGenerationConfig(DllmGenerationConfig):
         self.is_rcr_remasking = self.remasking == "rcr"
 
         if self.is_remdm_remasking:
-            assert self.remdm_steps is not None and self.remdm_steps >= 0, \
+            assert self.remdm_steps is not None and self.remdm_steps >= 0, (
                 "remdm_steps must be specified and non-negative for ReMDM remasking."
-            assert self.remdm_number is not None and self.remdm_number > 0, \
+            )
+            assert self.remdm_number is not None and self.remdm_number > 0, (
                 "remdm_number must be specified and positive for ReMDM remasking."
+            )
 
-            assert self.alg_temp == 0.0, \
-                "alg_temp must be 0.0 for ReMDM remasking."
-            assert self.alg_threshold is None, \
+            assert self.alg_temp == 0.0, "alg_temp must be 0.0 for ReMDM remasking."
+            assert self.alg_threshold is None, (
                 "alg_threshold should not be set for ReMDM remasking."
-            assert self.alg_factor is None, \
+            )
+            assert self.alg_factor is None, (
                 "alg_factor should not be set for ReMDM remasking."
+            )
 
         if self.is_rcr_remasking:
-            assert (
-                self.rcr_overtime_conf is not None and isinstance(self.rcr_overtime_conf, bool)
+            assert self.rcr_overtime_conf is not None and isinstance(
+                self.rcr_overtime_conf, bool
             ), "overtime_conf must be specified for RCR remasking and be a boolean."
-            
+
             assert self.temperature == 0.0, "temperature must be 0.0 for RCR remasking."
             assert self.alg_temp == 0.0, "alg_temp must be 0.0 for RCR remasking."
-            assert (
-                self.alg_threshold is None
-            ), "alg_threshold should not be set for RCR remasking."
-            assert self.alg_factor is None, "alg_factor should not be set for RCR remasking."
+            assert self.alg_threshold is None, (
+                "alg_threshold should not be set for RCR remasking."
+            )
+            assert self.alg_factor is None, (
+                "alg_factor should not be set for RCR remasking."
+            )
 
     def to_generation_kwargs(self):
         gen_kwargs = super().to_generation_kwargs()
 
         if self.is_remdm_remasking:
-            gen_kwargs.update({
-                "remdm_steps": self.remdm_steps,
-                "remdm_number": self.remdm_number,
-            })
+            gen_kwargs.update(
+                {
+                    "remdm_steps": self.remdm_steps,
+                    "remdm_number": self.remdm_number,
+                }
+            )
 
         if self.is_rcr_remasking:
-            gen_kwargs.update({
-                "overtime_conf": self.rcr_overtime_conf,
-            })
+            gen_kwargs.update(
+                {
+                    "overtime_conf": self.rcr_overtime_conf,
+                }
+            )
 
         return gen_kwargs
 
+
 @ModelRegistry.register(
-    lambda name: name
-    in ("GSAI-ML/LLaDA-8B-Instruct", "GSAI-ML/LLaDA-1.5")
+    lambda name: name in ("GSAI-ML/LLaDA-8B-Instruct", "GSAI-ML/LLaDA-1.5")
     or "llada" in name.lower()
 )
 class LladaModel(LocalModel):
-    def __init__(self, model_name: str, accel_framework: Optional[str]=None):
+    def __init__(self, model_name: str, accel_framework: Optional[str] = None):
         """Initialize the LladaModel.
 
         Args:
@@ -96,7 +106,9 @@ class LladaModel(LocalModel):
         """
         model_class = FastLLaDAModelLM if accel_framework == "fast_dllm" else AutoModel
 
-        super().__init__(model_name, model_class=model_class, accel_framework=accel_framework)
+        super().__init__(
+            model_name, model_class=model_class, accel_framework=accel_framework
+        )
 
         self.patch_model_forward(self.model, LLADA_MASK_TOKEN_ID)
         self.tokenizer.mask_token_id = LLADA_MASK_TOKEN_ID
@@ -113,16 +125,15 @@ class LladaModel(LocalModel):
         Side Effects:
             Modifies the model's forward method in-place to set the logits of the mask token to -inf.
         """
-        fwd_fn = model.__class__.forward
 
-        def wrapped_forward(*args, **kwargs):
-            output = fwd_fn(*args, **kwargs)
+        def wrapped_forward(self_model, *args, **kwargs):
+            output = self_model.__class__.forward(self_model, *args, **kwargs)
             output.logits[:, :, mask_token_id] = -float(
                 "Inf"
             )  # cannot sample mask token
             return output
 
-        model.__class__.forward = wrapped_forward
+        model.forward = types.MethodType(wrapped_forward, model)
 
     @measure_time_mem("generate")
     def _generate(
@@ -143,13 +154,15 @@ class LladaModel(LocalModel):
         """
         gen_kwargs = gen_config.to_generation_kwargs()
 
-        gen_kwargs.update({
-            "model": self.model,
-            "prompt": input_ids,
-            "mask_id": self.mask_id,
-            "output_history": output_history,
-            "output0_ids": output0_ids,
-        })
+        gen_kwargs.update(
+            {
+                "model": self.model,
+                "prompt": input_ids,
+                "mask_id": self.mask_id,
+                "output_history": output_history,
+                "output0_ids": output0_ids,
+            }
+        )
 
         if gen_config.is_remdm_remasking:
             return generate_remdm(**gen_kwargs)
@@ -161,10 +174,10 @@ class LladaModel(LocalModel):
     def generate(
         self,
         messages: Union[list[str], str],
-        output_prefix:torch.Tensor=None,
-        gen_config:dict=None,
-        output_history:bool=False
-    )-> DLLMOutput:
+        output_prefix: torch.Tensor = None,
+        gen_config: dict = None,
+        output_history: bool = False,
+    ) -> DLLMOutput:
         """Generate output from input messages.
         Args:
             messages (Union[List[str], str]): Input messages in chat format or a single string prompt.
@@ -220,9 +233,12 @@ class LladaModel(LocalModel):
             "History should not be None if output_history is True."
         )
 
-        decoding_order, decoding_order_corrs = (
-            compute_decoding_order_correlation_from_history(self.tokenizer, history)
-        )
+        if history is not None:
+            decoding_order, decoding_order_corrs = (
+                compute_decoding_order_correlation_from_history(self.tokenizer, history)
+            )
+        else:
+            decoding_order, decoding_order_corrs = None, None
 
         return DLLMOutput(
             output=output,
