@@ -78,14 +78,15 @@ def generate_dlm(model, prompt, steps=64, gen_length=128, block_length=32, tempe
 
         assert gen_length % block_length == 0
         num_blocks = gen_length // block_length
-        intermediate_inputs = []
-        intermediate_results = []
-        intermediate_confidence = []
+        # intermediate_inputs = []
+        # intermediate_results = []
+        # intermediate_confidence = []
         # Adjust steps if needed
         steps_per_block = max(1, steps // num_blocks)
         overtime_confidence = torch.zeros_like(x, dtype=torch.float32)
         if implicit_diffusion:
             logits = model(x, diffusion_steps=steps).logits
+            nfe += 1
             logits_with_noise = add_gumbel_noise(logits, temperature)
             x = torch.argmax(logits_with_noise, dim=-1)
         else:
@@ -98,7 +99,7 @@ def generate_dlm(model, prompt, steps=64, gen_length=128, block_length=32, tempe
 
                 for i in range(steps_per_block):
                     mask_index = (x == mask_id)
-                    intermediate_inputs.append(x.clone().cpu())
+                    # intermediate_inputs.append(x.clone().cpu())
                     # Handle classifier-free guidance more efficiently
                     if cfg_scale > 0.:
                         un_x = x.clone()
@@ -107,10 +108,12 @@ def generate_dlm(model, prompt, steps=64, gen_length=128, block_length=32, tempe
 
                         # Get logits in a single forward pass
                         logits = model(x_).logits
+                        nfe += 1
                         logits, un_logits = torch.chunk(logits, 2, dim=0)
                         logits = un_logits + (cfg_scale + 1) * (logits - un_logits)
                     else:
                         logits = model(x).logits
+                        nfe += 1
 
                     # Apply Gumbel noise for sampling
                     logits_with_noise = add_gumbel_noise(logits, temperature)
@@ -124,13 +127,13 @@ def generate_dlm(model, prompt, steps=64, gen_length=128, block_length=32, tempe
                         x0_p = torch.rand(x0.shape, device=x0.device)
                     else:
                         raise NotImplementedError(remasking)
-                    if not overtime_conf:
-                        intermediate_confidence.append(x0_p.clone().cpu())
+                    # if not overtime_conf:
+                    #     intermediate_confidence.append(x0_p.clone().cpu())
                     # Ensure we don't process tokens beyond the current block
                     x0_p[:, end_idx:] = -np.inf
                     # Update masked tokens
                     x0 = torch.where(mask_index, x0, x)
-                    intermediate_results.append(x0.clone().cpu())
+                    # intermediate_results.append(x0.clone().cpu())
                     # valid_token_mask = x0 != 198
                     # confidence = torch.where(torch.logical_and(mask_index, valid_token_mask), x0_p, torch.tensor(-np.inf, device=x0.device))
                     confidence = torch.where(mask_index, x0_p, torch.tensor(-np.inf, device=x0.device))
@@ -175,7 +178,7 @@ def generate_dlm(model, prompt, steps=64, gen_length=128, block_length=32, tempe
                     if history is not None:
                         history.append(x[:, input_length:].cpu().clone())  # clone
 
-                    if overtime_conf:
-                        intermediate_confidence.append(overtime_confidence.clone().cpu())
+                    # if overtime_conf:
+                    #     intermediate_confidence.append(overtime_confidence.clone().cpu())
         # return x, intermediate_results, intermediate_confidence, intermediate_inputs
         return x, nfe, history
