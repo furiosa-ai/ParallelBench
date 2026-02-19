@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from enum import Enum
 import functools
+import types
 import numpy as np
 from typing import Optional
 from transformers import AutoModel, AutoTokenizer
@@ -289,16 +290,12 @@ class LladaModel(BaseModel):
         else:
             model_class = AutoModel
 
-        if model_name == "llada-tiny_random":
-            self.model = model_class.from_config(
-                model_name,)
-        else:
-            self.model = model_class.from_pretrained(
-                model_name,
-                trust_remote_code=True,
-                torch_dtype=torch.bfloat16,
-                device_map="auto"
-            )
+        self.model = model_class.from_pretrained(
+            model_name,
+            trust_remote_code=True,
+            torch_dtype=torch.bfloat16,
+            device_map="auto"
+        )
 
         self.patch_model_forward(self.model, LLADA_MASK_TOKEN_ID)
         
@@ -314,14 +311,14 @@ class LladaModel(BaseModel):
         self.accel_framework = accel_framework
 
     def patch_model_forward(self, model, mask_token_id):
-        fwd_fn = model.__class__.forward
-
-        def wrapped_forward(*args, **kwargs):
-            output = fwd_fn(*args, **kwargs)
-            output.logits[:, :, mask_token_id] = -float('Inf')  # cannot sample mask token
+        original_forward = model.forward
+        def wrapped_forward(self_model, *args, **kwargs):
+            output = original_forward(*args, **kwargs)
+            # Ensure vocab guard here as well
+            if mask_token_id < output.logits.size(-1):
+                output.logits[:, :, mask_token_id] = -float('Inf')
             return output
-
-        model.__class__.forward = wrapped_forward
+        model.forward = types.MethodType(wrapped_forward, model)
 
     def fill(self, prompt, suffix, gen_config=None):
         raise NotImplementedError
@@ -350,7 +347,7 @@ class LladaModel(BaseModel):
                 else:
                     generate_fn = generate_with_prefix_cache
             else:
-                assert False
+                raise ValueError("fast_dllm_use_cache must be True for fast_dllm accel_framework")
         elif self.accel_framework is None:
             generate_fn = generate_no_cache
 
@@ -382,7 +379,10 @@ class LladaModel(BaseModel):
 
         assert not (output_history and history is None), "History should not be None if output_history is True."
 
-        decoding_order, decoding_order_corrs = compute_decoding_order_correlation_from_history(self.tokenizer, history)
+        if history is not None:
+            decoding_order, decoding_order_corrs = compute_decoding_order_correlation_from_history(self.tokenizer, history)
+        else:
+            decoding_order, decoding_order_corrs = None, None
 
         return DLLMOutput(
             output=output,
