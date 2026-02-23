@@ -25,10 +25,14 @@ class ExampleGenerationConfig(DllmGenerationConfig):
         })
         return gen_kwargs
 
-@ModelRegistry.register(
-    lambda name: name.startswith("example-model") and False,  # Set to False to prevent actual registration
-)
 class ExampleModel(LocalModel):
+    """
+    Example LocalModel implementation.
+
+    This class is not registered in ModelRegistry by default. To use it in a
+    real deployment, add an appropriate @ModelRegistry.register(...) decorator
+    with a predicate that matches your desired model name(s).
+    """
     def __init__(self, model_name: str, accel_framework: Optional[str] = None, **kwargs):
         super().__init__(model_name, accel_framework=accel_framework, **kwargs)
         # Initialize the model here (e.g., load weights, set up tokenizer, etc.)
