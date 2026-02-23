@@ -174,7 +174,7 @@ class Evaluator:
         print(metrics)
 
     def _update_decoding_order(self, outputs):
-        from model.local.llada_model import LLADA_MASK_TOKEN_ID
+        from model.local.llada.constants import LLADA_MASK_TOKEN_ID
 
         from model.model_utils import compute_decoding_order_correlation_from_history
 
