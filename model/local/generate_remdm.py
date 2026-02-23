@@ -55,6 +55,7 @@ def generate_remdm(
     assert alg_temp == 0.0
     assert remdm_number is not None and remdm_number > 0
     assert remdm_steps is not None and remdm_steps >= 0
+    assert output0_ids is None, "output0_ids is not supported in remdm currently"
 
     history = [] if output_history else None
 
@@ -91,12 +92,12 @@ def generate_remdm(
             xt[
                 :,
                 prompt.shape[1]
-                + num_block * block_length : prompt.shape[1]
-                + (num_block + 1) * block_length,
+                + num_block * block_length: prompt.shape[1]
+                + (num_block + 1) * block_length
             ]
             == mask_id
         )
-        num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps)[0].tolist()
+        num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps_per_block)[0].tolist()
 
         for i, is_remasking_step in enumerate(is_remasking_steps):
             if is_remasking_step:
