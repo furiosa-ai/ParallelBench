@@ -1,0 +1,174 @@
+<footer
+  id="citation"
+  class="border-t border-slate-200 bg-slate-50 py-16 sm:py-20 lg:py-24"
+>
+  <div class="mx-auto max-w-5xl px-6 lg:px-12">
+    <!-- Citation Section -->
+    <div class="mb-20">
+      <div class="text-center mb-10">
+        <h3 class="text-3xl font-bold text-slate-900">Citation</h3>
+        <p class="mt-6 text-slate-600">
+          If you use <b>ParallelBench</b> in your research, please cite our
+          paper:
+        </p>
+      </div>
+      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden">
+        <div class="bg-slate-800 px-5 py-3 flex items-center justify-between">
+          <span class="text-xs font-medium text-slate-300">BibTeX</span>
+          <button
+            onclick="copyToClipboard()"
+            class="flex items-center gap-1.5 rounded-md bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-600"
+          >
+            <svg
+              class="h-3.5 w-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+            Copy
+          </button>
+        </div>
+        <pre
+          id="citation-text"
+          class="overflow-x-auto bg-slate-900 p-6 text-sm text-slate-200 leading-relaxed"
+        >
+@article{kang2025parallelbench,
+  title={ParallelBench: Understanding the Trade-offs of Parallel Decoding in Diffusion LLMs},
+  author={Kang, Wonjun and Galim, Kevin and Oh, Seunghyuk and Lee, Minjae and Zeng, Yuchen and Zhang, Shuibai and Hooper, Coleman and Hu, Yuezhou and Koo, Hyung Il and Cho, Nam Ik and others},
+  journal={arXiv preprint arXiv:2510.04767},
+  year={2025}
+}</pre
+        >
+      </div>
+    </div>
+
+    <!-- Footer Links and Info -->
+    <div class="grid gap-10 border-t border-slate-200 pt-10 md:grid-cols-3">
+      <!-- About -->
+      <div>
+        <h4 class="mb-3 text-sm font-bold text-slate-900">About</h4>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <b>ParallelBench</b> is a benchmark for analyzing dLLMs under parallel
+          decoding and their speed-quality trade-offs.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="mb-3 text-sm font-bold text-slate-900">Quick Links</h4>
+        <ul class="space-y-2 text-sm text-slate-600">
+          <li>
+            <a
+              href="https://github.com/furiosa-ai/ParallelBench"
+              class="transition hover:text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub Repository
+            </a>
+          </li>
+          <!-- <li>
+            <a href="#abstract" class="transition hover:text-primary"
+              >Abstract</a
+            >
+          </li> -->
+          <li>
+            <a href="#benchmark" class="transition hover:text-primary"
+              >Benchmark</a
+            >
+          </li>
+          <li>
+            <a href="#results" class="transition hover:text-primary">Results</a>
+          </li>
+          <li>
+            <a href="#implications" class="transition hover:text-primary"
+              >Trade-off</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Affiliations -->
+      <div>
+        <h4 class="mb-3 text-sm font-bold text-slate-900">Affiliations</h4>
+        <ul class="space-y-2 text-sm text-slate-600">
+          <li>
+            <a
+              href="https://www.furiosa.ai/"
+              class="transition hover:text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              >FuriosaAI</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.wisc.edu/"
+              class="transition hover:text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              >UW-Madison</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.microsoft.com/en-us/research/"
+              class="transition hover:text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Microsoft Research</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.berkeley.edu/"
+              class="transition hover:text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              >UC Berkeley</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.snu.ac.kr/"
+              class="transition hover:text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Seoul National University</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.krafton.ai/"
+              class="transition hover:text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              >KRAFTON AI</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="mt-10 border-t border-slate-200 pt-8 text-center">
+      <p class="text-xs text-slate-500">
+        &copy; 2025 ParallelBench Contributors &middot; Licensed under
+        <a
+          href="http://creativecommons.org/licenses/by-sa/4.0/"
+          class="text-primary hover:underline"
+          target="_blank"
+          rel="noopener"
+          >CC BY-SA 4.0</a
+        >
+      </p>
+    </div>
+  </div>
+</footer>
