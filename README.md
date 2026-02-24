@@ -81,35 +81,27 @@ These steps will guide you through setting up the necessary environment and depe
 - **NVIDIA GPU**: CUDA >= 11.8.
 - **Java Development Kit (JDK)**: Required only for grammar-based evaluation metrics.
 
-### 2. Create Conda Environment
-First, create and activate the conda environment. We use **Python 3.10**.
+### 2. Set Python Environment
 
-```bash
-conda create -n parallelbench python=3.10 -y
-conda activate parallelbench
-```
-
-### 3. Install Python Dependencies
 We use `uv` for faster package installation. The following commands will install PyTorch, `vLLM` for the LLM baselines, and all other required packages from `requirements.txt`.
 
 ```bash
-# Install uv, a fast package installer
-pip install uv
-
+# Use curl to download the script and execute it with sh:
+curl -LsSf https://astral.sh/uv/install.sh | sh
 # Install core dependencies
-uv pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu118
-uv pip install -r requirements.txt
-uv pip install vllm  # optional for LLM evaluation
+uv sync
 ```
 
-### 4. Install Java (Optional)
-If you need to run the **grammar-based** evaluations, install the JDK via conda:
+### 3. Install Java (Optional)
+
+If you need to run the **grammar-based** evaluations, install the JDK:
+
 ```bash
-conda install -c conda-forge openjdk=17
+apt-get install openjdk-17-jdk -y
 ```
-
 
 ## ⚡ Quickstart
+
 Here's a simple example of how to load a model and run it on a **ParallelBench** task. For a more in-depth example, see the [`demo.py`](demo.py) script.
 
 ```python
@@ -214,21 +206,65 @@ PYTHONPATH=. python dataset/parallel_bench/data/task.py --task test/copy_reverse
 
 This command uses the configurations specified in `dataset/parallel_bench/data/task_configs/`.
 
+***
+
+## 🧩 Adding Custom Models
+
+You can integrate your own diffusion LLM by following the example in `model/local/example/`. This directory contains:
+
+- **`example_model.py`**: Template for implementing a custom model class that inherits from `LocalModel`
+- **`constants.py`**: Example constants such as mask token IDs and valid remasking strategies
+
+### Implementation Steps
+
+1. **Define Generation Config**: Extend `DllmGenerationConfig` to include model-specific parameters
+2. **Implement Model Class**: Create a class that inherits from `LocalModel` and implements the `generate()` method
+3. **Register Your Model**: Use the `@ModelRegistry.register()` decorator with a name pattern matcher
+
+Example structure:
+
+```python
+from model.base_model import DLLMOutput, LocalModel
+from model.generation_config import DllmGenerationConfig
+from model.registry import ModelRegistry
+
+@dataclass
+class CustomGenerationConfig(DllmGenerationConfig):
+    custom_param: str = "default_value"
+    
+    def to_generation_kwargs(self):
+        gen_kwargs = super().to_generation_kwargs()
+        gen_kwargs.update({"custom_param": self.custom_param})
+        return gen_kwargs
+
+@ModelRegistry.register(
+    lambda name: name.startswith("your-model-prefix")
+)
+class CustomModel(LocalModel):
+    def generate(self, messages, output_prefix=None, gen_config=None, output_history=False):
+        # Your generation logic here
+        return DLLMOutput(...)
+```
+
+See `model/local/example/` for a working example.
 
 ## 🚀 Running Evaluations
 
 
 ### Configuration
 
-Before running the evaluations, you must export the necessary API keys as environment variables.
+Before running the evaluations, copy the example environment file and fill in your API keys:
 
 ```bash
-# For logging results
-export WANDB_API_KEY="your_weights_and_biases_key"
+cp .env.example .env
+```
 
-# For commercial model APIs
-export ANTHROPIC_API_KEY="your_anthropic_key"      # For Haiku
-export INCEPTION_API_KEY="your_mercury_model_key"  # For Mercury
+Then edit `.env` with your actual keys. The keys will be loaded automatically via `python-dotenv`.
+
+For logging results, log in to Weights & Biases:
+
+```bash
+uv run wandb login
 ```
 
 All experiments are launched using the `run_all.py` script. The general command structure is:

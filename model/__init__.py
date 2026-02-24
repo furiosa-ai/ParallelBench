@@ -1,44 +1,64 @@
+from model.base_model import ApiModel, BaseModel, LocalModel
+# Local models
+from model.local import DreamModel, LladaModel, TradoModel, SeddModel
+# API models
+from model.api import AnthropicModel, MercuryModel
+from model.registry import ModelRegistry
+from model.local.transformers_model import TransformersModel
+from model.local.vllm_model import vllmModel
 
-from model.anthropic_model import AnthropicModel
-from model.dream_model import DreamModel
-from model.mercury_model import MercuryModel
-from model.llada_model import LladaModel
-from model.trado_model import TradoModel
-from model.transformers_model import TransformersModel
-from model.vllm_model import vllmModel
 
-def load_model(model_name, **kwargs):
+__all__ = [
+    "BaseModel",
+    "ApiModel",
+    "LocalModel",
+    "ModelRegistry",
+    "DreamModel",
+    "LladaModel",
+    "TradoModel",
+    "SeddModel",
+    "AnthropicModel",
+    "MercuryModel",
+    "TransformersModel",
+    "vllmModel",
+]
+
+
+def load_model(model_name: str, **kwargs) -> "BaseModel":
     """
-    Load a model from the specified path with given model arguments.
-    
+    Load a model from the specified model name with given model arguments.
+
+    Dispatch order:
+    1. Try ModelRegistry (name-based lookup)
+    2. Fall back to accel_framework parameter (vllm, transformers)
+    3. Raise ValueError if no match
+
     Args:
-        model_name (str): Path to the model.
-        model_kwargs (dict, optional): Additional arguments for loading the model.
-        
+        model_name (str): Name or path of the model.
+        **kwargs: Additional arguments. May include 'accel_framework'.
+
     Returns:
         BaseModel: An instance of the loaded model.
-    """
 
-    if model_name in ("mercury", "mercury-coder"):
-        return MercuryModel(model_name, **kwargs)
-    elif model_name in ("Dream-org/Dream-v0-Instruct-7B", "Dream-org/Dream-Coder-v0-Instruct-7B", "apple/DiffuCoder-7B-Instruct", "apple/DiffuCoder-7B-cpGRPO", "hub/dream-v0-instruct-tiny-random"):
-        return DreamModel(model_name, **kwargs)
-    elif model_name in ("Gen-Verse/TraDo-4B-Instruct", "Gen-Verse/TraDo-8B-Instruct", "Gen-Verse/TraDo-8B-Thinking") or "SDAR" in model_name:
-        return TradoModel(model_name, **kwargs)
-    elif model_name in ("GSAI-ML/LLaDA-8B-Instruct", "GSAI-ML/LLaDA-1.5", "hub/llada-1.5-tiny-random") or "llada" in model_name.lower():
-        return LladaModel(model_name, **kwargs)
-    elif kwargs["accel_framework"] == "vllm":
-        kwargs.pop("accel_framework")
+    Raises:
+        ValueError: If model_name is not supported.
+    """
+    accel_framework = kwargs.pop("accel_framework", None)
+
+    # Try registry first
+    try:
+        model_class = ModelRegistry.get_model_class(model_name)
+    except ValueError:
+        model_class = None
+
+    if model_class:
+        # API models don't accept accel_framework
+        if issubclass(model_class, ApiModel):
+            return model_class(model_name, **kwargs)
+        return model_class(model_name, accel_framework=accel_framework, **kwargs)
+    elif accel_framework == "vllm":
         return vllmModel(model_name, **kwargs)
-    # elif kwargs["accel_framework"] == "anthropic":
-    elif model_name.startswith("claude-"):
-        kwargs.pop("accel_framework", None)
-        return AnthropicModel(model_name, **kwargs)
-    elif kwargs["accel_framework"] == "transformers":
-        kwargs.pop("accel_framework")
+    elif accel_framework == "transformers":
         return TransformersModel(model_name, **kwargs)
-    elif "sedd" in model_name:
-        from model.sedd_model import SeddModel
-        return SeddModel(model_name, **kwargs)
     else:
         raise ValueError(f"Model {model_name} is not supported.")

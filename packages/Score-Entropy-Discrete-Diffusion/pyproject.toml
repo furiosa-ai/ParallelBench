@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sedd"
+version = "0.1.0"
+description = "Score Entropy Discrete Diffusion"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "torch>=2.0.0",
+    "einops>=0.7.0",
+    "omegaconf",
+    "hydra-core",
+    "transformers>=4.30.0",
+    "huggingface-hub>=0.20.0",
+    "accelerate>=0.25.0",
+    "datasets>=2.15.0",
+    "wandb>=0.16.0",
+    "numpy>=1.24.0",
+    "tqdm>=4.60.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+]
+
+[tool.setuptools.packages.find]
+include = ["sedd*"]

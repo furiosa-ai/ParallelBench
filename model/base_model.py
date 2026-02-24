@@ -1,14 +1,59 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
-from typing import Optional
-
+from typing import Optional, Union, List, Dict
+from transformers import AutoModel, AutoTokenizer
 import torch
 
+VALID_ACCEL_FRAMEWORKS = {None, "vllm", "transformers", "fast_dllm"}
 
-class BaseModel:
-    @property
-    def num_workers(self):
-        return 0
+
+class BaseModel(ABC):
+    """Abstract base class for all models (API and local)."""
+
+    @abstractmethod
+    def generate(
+        self, messages: Union[List[str], str], gen_config: Dict=None, output_prefix: Optional[torch.tensor]=None, output_history: bool=False
+    ) -> "DLLMOutput":
+        """Generate output from input messages.
+
+        Args:
+            messages: Input messages in chat format
+            gen_config: Generation configuration dictionary passed to the model-specific GenerationConfig
+            output_prefix: Prefix token tensor to prepend to the generated output
+            output_history: If True, return intermediate decoding states in history field of DLLMOutput
+        Returns:
+            DLLMOutput: Generated output with metadata
+        """
+        pass
+
+
+class ApiModel(BaseModel):
+    """Base class for API-backed models (no local weight loading)."""
+    pass
+
+
+class LocalModel(BaseModel):
+    """Base class for local models that load weights via transformers."""
+
+    def __init__(self, model_name, model_class=AutoModel, accel_framework=None, ):
+        if accel_framework not in VALID_ACCEL_FRAMEWORKS:
+            raise ValueError(
+                f"Invalid accel_framework: {accel_framework}. "
+                f"Valid options are: {VALID_ACCEL_FRAMEWORKS}"
+            )
+
+        self.accel_framework = accel_framework
+        self.is_fast_dllm = self.accel_framework == "fast_dllm"
+
+        self.model = model_class.from_pretrained(
+            model_name,
+            trust_remote_code=True,
+            torch_dtype=torch.bfloat16,
+            device_map="auto",
+        )
+        self.model.eval()
+
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
 
 @dataclass
@@ -31,8 +76,9 @@ class DLLMOutput:
     def output_length(self):
         if self.pad_token_id is None:
             return self.output_ids.size(1) if self.output_ids is not None else None
-        
-        return (self.output_ids.squeeze() != self.pad_token_id).sum().item() if self.output_ids is not None else None
 
-    def __post_init__(self):
-        pass
+        return (
+            (self.output_ids.squeeze() != self.pad_token_id).sum().item()
+            if self.output_ids is not None
+            else None
+        )

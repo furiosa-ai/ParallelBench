@@ -1,19 +1,20 @@
 import argparse
+import importlib
 import itertools
-from math import ceil
-from multiprocessing import Process, Queue
 import multiprocessing
 import os
-from pathlib import Path
-import sys
-from queue import Empty
 import subprocess
-from threading import Thread
+import sys
 import time
-import importlib
+from math import ceil
+from multiprocessing import Process, Queue
+from pathlib import Path
+from queue import Empty
+from threading import Thread
 
-from tqdm import tqdm
 import yaml
+from dotenv import load_dotenv
+from tqdm import tqdm
 
 from utils.utils import get_missing_run_ids
 
@@ -258,4 +259,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()
