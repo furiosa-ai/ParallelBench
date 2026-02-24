@@ -81,35 +81,27 @@ These steps will guide you through setting up the necessary environment and depe
 - **NVIDIA GPU**: CUDA >= 11.8.
 - **Java Development Kit (JDK)**: Required only for grammar-based evaluation metrics.
 
-### 2. Create Conda Environment
-First, create and activate the conda environment. We use **Python 3.10**.
+### 2. Set Python Environment
 
-```bash
-conda create -n parallelbench python=3.10 -y
-conda activate parallelbench
-```
-
-### 3. Install Python Dependencies
 We use `uv` for faster package installation. The following commands will install PyTorch, `vLLM` for the LLM baselines, and all other required packages from `requirements.txt`.
 
 ```bash
-# Install uv, a fast package installer
-pip install uv
-
+# Use curl to download the script and execute it with sh:
+curl -LsSf https://astral.sh/uv/install.sh | sh
 # Install core dependencies
-uv pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu118
-uv pip install -r requirements.txt
-uv pip install vllm  # optional for LLM evaluation
+uv sync
 ```
 
 ### 4. Install Java (Optional)
-If you need to run the **grammar-based** evaluations, install the JDK via conda:
+
+If you need to run the **grammar-based** evaluations, install the JDK:
+
 ```bash
-conda install -c conda-forge openjdk=17
+apt-get install openjdk-17-jdk -y
 ```
 
-
 ## ⚡ Quickstart
+
 Here's a simple example of how to load a model and run it on a **ParallelBench** task. For a more in-depth example, see the [`demo.py`](demo.py) script.
 
 ```python
