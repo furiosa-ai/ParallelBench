@@ -92,7 +92,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync
 ```
 
-### 4. Install Java (Optional)
+### 3. Install Java (Optional)
 
 If you need to run the **grammar-based** evaluations, install the JDK:
 
