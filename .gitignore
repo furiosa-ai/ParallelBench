@@ -228,3 +228,6 @@ __marimo__/
 .env
 *.local
 *.local.*
+
+CLAUDE.*
+.mcp.json
