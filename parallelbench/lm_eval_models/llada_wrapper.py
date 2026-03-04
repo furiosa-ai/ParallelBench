@@ -7,6 +7,9 @@ from typing import Optional
 from lm_eval.api.registry import register_model
 
 from parallelbench.model.base_model import BaseModel
+
+# FIXME: Consider using ModelRegistry.get_model_class() instead of direct import
+#  to reduce coupling between lm_eval_models/ and model/ internals.
 from parallelbench.model.local.llada.llada_model import LladaModel
 from parallelbench.lm_eval_models.dllm_base import DLLMBase
 

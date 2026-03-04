@@ -6,6 +6,9 @@ from lm_eval.api.instance import Instance
 from lm_eval.api.registry import register_model
 
 from parallelbench.model.base_model import BaseModel, DLLMOutput
+
+# FIXME: Consider using ModelRegistry.get_model_class() or load_model() instead of
+#  direct imports to reduce coupling between lm_eval_models/ and model/ internals.
 from parallelbench.model.local.transformers_model import TransformersModel
 from parallelbench.model.local.vllm_model import vllmModel
 from parallelbench.lm_eval_models.dllm_base import DLLMBase
