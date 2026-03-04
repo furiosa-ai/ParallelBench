@@ -14,8 +14,8 @@ import yaml
 from datasets import Dataset, concatenate_datasets
 
 
-from dataset.parallel_bench.data.task_utils import ALPHABET_CHARS, RandomMathOp, _generate_domino_sequence, _get_task_file, _shuffle, generate_latin_square, generate_word_lists, latin_square_to_str, list_difference, list_to_str, load_task_configs, load_words_from_file, repeat_list, str_to_seed
-from utils.grammar_check import grammar_check
+from parallelbench.dataset.task_utils import ALPHABET_CHARS, RandomMathOp, _generate_domino_sequence, _get_task_file, _shuffle, generate_latin_square, generate_word_lists, latin_square_to_str, list_difference, list_to_str, load_task_configs, load_words_from_file, repeat_list, str_to_seed
+from parallelbench.utils.grammar_check import grammar_check
 
 
 DEFAULT_SEED = 42

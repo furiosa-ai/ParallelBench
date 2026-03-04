@@ -3,8 +3,8 @@ import re
 import json
 
 import evaluate
-from dataset.parallel_bench.data.task_utils import str_to_latin_square
-from utils.grammar_check import grammar_check
+from parallelbench.dataset.task_utils import str_to_latin_square
+from parallelbench.utils.grammar_check import grammar_check
 
 
 def _parse_list(input_str, strict=False):

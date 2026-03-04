@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModel, AutoTokenizer, PreTrainedModel, PreTrainedTokenizer
-from dataset.parallel_bench import ParallelBench
+from parallelbench.dataset import ParallelBench
 from typing import Dict, List, Any
 
 # --- Configuration ---

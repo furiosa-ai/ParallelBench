@@ -124,7 +124,7 @@ def load_task_configs(task_config_file):
     task_config_file = Path(task_config_file)
     
     if "." not in str(task_config_file):
-        task_config_file = Path(__file__).parent / "task_configs" / f"{task_config_file}.yaml"
+        task_config_file = Path(__file__).parent / "data" / "task_configs" / f"{task_config_file}.yaml"
 
     with open(task_config_file, "r") as f:
         task_config = yaml.safe_load(f)
@@ -142,7 +142,7 @@ def load_task_configs(task_config_file):
 
 
 def _get_task_file(split, task_name):
-    return Path(__file__).parent / "output" / split / f"{task_name}.jsonl"
+    return Path(__file__).parent / "data" / "output" / split / f"{task_name}.jsonl"
 
 
 def str_to_seed(seed_str, offset=0):
@@ -188,10 +188,10 @@ def load_words_from_file(file_path):
         return ALPHABET_CHARS
 
     if file_path.endswith(".txt"):
-        with open(Path(__file__).parent / file_path, "r") as f:
+        with open(Path(__file__).parent / "data" / file_path, "r") as f:
             words = [line.strip() for line in f if line.strip()]
     elif file_path.endswith(".yaml") or file_path.endswith(".yml"):
-        with open(Path(__file__).parent / file_path, "r") as f:
+        with open(Path(__file__).parent / "data" / file_path, "r") as f:
             words = yaml.safe_load(f)
 
         if isinstance(words[0], list):

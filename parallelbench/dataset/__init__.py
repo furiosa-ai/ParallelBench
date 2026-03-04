@@ -2,8 +2,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from dataset.parallel_bench.data.task import create_parallel_bench_task, load_task
-from dataset.parallel_bench.metrics import Metric, parallel_bench_metric_func_map
+from parallelbench.dataset.task import create_parallel_bench_task, load_task
+from parallelbench.dataset.metrics import Metric, parallel_bench_metric_func_map
 
 from datasets import Dataset
 
