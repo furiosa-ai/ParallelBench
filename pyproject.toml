@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "parallelbench"
 version = "0.1.0"
@@ -15,6 +19,7 @@ dependencies = [
     "anthropic>=0.71.0",
     "python-dotenv>=1.2.1",
     "vllm==0.11.*",
+    "lm-eval>=0.4.8",
 ]
 
 
@@ -37,8 +42,22 @@ flash-attn = [
     "packaging",
 ]
 
+[project.entry-points."lm_eval.models"]
+parallelbench_llada = "parallelbench.lm_eval_models.llada_wrapper:LLaDAWrapper"
+parallelbench_dream = "parallelbench.lm_eval_models.dream_wrapper:DreamWrapper"
+parallelbench_sedd = "parallelbench.lm_eval_models.sedd_wrapper:SEDDWrapper"
+parallelbench_trado = "parallelbench.lm_eval_models.trado_wrapper:TradoWrapper"
+parallelbench_ar = "parallelbench.lm_eval_models.ar_wrapper:ARWrapper"
+parallelbench_api = "parallelbench.lm_eval_models.api_wrapper:ApiWrapper"
+
+[project.scripts]
+parallelbench = "parallelbench.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["parallelbench*"]
+
 [dependency-groups]
 dev = [
+    "pre-commit>=4.5.1",
     "pytest>=9.0.2",
 ]
-
