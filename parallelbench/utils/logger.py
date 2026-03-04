@@ -1,6 +1,6 @@
 import wandb
 
-from utils.constants import WANDB_ENTITY, WANDB_PROJECT
+from parallelbench.utils.constants import WANDB_ENTITY, WANDB_PROJECT
 
 
 class Logger:

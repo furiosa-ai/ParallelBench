@@ -2,9 +2,9 @@
 
 import pytest
 
-from model.local.llada.llada_model import LladaGenerationConfig
-from model.local.dream.dream_model import DreamGenerationConfig
-from model.local.trado.trado_model import TradoGenerationConfig
+from parallelbench.model.local.llada.llada_model import LladaGenerationConfig
+from parallelbench.model.local.dream.dream_model import DreamGenerationConfig
+from parallelbench.model.local.trado.trado_model import TradoGenerationConfig
 
 
 # ============================================================

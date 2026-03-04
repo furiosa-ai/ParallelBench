@@ -2,7 +2,7 @@
 
 import pytest
 
-from model.generation_config import DllmGenerationConfig
+from parallelbench.model.generation_config import DllmGenerationConfig
 
 
 def test_fast_dllm_cache_allowed_with_fast_dllm_framework():

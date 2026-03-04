@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import torch
 
-from model.model_utils import (
+from parallelbench.model.model_utils import (
     compute_decoding_order_correlation,
     compute_decoding_order_correlation_from_history,
     compute_history_decoding_order,

@@ -12,13 +12,13 @@ class TestModelRegistry:
 
     def setup_method(self):
         """Reset registry before each test for isolation."""
-        from model.registry import ModelRegistry
+        from parallelbench.model.registry import ModelRegistry
 
         ModelRegistry.clear()
 
     def test_registered_class_can_be_retrieved(self):
         """Test that after decorating a class, get_model_class() returns that class when matcher returns True."""
-        from model.registry import ModelRegistry
+        from parallelbench.model.registry import ModelRegistry
 
         @ModelRegistry.register(matcher=lambda name: name == "test_model")
         class TestModel:
@@ -32,7 +32,7 @@ class TestModelRegistry:
 
     def test_no_match_raises_value_error(self):
         """Test that when no matcher matches, get_model_class() raises ValueError."""
-        from model.registry import ModelRegistry
+        from parallelbench.model.registry import ModelRegistry
 
         @ModelRegistry.register(matcher=lambda name: name == "test_model")
         class TestModel:
@@ -44,7 +44,7 @@ class TestModelRegistry:
 
     def test_multiple_registrations_ambiguous_raises_error(self):
         """Test that multiple matching registrations raise ValueError."""
-        from model.registry import ModelRegistry
+        from parallelbench.model.registry import ModelRegistry
 
         @ModelRegistry.register(matcher=lambda name: "test" in name)
         class FirstModel:
@@ -59,7 +59,7 @@ class TestModelRegistry:
 
     def test_registry_can_be_cleared_for_test_isolation(self):
         """Test that registry can be reset with clear() for test isolation."""
-        from model.registry import ModelRegistry
+        from parallelbench.model.registry import ModelRegistry
 
         @ModelRegistry.register(matcher=lambda name: name == "test_model")
         class TestModel:

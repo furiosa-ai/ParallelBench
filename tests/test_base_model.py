@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from model.base_model import BaseModel, DLLMOutput
+from parallelbench.model.base_model import BaseModel, DLLMOutput
 
 
 def test_subclass_without_generate_cannot_be_instantiated():

@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 import torch
 
-from model.base_model import BaseModel, DLLMOutput
-from utils.perf_utils import measure_time_mem
+from parallelbench.model.base_model import BaseModel, DLLMOutput
+from parallelbench.utils.perf_utils import measure_time_mem
 
 
 @dataclass

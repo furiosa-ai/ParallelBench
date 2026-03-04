@@ -2,7 +2,7 @@
 
 import pytest
 
-from model.generation_config import (
+from parallelbench.model.generation_config import (
     DllmGenerationConfig,
     ARGenerationConfig,
 )
@@ -132,7 +132,7 @@ def test_dllm_to_generation_kwargs():
 
 def test_transformers_generation_config_no_crash():
     """TransformersGenerationConfig (inherits ARGenerationConfig) should not crash."""
-    from model.local.transformers_model import TransformersGenerationConfig
+    from parallelbench.model.local.transformers_model import TransformersGenerationConfig
 
     config = TransformersGenerationConfig()
     assert config.max_tokens == 128

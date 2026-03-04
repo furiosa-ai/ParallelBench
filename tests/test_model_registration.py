@@ -7,18 +7,18 @@ matcher functions and can be retrieved via ModelRegistry.get_model_class().
 
 import pytest
 
-from model.registry import ModelRegistry
+from parallelbench.model.registry import ModelRegistry
 
 # Import all model modules at module level to trigger decorator registration
-import model.api.mercury_model
-import model.local.dream.dream_model
-import model.local.trado.trado_model
-import model.local.llada.llada_model
-import model.api.anthropic_model
+import parallelbench.model.api.mercury_model
+import parallelbench.model.local.dream.dream_model
+import parallelbench.model.local.trado.trado_model
+import parallelbench.model.local.llada.llada_model
+import parallelbench.model.api.anthropic_model
 
 SEDD_AVAILABLE = False
 try:
-    import model.local.sedd.sedd_model
+    import parallelbench.model.local.sedd.sedd_model
 
     SEDD_AVAILABLE = True
 except ImportError:

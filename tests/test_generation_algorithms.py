@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 import torch
 
-from model.local.generate import get_num_transfer_tokens
-from model.local.generate_rcr import gamma_func, get_num_transfer_tokens_maskgit
+from parallelbench.model.local.generate import get_num_transfer_tokens
+from parallelbench.model.local.generate_rcr import gamma_func, get_num_transfer_tokens_maskgit
 
 
 # -- get_num_transfer_tokens --

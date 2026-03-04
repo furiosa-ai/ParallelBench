@@ -6,19 +6,19 @@ import torch
 from fast_dllm.llada.model.modeling_llada import LLaDAModelLM as FastLLaDAModelLM
 from transformers import AutoModel, PreTrainedModel
 
-from dataset.parallel_bench.data.task import PARALLEL_BENCH_MASK_TOKEN
-from model.base_model import DLLMOutput, LocalModel
-from model.generation_config import DllmGenerationConfig
-from model.local.generate import generate
-from model.local.generate_rcr import generate_rcr
-from model.local.generate_remdm import generate_remdm
-from model.local.llada.constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_STRATEGIES
-from model.model_utils import (
+from parallelbench.dataset.task import PARALLEL_BENCH_MASK_TOKEN
+from parallelbench.model.base_model import DLLMOutput, LocalModel
+from parallelbench.model.generation_config import DllmGenerationConfig
+from parallelbench.model.local.generate import generate
+from parallelbench.model.local.generate_rcr import generate_rcr
+from parallelbench.model.local.generate_remdm import generate_remdm
+from parallelbench.model.local.llada.constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_STRATEGIES
+from parallelbench.model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
 )
-from model.registry import ModelRegistry
-from utils.perf_utils import measure_time_mem
+from parallelbench.model.registry import ModelRegistry
+from parallelbench.utils.perf_utils import measure_time_mem
 
 
 @dataclass

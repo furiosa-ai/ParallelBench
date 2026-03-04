@@ -3,10 +3,10 @@ from typing import Optional, Union
 
 import torch
 
-from model.base_model import DLLMOutput, LocalModel
-from model.generation_config import DllmGenerationConfig
-from model.model_utils import decode_history
-from model.registry import ModelRegistry
+from parallelbench.model.base_model import DLLMOutput, LocalModel
+from parallelbench.model.generation_config import DllmGenerationConfig
+from parallelbench.model.model_utils import decode_history
+from parallelbench.model.registry import ModelRegistry
 
 
 @dataclass

@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 import torch
 
-from model.base_model import BaseModel, DLLMOutput
-from model.generation_config import ARGenerationConfig
-from utils.perf_utils import measure_time_mem
+from parallelbench.model.base_model import BaseModel, DLLMOutput
+from parallelbench.model.generation_config import ARGenerationConfig
+from parallelbench.utils.perf_utils import measure_time_mem
 
 
 @dataclass
