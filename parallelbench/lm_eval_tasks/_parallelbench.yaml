@@ -1,0 +1,8 @@
+group: parallel_bench
+group_alias: ParallelBench
+task:
+  - parallel_bench_waiting_line
+  - parallel_bench_waiting_line_n15
+  - parallel_bench_words_to_sentence
+  - parallel_bench_paraphrase_summarize
+  - parallel_bench_puzzle

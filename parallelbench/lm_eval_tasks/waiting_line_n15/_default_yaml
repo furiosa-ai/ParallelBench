@@ -1,0 +1,13 @@
+group: parallel_bench_waiting_line_n15
+group_alias: "ParallelBench - Waiting Line N15"
+task:
+  - parallel_bench_waiting_line_n15_copy
+  - parallel_bench_waiting_line_n15_reverse
+  - parallel_bench_waiting_line_n15_sort
+  - parallel_bench_waiting_line_n15_shuffle
+  - parallel_bench_waiting_line_n15_insert_index
+  - parallel_bench_waiting_line_n15_insert_random
+  - parallel_bench_waiting_line_n15_remove_index
+  - parallel_bench_waiting_line_n15_remove_random
+  - parallel_bench_waiting_line_n15_replace_index
+  - parallel_bench_waiting_line_n15_replace_random

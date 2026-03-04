@@ -1,0 +1,10 @@
+task: parallel_bench_waiting_line_insert_index
+class: !function ../parallel_bench_task.ParallelBenchTask
+output_type: generate_until
+generation_kwargs:
+  until:
+    - "\n\n"
+  do_sample: false
+test_split: test
+metadata:
+  parallel_bench_task: "waiting_line/insert_index"
