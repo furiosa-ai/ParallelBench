@@ -167,7 +167,7 @@
   // MD033/no-inline-html : Inline HTML : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md033.md
   "MD033": {
     // Allowed elements
-    "allowed_elements": []
+    "allowed_elements": ["p", "img", "a", "sup", "br"]
   },
 
   // MD034/no-bare-urls : Bare URL used : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md034.md
@@ -180,10 +180,7 @@
   },
 
   // MD036/no-emphasis-as-heading : Emphasis used instead of a heading : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md036.md
-  "MD036": {
-    // Punctuation characters
-    "punctuation": ".,;:!?。，；：！？"
-  },
+  "MD036": false,
 
   // MD037/no-space-in-emphasis : Spaces inside emphasis markers : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md037.md
   "MD037": true,
@@ -227,7 +224,7 @@
   },
 
   // MD045/no-alt-text : Images should have alternate text (alt text) : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md045.md
-  "MD045": true,
+  "MD045": false,
 
   // MD046/code-block-style : Code block style : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md046.md
   "MD046": {

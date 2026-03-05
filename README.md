@@ -5,16 +5,16 @@
 </p>
 
 <p align="center">
-      <a href="https://scholar.google.com/citations?user=Q-ARWkwAAAAJ&hl=eh" target="_blank">Wonjun Kang</a><sup>*1,5</sup>, 
-      <a href="https://scholar.google.com/citations?user=G1EpeWYAAAAJ&hl=en" target="_blank">Kevin Galim</a><sup>*1</sup>, 
-      <a href="https://scholar.google.com/citations?user=IXJcR1gAAAAJ&hl=en" target="_blank">Seunghyuk Oh</a><sup>*1</sup>, 
-      <a href="https://scholar.google.com/citations?user=XJXKp60AAAAJ&hl=en" target="_blank">Minjae Lee</a><sup>1</sup>, 
-      <a href="https://yzeng58.github.io/zyc_cv/" target="_blank">Yuchen Zeng</a><sup>2,3</sup>, 
+      <a href="https://scholar.google.com/citations?user=Q-ARWkwAAAAJ&hl=eh" target="_blank">Wonjun Kang</a><sup>*1,5</sup>,
+      <a href="https://scholar.google.com/citations?user=G1EpeWYAAAAJ&hl=en" target="_blank">Kevin Galim</a><sup>*1</sup>,
+      <a href="https://scholar.google.com/citations?user=IXJcR1gAAAAJ&hl=en" target="_blank">Seunghyuk Oh</a><sup>*1</sup>,
+      <a href="https://scholar.google.com/citations?user=XJXKp60AAAAJ&hl=en" target="_blank">Minjae Lee</a><sup>1</sup>,
+      <a href="https://yzeng58.github.io/zyc_cv/" target="_blank">Yuchen Zeng</a><sup>2,3</sup>,
       <a href="https://scholar.google.com/citations?user=jkXzD7YAAAAJ&hl=en" target="_blank">Shuibai Zhang</a><sup>2</sup>,<br>
       <a href="https://scholar.google.com/citations?user=si-368wAAAAJ&hl=en" target="_blank">Coleman Hooper</a><sup>4</sup>,
-      <a href="https://yuezhouhu.github.io/" target="_blank">Yuezhou Hu</a><sup>4</sup>, 
-      <a href="https://scholar.google.com/citations?user=Oyy8aDMAAAAJ&hl=en" target="_blank">Hyung Il Koo</a><sup>1</sup>, 
-      <a href="https://ece.snu.ac.kr/en/research-faculty/faculty/fulltime?md=view&profid=p041" target="_blank">Nam Ik Cho</a><sup>5</sup>, 
+      <a href="https://yuezhouhu.github.io/" target="_blank">Yuezhou Hu</a><sup>4</sup>,
+      <a href="https://scholar.google.com/citations?user=Oyy8aDMAAAAJ&hl=en" target="_blank">Hyung Il Koo</a><sup>1</sup>,
+      <a href="https://ece.snu.ac.kr/en/research-faculty/faculty/fulltime?md=view&profid=p041" target="_blank">Nam Ik Cho</a><sup>5</sup>,
       <a href="https://kangwooklee.com/aboutme/" target="_blank">Kangwook Lee</a><sup>2,6,7</sup>
   </p>
   <p  align="center">
@@ -154,47 +154,47 @@ print(f"Metrics: {metrics}")
 
 ### Tasks
 
-* **Waiting Line**
-    * `waiting_line/copy`
-    * `waiting_line/insert_index`
-    * `waiting_line/insert_random`
-    * `waiting_line/remove_index`
-    * `waiting_line/remove_random`
-    * `waiting_line/replace_index`
-    * `waiting_line/replace_random`
-    * `waiting_line/reverse`
-    * `waiting_line/shuffle`
-    * `waiting_line/sort`
-* **Text Writing**
-    * `paraphrase_summarize/chatgpt-paraphrases`
-    * `paraphrase_summarize/samsum`
-    * `words_to_sentence/easy`
-    * `words_to_sentence/medium`
-    * `words_to_sentence/hard`
-* **Puzzle**
-    * `puzzle/latin_square_n4`
-    * `puzzle/sudoku_n4_12`
- 
+- **Waiting Line**
+    - `waiting_line/copy`
+    - `waiting_line/insert_index`
+    - `waiting_line/insert_random`
+    - `waiting_line/remove_index`
+    - `waiting_line/remove_random`
+    - `waiting_line/replace_index`
+    - `waiting_line/replace_random`
+    - `waiting_line/reverse`
+    - `waiting_line/shuffle`
+    - `waiting_line/sort`
+- **Text Writing**
+    - `text_writing/paraphrasing`
+    - `text_writing/summarization`
+    - `text_writing/words_to_sentence_easy`
+    - `text_writing/words_to_sentence_medium`
+    - `text_writing/words_to_sentence_hard`
+- **Puzzles**
+    - `puzzles/latin_square_n4`
+    - `puzzles/sudoku_n4_12`
+
 ### Models
 
 For additional models and unmasking methods, please refer to the [Roadmap](https://github.com/furiosa-ai/ParallelBench/#%EF%B8%8F-roadmap) section.
 
-* LLaDA Family ([LLaDA 1.x](https://github.com/ML-GSAI/LLaDA))
-* Dream Family ([Dream](https://github.com/DreamLM/Dream), [DiffuCoder](https://github.com/apple/ml-diffucoder))
-* SDAR Family ([SDAR](https://github.com/JetAstra/SDAR), [TraDo](https://github.com/Gen-Verse/dLLM-RL))
+- LLaDA Family ([LLaDA 1.x](https://github.com/ML-GSAI/LLaDA))
+- Dream Family ([Dream](https://github.com/DreamLM/Dream), [DiffuCoder](https://github.com/apple/ml-diffucoder))
+- SDAR Family ([SDAR](https://github.com/JetAstra/SDAR), [TraDo](https://github.com/Gen-Verse/dLLM-RL))
 
 ### Unmasking Methods
 
-* Top-k methods:
-    * Random
-    * Confidence
-    * Entropy
-    * Margin
-* Advanced methods:
-    * Threshold-based
-    * Factor-based
-    * [RCR](https://github.com/Gen-Verse/dLLM-RL)
-    * [ReMDM](https://github.com/kuleshov-group/remdm)
+- Top-k methods:
+    - Random
+    - Confidence
+    - Entropy
+    - Margin
+- Advanced methods:
+    - Threshold-based
+    - Factor-based
+    - [RCR](https://github.com/Gen-Verse/dLLM-RL)
+    - [ReMDM](https://github.com/kuleshov-group/remdm)
 
 
 ## 🛠️ Create Your Own Tasks
@@ -232,7 +232,7 @@ from model.registry import ModelRegistry
 @dataclass
 class CustomGenerationConfig(DllmGenerationConfig):
     custom_param: str = "default_value"
-    
+
     def to_generation_kwargs(self):
         gen_kwargs = super().to_generation_kwargs()
         gen_kwargs.update({"custom_param": self.custom_param})
@@ -350,4 +350,3 @@ This project builds upon the work of several fantastic open-source repositories.
   year={2025}
 }
 ```
- 
