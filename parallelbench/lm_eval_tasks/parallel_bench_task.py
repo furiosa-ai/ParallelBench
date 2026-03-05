@@ -1,6 +1,6 @@
 """ParallelBench task implementation for lm-eval-harness.
 
-Each ParallelBench task (e.g. waiting_line/copy, puzzle/sudoku_n4_12) is defined
+Each ParallelBench task (e.g. waiting_line/copy, puzzles/sudoku_n4_12) is defined
 by a YAML file that sets metadata.parallel_bench_task to the task identifier.
 This class loads data from the existing ParallelBench dataset, formats prompts,
 and computes metrics using the existing metric functions.
@@ -31,6 +31,9 @@ class ParallelBenchTask(ConfigurableTask):
         metadata:
           parallel_bench_task: "waiting_line/copy"  # dataset task identifier
 
+    Hub에서 데이터를 로드하려면 dataset_path를 설정합니다:
+        dataset_path: "furiosa-ai/ParallelBench"
+
     The task loads data from ParallelBench, uses the existing prompt templates,
     and computes metrics using the existing metric functions. dLLM metadata
     (NFE, decoding order) is extracted from MetadataStore.
@@ -45,13 +48,17 @@ class ParallelBenchTask(ConfigurableTask):
 
         # Initialize ParallelBench before super().__init__ because the parent
         # calls fewshot_docs() -> test_docs() during init, which needs _parallel_bench.
-        task_name = (config or {}).get("metadata", {}).get("parallel_bench_task")
+        metadata = (config or {}).get("metadata", {})
+        task_name = metadata.get("parallel_bench_task")
         if task_name is None:
             raise ValueError(
                 "ParallelBenchTask requires metadata.parallel_bench_task in YAML config"
             )
 
-        self._parallel_bench = ParallelBench(task=task_name, split="test")
+        from_hub = (config or {}).get("dataset_path")
+        self._parallel_bench = ParallelBench(
+            task=task_name, split="test", from_hub=from_hub
+        )
         self._metric_name = self._parallel_bench.metric_name
 
         metric_func = self._parallel_bench.metric_func

@@ -1,0 +1,10 @@
+task: parallel_bench_puzzles_latin_square_n4
+class: !function ../parallel_bench_task.ParallelBenchTask
+output_type: generate_until
+generation_kwargs:
+  until:
+    - "\n\n\n"
+  do_sample: false
+test_split: test
+metadata:
+  parallel_bench_task: "puzzles/latin_square_n4"

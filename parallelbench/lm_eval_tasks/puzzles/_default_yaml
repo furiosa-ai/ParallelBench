@@ -1,0 +1,5 @@
+group: parallel_bench_puzzles
+group_alias: "ParallelBench - Puzzles"
+task:
+  - parallel_bench_puzzles_sudoku_n4_12
+  - parallel_bench_puzzles_latin_square_n4

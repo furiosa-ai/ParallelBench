@@ -12,31 +12,31 @@ MODEL_NAME = "Dream-org/Dream-v0-Instruct-7B"
 # This helps control the length of the model's output to match task requirements.
 TASKS_MAX_TOKENS = {
     # Tasks involving list manipulation
-    'waiting_line/copy': 32,
-    'waiting_line/insert_index': 32,
-    'waiting_line/insert_random': 32,
-    'waiting_line/remove_index': 32,
-    'waiting_line/remove_random': 32,
-    'waiting_line/replace_index': 32,
-    'waiting_line/replace_random': 32,
-    'waiting_line/reverse': 32,
-    'waiting_line/shuffle': 32,
-    'waiting_line/sort': 32,
-
+    "waiting_line/copy": 32,
+    "waiting_line/insert_index": 32,
+    "waiting_line/insert_random": 32,
+    "waiting_line/remove_index": 32,
+    "waiting_line/remove_random": 32,
+    "waiting_line/replace_index": 32,
+    "waiting_line/replace_random": 32,
+    "waiting_line/reverse": 32,
+    "waiting_line/shuffle": 32,
+    "waiting_line/sort": 32,
     # Text generation and summarization tasks
-    'paraphrase_summarize/chatgpt-paraphrases': 64,
-    'paraphrase_summarize/samsum': 64,
-    'words_to_sentence/easy': 64,
-    'words_to_sentence/hard': 64,
-    'words_to_sentence/medium': 64,
-
+    "text_writing/paraphrasing": 64,
+    "text_writing/summarization": 64,
+    "text_writing/words_to_sentence_easy": 64,
+    "text_writing/words_to_sentence_hard": 64,
+    "text_writing/words_to_sentence_medium": 64,
     # Logic puzzle tasks
-    'puzzle/latin_square_n4': 64,
-    'puzzle/sudoku_n4_12': 64,
+    "puzzles/latin_square_n4": 64,
+    "puzzles/sudoku_n4_12": 64,
 }
 
 
-def load_model_and_tokenizer(model_name: str) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
+def load_model_and_tokenizer(
+    model_name: str,
+) -> tuple[PreTrainedModel, PreTrainedTokenizer]:
     """
     Loads the model and tokenizer from the Hugging Face Hub.
 
@@ -51,13 +51,10 @@ def load_model_and_tokenizer(model_name: str) -> tuple[PreTrainedModel, PreTrain
         model_name,
         trust_remote_code=True,
         torch_dtype=torch.bfloat16,  # Use bfloat16 for memory efficiency
-        device_map="auto"           # Automatically distribute model across available devices
+        device_map="auto",  # Automatically distribute model across available devices
     )
     print("Loading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name,
-        trust_remote_code=True
-    )
+    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
     return model, tokenizer
 
 
@@ -66,7 +63,7 @@ def evaluate_on_task(
     tokenizer: PreTrainedTokenizer,
     task_name: str,
     num_samples: int,
-    task_configs: Dict[str, int]
+    task_configs: Dict[str, int],
 ) -> None:
     """
     Evaluates the model on a specific task from the ParallelBench dataset.
@@ -79,7 +76,9 @@ def evaluate_on_task(
         task_configs (Dict[str, int]): A dictionary mapping task names to max tokens.
     """
     if task_name not in task_configs:
-        raise ValueError(f"Task '{task_name}' not found in TASKS_MAX_TOKENS configuration.")
+        raise ValueError(
+            f"Task '{task_name}' not found in TASKS_MAX_TOKENS configuration."
+        )
 
     print(f"\n--- Evaluating task: {task_name} ---")
     dataset = ParallelBench(task_name)
@@ -90,16 +89,13 @@ def evaluate_on_task(
     references: List[str] = []
 
     for i in range(num_samples):
-        print(f"\nProcessing sample {i+1}/{num_samples}...")
+        print(f"\nProcessing sample {i + 1}/{num_samples}...")
         sample: Dict[str, Any] = dataset[i]
 
         # Prepare the input prompt using the chat template
         messages: List[Dict[str, str]] = sample["input"]["messages"]
         input_ids: torch.Tensor = tokenizer.apply_chat_template(
-            messages,
-            add_generation_prompt=True,
-            tokenize=True,
-            return_tensors="pt"
+            messages, add_generation_prompt=True, tokenize=True, return_tensors="pt"
         )
 
         # Generate the output using the model's diffusion-based generation method
@@ -108,13 +104,12 @@ def evaluate_on_task(
             max_tokens=max_tokens,
             block_length=4,  # Parameters specific to the generation method
             steps=4,
-            temperature=0.0  # Use 0.0 for deterministic, greedy output
+            temperature=0.0,  # Use 0.0 for deterministic, greedy output
         )
 
         # Decode only the newly generated tokens, skipping special tokens
         output_str: str = tokenizer.decode(
-            generated_ids[0][len(input_ids[0]):],
-            skip_special_tokens=True
+            generated_ids[0][len(input_ids[0]) :], skip_special_tokens=True
         )
 
         # Store results for final metric computation
@@ -138,7 +133,7 @@ def main():
     # --- Parameters ---
     task_to_run = "waiting_line/copy"
     num_samples_to_evaluate = 3
-    
+
     # Load the model and tokenizer
     model, tokenizer = load_model_and_tokenizer(MODEL_NAME)
 
@@ -148,7 +143,7 @@ def main():
         tokenizer=tokenizer,
         task_name=task_to_run,
         num_samples=num_samples_to_evaluate,
-        task_configs=TASKS_MAX_TOKENS
+        task_configs=TASKS_MAX_TOKENS,
     )
 
 

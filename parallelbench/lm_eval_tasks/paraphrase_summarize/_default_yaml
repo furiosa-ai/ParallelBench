@@ -1,5 +1,0 @@
-group: parallel_bench_paraphrase_summarize
-group_alias: "ParallelBench - Paraphrase & Summarize"
-task:
-  - parallel_bench_paraphrase_summarize_chatgpt_paraphrases
-  - parallel_bench_paraphrase_summarize_samsum

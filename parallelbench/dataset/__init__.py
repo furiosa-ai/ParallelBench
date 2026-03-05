@@ -1,25 +1,20 @@
 from pathlib import Path
-import pandas as pd
-import yaml
 
-from parallelbench.dataset.task import create_parallel_bench_task, load_task
+from parallelbench.dataset.task import (
+    PARALLEL_BENCH_MASK_TOKEN as PARALLEL_BENCH_MASK_TOKEN,
+    create_parallel_bench_task as create_parallel_bench_task,
+    load_task,
+    task_name_to_config_name as task_name_to_config_name,
+    config_name_to_task_name as config_name_to_task_name,
+)
 from parallelbench.dataset.metrics import Metric, parallel_bench_metric_func_map
-
-from datasets import Dataset
-
-
-# def load_dataset(path, name, split):
-#     dataset_file = Path(__file__).parent / "data" / "output" / f"{name}.jsonl"
-
-#     if not dataset_file.exists():
-#         create_parallel_bench_task(name, dataset_file)
-
-#     return Dataset.from_pandas(pd.read_json(path_or_buf=dataset_file, lines=True))
 
 
 def get_task_names(split="test"):
     path = Path(__file__).parent / "data" / "output" / split
-    task_names = sorted((str(p.relative_to(path)).rsplit(".", 1)[0]) for p in path.glob("*/*.jsonl"))
+    task_names = sorted(
+        (str(p.relative_to(path)).rsplit(".", 1)[0]) for p in path.glob("*/*.jsonl")
+    )
     task_names = [t for t in task_names if not t[0] == "_"]
     return task_names
 
@@ -28,25 +23,20 @@ PARALLEL_BENCH_TASKS = get_task_names()
 
 
 class ParallelBench:
-    def __init__(self, task, split="test", num_samples=None, infill=False):
-        # self.ds = load_dataset("parallel_bench", task, split="test")
-
-        # with open(Path(__file__).parent / "data" / "task_config.yaml", "r") as f:
-        #     task_config = yaml.safe_load(f)[task]
-
+    def __init__(
+        self, task, split="test", num_samples=None, infill=False, from_hub=None
+    ):
         self.task = task
         self.infill = infill
-        self.ds, task_config = load_task(split, task)
+        self.ds, task_config = load_task(split, task, from_hub=from_hub)
 
         self.prompt = task_config["prompt"]
         self.metric_name = task_config["metric"]
-        self.metric_func = parallel_bench_metric_func_map[task_config["metric"]]
-
-        try:
-            if issubclass(self.metric_func, Metric):
-                self.metric_func = self.metric_func()
-        except TypeError:
-            pass
+        metric_func = parallel_bench_metric_func_map[task_config["metric"]]
+        if isinstance(metric_func, type) and issubclass(metric_func, Metric):
+            self.metric_func = metric_func()
+        else:
+            self.metric_func = metric_func
 
         if num_samples is not None:
             self.ds = self.ds.select([i for i in list(range(num_samples))])
@@ -65,16 +55,23 @@ class ParallelBench:
         ]
 
         if "icl_examples" in sample["input"]:
-            messages_icl = [[
-                {
-                    "role": "user",
-                    "content": self.prompt.format(**icl_example["input"]).replace("\\n", "\n"),
-                },
-                {
-                    "role": "assistant",
-                    "content": icl_example["answer"] if isinstance(icl_example["answer"], str) else icl_example["answer"]["example"],
-                }
-            ] for icl_example in sample["input"]["icl_examples"]]
+            messages_icl = [
+                [
+                    {
+                        "role": "user",
+                        "content": self.prompt.format(**icl_example["input"]).replace(
+                            "\\n", "\n"
+                        ),
+                    },
+                    {
+                        "role": "assistant",
+                        "content": icl_example["answer"]
+                        if isinstance(icl_example["answer"], str)
+                        else icl_example["answer"]["example"],
+                    },
+                ]
+                for icl_example in sample["input"]["icl_examples"]
+            ]
 
             messages_icl = [item for sublist in messages_icl for item in sublist]
             messages = messages_icl + messages
@@ -84,27 +81,20 @@ class ParallelBench:
         if self.infill:
             input["output_prefix"] = sample["output_format"]
 
-        return dict(input=input, label=sample["answer"], index=idx, metadata=sample["metadata"])
+        return dict(
+            input=input, label=sample["answer"], index=idx, metadata=sample["metadata"]
+        )
 
-    def compute_metrics(self, predictions, references, output_per_sample=False, **kwargs):
-        assert len(predictions) == len(references), "Predictions and references must have the same length."
-
-        score = 0
-        score_strict = 0
+    def compute_metrics(
+        self, predictions, references, output_per_sample=False, **kwargs
+    ):
+        assert len(predictions) == len(references), (
+            "Predictions and references must have the same length."
+        )
 
         metrics_per_sample = []
         for pred, ref in zip(predictions, references):
-            sample_metrics = self.metric_func(pred, ref)
-
-            if isinstance(sample_metrics, float):
-                score = sample_metrics
-                score_strict = self.metric_func(pred, ref, strict=True)
-                metrics_per_sample.append({
-                    "score": score,
-                    "score_strict": score_strict
-                })
-            elif isinstance(sample_metrics, dict):
-                metrics_per_sample.append(sample_metrics)
+            metrics_per_sample.append(self.metric_func(pred, ref))
 
         metric_names = list(metrics_per_sample[0].keys())
         metrics = {name: [m[name] for m in metrics_per_sample] for name in metric_names}
@@ -115,7 +105,7 @@ class ParallelBench:
             return metrics, metrics_per_sample
         else:
             return metrics
-    
+
     def to_sft_dataset(self):
         for i in range(len(self.ds)):
             sample = self[i]
@@ -125,6 +115,8 @@ class ParallelBench:
 
             yield {
                 "prompt": prompt,
-                "answer": label if isinstance(label, str) else label.get("example", label.get("result")),
+                "answer": label
+                if isinstance(label, str)
+                else label.get("example", label.get("result")),
                 "task": self.task,
             }
