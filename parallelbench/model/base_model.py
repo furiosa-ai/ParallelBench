@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, Union, List, Dict
@@ -12,7 +13,11 @@ class BaseModel(ABC):
 
     @abstractmethod
     def generate(
-        self, messages: Union[List[str], str], gen_config: Dict=None, output_prefix: Optional[torch.tensor]=None, output_history: bool=False
+        self,
+        messages: Union[List[str], str],
+        gen_config: Dict = None,
+        output_prefix: Optional[torch.tensor] = None,
+        output_history: bool = False,
     ) -> "DLLMOutput":
         """Generate output from input messages.
 
@@ -29,13 +34,14 @@ class BaseModel(ABC):
 
 class ApiModel(BaseModel):
     """Base class for API-backed models (no local weight loading)."""
+
     pass
 
 
 class LocalModel(BaseModel):
     """Base class for local models that load weights via transformers."""
 
-    def __init__(self, model_name, model_class=AutoModel, accel_framework=None, ):
+    def __init__(self, model_name, model_class=AutoModel, accel_framework=None):
         if accel_framework not in VALID_ACCEL_FRAMEWORKS:
             raise ValueError(
                 f"Invalid accel_framework: {accel_framework}. "
@@ -45,15 +51,19 @@ class LocalModel(BaseModel):
         self.accel_framework = accel_framework
         self.is_fast_dllm = self.accel_framework == "fast_dllm"
 
+        local_rank = os.environ.get("LOCAL_RANK")
+        device_map = f"cuda:{local_rank}" if local_rank is not None else "cuda"
         self.model = model_class.from_pretrained(
             model_name,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
-            device_map="auto",
+            device_map=device_map,
         )
         self.model.eval()
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, trust_remote_code=True
+        )
 
 
 @dataclass

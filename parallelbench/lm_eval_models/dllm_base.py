@@ -12,6 +12,7 @@ from abc import abstractmethod
 from typing import Optional
 
 import torch
+from accelerate import Accelerator
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 
@@ -63,6 +64,13 @@ class DLLMBase(LM):
         **kwargs,
     ) -> None:
         super().__init__()
+
+        self.accelerator = Accelerator()
+        if self.accelerator.num_processes > 1:
+            self._rank = self.accelerator.local_process_index
+            self._world_size = self.accelerator.num_processes
+        self._device = torch.device(str(self.accelerator.device))
+
         self.model_path = model_path
         self.accel_framework = accel_framework
         self._steps = steps
@@ -79,6 +87,10 @@ class DLLMBase(LM):
         self._extra_kwargs = kwargs
 
         self._inner_model: BaseModel = self._create_inner_model()
+
+    @property
+    def device(self) -> torch.device:
+        return self._device
 
     @abstractmethod
     def _create_inner_model(self) -> BaseModel:
