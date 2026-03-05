@@ -229,7 +229,8 @@ __marimo__/
 *.local
 *.local.*
 
-CLAUDE.*
+CLAUDE.md
+AGENTS.md
 /.mcp.json
 /.claude/
 /.codex/
