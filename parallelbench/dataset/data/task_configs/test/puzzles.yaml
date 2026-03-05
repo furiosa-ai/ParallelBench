@@ -1,0 +1,11 @@
+global_config:
+  num_samples: 100
+  samples_per_length:
+    default: 100
+  icl_example_count: 1
+tasks:
+  latin_square_n4:
+    type: latin_square
+    metric: latin_square_score
+    size: 4
+    prompt: "Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV without header."

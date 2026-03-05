@@ -1,12 +1,8 @@
-
-
 import hashlib
 import itertools
 from pathlib import Path
 
-import pandas as pd
 import yaml
-
 
 
 ALPHABET_CHARS = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
@@ -21,7 +17,7 @@ class RandomMathOp:
         self.target_digits = target_digits
 
         assert not (a is not None and b is not None), "Cannot specify both a and b"
-        
+
         if b is not None:
             swap = True
             a = b
@@ -29,17 +25,31 @@ class RandomMathOp:
             swap = False
 
         if self.op == "+":
-            self.a = self._generate_random_number_with_digits(self.target_digits - 1) if a is None else a
+            self.a = (
+                self._generate_random_number_with_digits(self.target_digits - 1)
+                if a is None
+                else a
+            )
             self.b = self._generate_random_number_with_digits(self.target_digits - 1)
         elif self.op == "-":
-            self.a = self._generate_random_number_with_digits(self.target_digits - 1) if a is None else a
+            self.a = (
+                self._generate_random_number_with_digits(self.target_digits - 1)
+                if a is None
+                else a
+            )
             self.b = self._generate_random_number_with_digits(self.target_digits - 1)
         elif self.op == "*":
-            self.a = self._generate_random_number_with_digits(self.target_digits // 2) if a is None else a
-            self.b = self._generate_random_number_with_digits(max(self.target_digits - self.get_digit_count(self.a), 1))
+            self.a = (
+                self._generate_random_number_with_digits(self.target_digits // 2)
+                if a is None
+                else a
+            )
+            self.b = self._generate_random_number_with_digits(
+                max(self.target_digits - self.get_digit_count(self.a), 1)
+            )
         else:
             raise ValueError(f"Unsupported operation: {self.op}")
-        
+
         if swap:
             self.a, self.b = self.b, self.a
 
@@ -63,14 +73,19 @@ class RandomMathOp:
         return len(str(abs(n)))
 
     def _generate_random_number_with_digits(self, num_digits, min_value=0, max_value=9):
-        return int(''.join(str(self.rng.randint(min_value if i != 0 else 1, max_value)) for i in range(num_digits)))
+        return int(
+            "".join(
+                str(self.rng.randint(min_value if i != 0 else 1, max_value))
+                for i in range(num_digits)
+            )
+        )
 
     def __repr__(self):
         return f"({self.a} {self.op} {self.b})"
 
     def get_prompt(self):
         return f"{str(self)[1:-1]} = ?"
-    
+
     def get_target(self):
         return self.target
 
@@ -89,7 +104,6 @@ class RandomMathOp:
 
         a = RandomMathOp.create_chain(rng, target_digits, num_ops - 1, ops=ops)
         return RandomMathOp(rng, op, target_digits, a=a)
-    
 
 
 def _shuffle(rng, x):
@@ -101,7 +115,7 @@ def _shuffle(rng, x):
 
 def _generate_domino_sequence(rng, length, start):
     sequence = [start]
-    for _ in range(length - 1):  
+    for _ in range(length - 1):
         prev = sequence[-1]
         last_digit = prev % 10
         next_number = last_digit * 10 + rng.randint(1, 9)
@@ -109,9 +123,7 @@ def _generate_domino_sequence(rng, length, start):
     return sequence
 
 
-
-
-def parse_global_config(global_config, task):
+def merge_global_config(global_config, task):
     global_config = {**global_config}
     for k, v in global_config.items():
         if isinstance(v, dict):
@@ -120,23 +132,54 @@ def parse_global_config(global_config, task):
     return global_config
 
 
+def _load_tasks_spec(config_file: Path, tasks_spec):
+    if isinstance(tasks_spec, str):
+        with open(config_file.parent / tasks_spec, "r") as f:
+            return yaml.safe_load(f)
+    if isinstance(tasks_spec, dict):
+        return tasks_spec
+    raise ValueError(
+        f"Invalid 'tasks' in {config_file}. Expected path string or mapping."
+    )
+
+
 def load_task_configs(task_config_file):
     task_config_file = Path(task_config_file)
-    
+
     if "." not in str(task_config_file):
-        task_config_file = Path(__file__).parent / "data" / "task_configs" / f"{task_config_file}.yaml"
+        task_config_file = (
+            Path(__file__).parent / "data" / "task_configs" / f"{task_config_file}.yaml"
+        )
 
     with open(task_config_file, "r") as f:
         task_config = yaml.safe_load(f)
 
     global_config = task_config.get("global_config", {})
-    tasks_file = task_config.pop("tasks", None)
 
-    with open(Path(task_config_file).parent / tasks_file, "r") as f:
-        tasks = yaml.safe_load(f)
+    tasks_from = task_config.get("tasks_from")
+    if tasks_from is not None:
+        ref_file = task_config_file.parent / tasks_from
+        with open(ref_file, "r") as f:
+            ref_cfg = yaml.safe_load(f)
+        tasks = _load_tasks_spec(ref_file, ref_cfg.get("tasks"))
+    else:
+        tasks = {}
+
+    if "tasks" in task_config:
+        tasks = {
+            **tasks,
+            **_load_tasks_spec(task_config_file, task_config.get("tasks")),
+        }
 
     tasks = {f"{task_config_file.stem}/{k}": v for k, v in tasks.items()}
-    tasks = {task_name: {**cfg, **parse_global_config(global_config, task_name), "name": task_name} for task_name, cfg in tasks.items()}
+    tasks = {
+        task_name: {
+            **cfg,
+            **merge_global_config(global_config, task_name),
+            "name": task_name,
+        }
+        for task_name, cfg in tasks.items()
+    }
 
     return tasks
 
@@ -147,7 +190,9 @@ def _get_task_file(split, task_name):
 
 def str_to_seed(seed_str, offset=0):
     seed = int(hashlib.sha256(seed_str.encode()).hexdigest(), 16) + offset
-    return seed % (2**16 - 1)  # Ensure seed is within the range of a 32-bit unsigned integer
+    return seed % (
+        2**16 - 1
+    )  # Ensure seed is within the range of a 32-bit unsigned integer
 
 
 def list_difference(list1, list2):
@@ -156,19 +201,26 @@ def list_difference(list1, list2):
 
 
 def list_to_str(lst):
-    tokens = ["[\""]
+    tokens = ['["']
 
     for word in lst:
         tokens.append(str(word))
-        tokens.append("\", \"")
+        tokens.append('", "')
 
     tokens.pop()  # Remove the last comma
-    tokens.append("\"]")
+    tokens.append('"]')
     return "".join(tokens)
 
 
 def sentence_to_words(sentence):
-    return sentence.replace(".", "").replace(",", "").split()
+    word_map = {
+        "an": "a",
+        "An": "A",
+    }
+
+    words = sentence.replace(".", "").replace(",", "").split()
+    words = [word_map.get(word, word) for word in words]
+    return words
 
 
 def repeat_list(lst, count, repeat_type="each"):
@@ -187,11 +239,28 @@ def load_words_from_file(file_path):
     if file_path == "<ALPHABET_CHARS>":
         return ALPHABET_CHARS
 
+    data_root = Path(__file__).parent / "data"
+    candidates = [
+        data_root / file_path,
+        data_root / "resources" / file_path,
+        # Backward-compatible lookup for previous layouts.
+        data_root / "resources" / "text" / file_path,
+        data_root / "resources" / "people" / file_path,
+        data_root / "resources" / "lexicons" / file_path,
+        data_root / "resources" / "names" / file_path,
+    ]
+    source_path = next((p for p in candidates if p.exists()), None)
+    if source_path is None:
+        searched = ", ".join(str(p) for p in candidates)
+        raise FileNotFoundError(
+            f"Could not resolve words file '{file_path}'. Searched: {searched}"
+        )
+
     if file_path.endswith(".txt"):
-        with open(Path(__file__).parent / "data" / file_path, "r") as f:
+        with open(source_path, "r") as f:
             words = [line.strip() for line in f if line.strip()]
     elif file_path.endswith(".yaml") or file_path.endswith(".yml"):
-        with open(Path(__file__).parent / "data" / file_path, "r") as f:
+        with open(source_path, "r") as f:
             words = yaml.safe_load(f)
 
         if isinstance(words[0], list):
@@ -200,7 +269,16 @@ def load_words_from_file(file_path):
     return words
 
 
-def generate_word_lists(rng, words, num_samples, min_length=None, max_length=None, lengths=None, with_replacement=False, **kwargs):
+def generate_word_lists(
+    rng,
+    words,
+    num_samples,
+    min_length=None,
+    max_length=None,
+    lengths=None,
+    with_replacement=False,
+    **kwargs,
+):
     for _ in range(num_samples):
         if lengths:
             length = rng.choice(lengths)
@@ -225,12 +303,12 @@ def generate_latin_square(rng, symbols):
         square.append(next_row)
 
     # Randomly shuffle rows and columns to create a more varied square
-    rng.shuffle(square) # Shuffle rows
-    
+    rng.shuffle(square)  # Shuffle rows
+
     # Transpose and shuffle to shuffle columns
     transposed_square = list(zip(*square))
     rng.shuffle(transposed_square)
-    
+
     # Transpose back to original orientation
     final_square = [list(row) for row in zip(*transposed_square)]
 

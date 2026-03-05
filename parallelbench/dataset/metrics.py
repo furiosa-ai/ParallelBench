@@ -1,9 +1,14 @@
+"""Metric functions for ParallelBench benchmark evaluation.
 
-import re
+All public metric functions return dict[str, float].
+"""
+
 import json
+import re
 
 import evaluate
-from parallelbench.dataset.task_utils import str_to_latin_square
+
+from parallelbench.dataset.task_utils import sentence_to_words
 from parallelbench.utils.grammar_check import grammar_check
 
 
@@ -21,48 +26,39 @@ def _parse_list(input_str, strict=False):
         return None
 
     if not strict:
-        return [item.strip("\" ") for item in input_str.strip("[]").split(",") if item.strip()]
+        return [
+            item.strip('" ')
+            for item in input_str.strip("[]").split(",")
+            if item.strip()
+        ]
     else:
         items = input_str.split(", ")
         for i in range(len(items)):
             item = items[i]
 
-            if item.startswith("\"") and item.endswith("\""):
+            if item.startswith('"') and item.endswith('"'):
                 item = item[1:-1]
             else:
                 return None
-            
-            if "\"" in item:
+
+            if '"' in item:
                 return None
-            
+
             items[i] = item
 
         return items
-    
+
 
 class Metric:
     pass
 
 
-def sentence_to_words(sentence):
-    word_map = {
-        "an": "a",
-        "An": "A",
-    }
-
-    words = sentence.replace(".", "").replace(",", "").split()
-    words = [word_map.get(word, word) for word in words]
-    return words
-
-
 def _extract_numbers_from_str(input_str):
-    # regex to find all numbers
-    import re
     numbers = re.findall(r"\d+", input_str)
     return [int(num) for num in numbers]
 
 
-def list_match_score(prediction, ground_truth, strict=False):
+def _list_match_score(prediction, ground_truth, strict=False):
     prediction_list = _parse_list(prediction, strict)
     gt_list = _parse_list(ground_truth)
 
@@ -72,9 +68,20 @@ def list_match_score(prediction, ground_truth, strict=False):
     return float(prediction_list == gt_list)
 
 
-def math_op_score(prediction, ground_truth, strict=False):
+def list_match_score(prediction, ground_truth) -> dict[str, float]:
+    return {
+        "score": _list_match_score(prediction, ground_truth, strict=False),
+        "score_strict": _list_match_score(prediction, ground_truth, strict=True),
+    }
+
+
+def _math_op_score(prediction, ground_truth, strict=False):
     prediction = prediction.replace(",", "").strip()
-    ground_truth = int(ground_truth.split()[-1]) if not isinstance(ground_truth, dict) else int(ground_truth["result"])
+    ground_truth = (
+        int(ground_truth.split()[-1])
+        if not isinstance(ground_truth, dict)
+        else int(ground_truth["result"])
+    )
 
     if strict:
         try:
@@ -82,12 +89,19 @@ def math_op_score(prediction, ground_truth, strict=False):
         except ValueError:
             return 0.0
 
-        return prediction == ground_truth
+        return float(prediction == ground_truth)
     else:
-        return f"{ground_truth:.0f}" in prediction
+        return float(f"{ground_truth:.0f}" in prediction)
 
 
-def list_shuffle_score(prediction, ground_truth, strict=False):
+def math_op_score(prediction, ground_truth) -> dict[str, float]:
+    return {
+        "score": _math_op_score(prediction, ground_truth, strict=False),
+        "score_strict": _math_op_score(prediction, ground_truth, strict=True),
+    }
+
+
+def _list_shuffle_score(prediction, ground_truth, strict=False):
     prediction_list = _parse_list(prediction, strict)
     gt_list = ground_truth["input"][:]
 
@@ -95,18 +109,24 @@ def list_shuffle_score(prediction, ground_truth, strict=False):
         return 0.0
 
     return float(
-        (sorted(prediction_list) == sorted(gt_list)) and  # Check if both lists are equal when sorted
-        (prediction_list != gt_list)  # Ensure the prediction is different from the ground truth
+        (sorted(prediction_list) == sorted(gt_list)) and (prediction_list != gt_list)
     )
 
 
-def random_insert_score(prediction_list, ground_truth_list, word, n_words=1):
+def list_shuffle_score(prediction, ground_truth) -> dict[str, float]:
+    return {
+        "score": _list_shuffle_score(prediction, ground_truth, strict=False),
+        "score_strict": _list_shuffle_score(prediction, ground_truth, strict=True),
+    }
+
+
+def _random_insert_score(prediction_list, ground_truth_list, word, n_words=1):
     if prediction_list is None or ground_truth_list is None:
         return 0.0
-    
+
     prediction_list = prediction_list[:]
     ground_truth_list = ground_truth_list[:]
-    
+
     if word is not None:
         words = [word] if isinstance(word, str) else word
 
@@ -118,21 +138,30 @@ def random_insert_score(prediction_list, ground_truth_list, word, n_words=1):
 
         return float(prediction_list == ground_truth_list)
     else:
-        # remove one random word from gt is equal to insert one random word to pred
-        return random_remove_score(prediction_list=ground_truth_list, ground_truth_list=prediction_list, n_words=n_words)
+        return _random_remove_score(
+            prediction_list=ground_truth_list,
+            ground_truth_list=prediction_list,
+            n_words=n_words,
+        )
 
 
-def list_random_insert_score(prediction, ground_truth, strict=False):
-    prediction_list = _parse_list(prediction, strict=strict)
+def list_random_insert_score(prediction, ground_truth) -> dict[str, float]:
     gt_list = ground_truth["input"]
     word = ground_truth["word"]
     n_words = ground_truth.get("n_words", 1)
-    return random_insert_score(prediction_list, gt_list, word, n_words=n_words)
+    return {
+        "score": _random_insert_score(
+            _parse_list(prediction, strict=False), gt_list, word, n_words=n_words
+        ),
+        "score_strict": _random_insert_score(
+            _parse_list(prediction, strict=True), gt_list, word, n_words=n_words
+        ),
+    }
 
 
-def sentence_random_insert_score(prediction, ground_truth, strict=False):
+def sentence_random_insert_score(prediction, ground_truth) -> dict[str, float]:
     prediction_list = sentence_to_words(prediction)
-    
+
     if isinstance(ground_truth, dict):
         ground_truth_list = sentence_to_words(ground_truth["input"])
         word = ground_truth.get("word")
@@ -142,13 +171,19 @@ def sentence_random_insert_score(prediction, ground_truth, strict=False):
         n_words = 1
         word = None
 
-    return random_insert_score(prediction_list, ground_truth_list, word, n_words=n_words)
+    score = _random_insert_score(
+        prediction_list, ground_truth_list, word, n_words=n_words
+    )
+    return {
+        "score": score,
+        "score_strict": score,
+    }
 
 
-def random_remove_score(prediction_list, ground_truth_list, n_words=1):
+def _random_remove_score(prediction_list, ground_truth_list, n_words=1):
     if prediction_list is None or ground_truth_list is None:
         return 0.0
-    
+
     prediction_list = prediction_list[:]
     ground_truth_list = ground_truth_list[:]
 
@@ -165,14 +200,20 @@ def random_remove_score(prediction_list, ground_truth_list, n_words=1):
     return float(prediction_list == ground_truth_list)
 
 
-def list_random_remove_score(prediction, ground_truth, strict=False):
-    prediction_list = _parse_list(prediction, strict=strict)
+def list_random_remove_score(prediction, ground_truth) -> dict[str, float]:
     ground_truth_list = ground_truth["input"][:]
     n_words = ground_truth.get("n_words", 1)
-    return random_remove_score(prediction_list, ground_truth_list, n_words=n_words)
+    return {
+        "score": _random_remove_score(
+            _parse_list(prediction, strict=False), ground_truth_list, n_words=n_words
+        ),
+        "score_strict": _random_remove_score(
+            _parse_list(prediction, strict=True), ground_truth_list[:], n_words=n_words
+        ),
+    }
 
 
-def sentence_random_remove_score(prediction, ground_truth, strict=False):
+def sentence_random_remove_score(prediction, ground_truth) -> dict[str, float]:
     prediction_list = sentence_to_words(prediction)
 
     if isinstance(ground_truth, dict):
@@ -182,13 +223,17 @@ def sentence_random_remove_score(prediction, ground_truth, strict=False):
         ground_truth_list = sentence_to_words(ground_truth)
         n_words = 1
 
-    return random_remove_score(prediction_list, ground_truth_list, n_words=n_words)
+    score = _random_remove_score(prediction_list, ground_truth_list, n_words=n_words)
+    return {
+        "score": score,
+        "score_strict": score,
+    }
 
 
-def random_replace_score(prediction_list, ground_truth_list, new_word=None, n_words=1):
+def _random_replace_score(prediction_list, ground_truth_list, new_word=None, n_words=1):
     if prediction_list is None or ground_truth_list is None:
         return 0.0
-    
+
     prediction_list = prediction_list[:]
     ground_truth_list = ground_truth_list[:]
 
@@ -200,26 +245,36 @@ def random_replace_score(prediction_list, ground_truth_list, new_word=None, n_wo
             replace_index = prediction_list.index(new_word)
         except ValueError:
             return 0.0
-        
+
         ground_truth_list[replace_index] = new_word
 
         return float(prediction_list == ground_truth_list)
     else:
-        # replace with any word
         num_diffs = sum(1 for p, g in zip(prediction_list, ground_truth_list) if p != g)
         return float(num_diffs == n_words)
 
 
-def list_random_replace_score(prediction, ground_truth, strict=False):
-    prediction_list = _parse_list(prediction, strict=strict)
+def list_random_replace_score(prediction, ground_truth) -> dict[str, float]:
     ground_truth_list = ground_truth["input"]
     word = ground_truth["word"]
     n_words = ground_truth.get("n_words", 1)
+    return {
+        "score": _random_replace_score(
+            _parse_list(prediction, strict=False),
+            ground_truth_list,
+            new_word=word,
+            n_words=n_words,
+        ),
+        "score_strict": _random_replace_score(
+            _parse_list(prediction, strict=True),
+            ground_truth_list[:],
+            new_word=word,
+            n_words=n_words,
+        ),
+    }
 
-    return random_replace_score(prediction_list, ground_truth_list, new_word=word, n_words=n_words)
 
-
-def sentence_random_replace_score(prediction, ground_truth, strict=False):
+def sentence_random_replace_score(prediction, ground_truth) -> dict[str, float]:
     prediction_list = sentence_to_words(prediction)
     if isinstance(ground_truth, dict):
         ground_truth_list = sentence_to_words(ground_truth["input"])
@@ -230,19 +285,24 @@ def sentence_random_replace_score(prediction, ground_truth, strict=False):
         word = None
         n_words = 1
 
-    return random_replace_score(prediction_list, ground_truth_list, new_word=word, n_words=n_words)
+    score = _random_replace_score(
+        prediction_list, ground_truth_list, new_word=word, n_words=n_words
+    )
+    return {
+        "score": score,
+        "score_strict": score,
+    }
 
 
-def sentence_replace_all_with_unique_random_score(prediction, ground_truth, strict=False):
+def sentence_replace_all_with_unique_random_score(
+    prediction, ground_truth
+) -> dict[str, float]:
     prediction_list = sentence_to_words(prediction)
     ground_truth_list = sentence_to_words(ground_truth["input"])
     old_word = ground_truth["word"]
     n_replace = ground_truth["n_replace"]
 
-    metrics = {
-        "score": 0.0,
-        "score_loose": 0.0
-    }
+    metrics = {"score": 0.0, "score_loose": 0.0}
 
     if len(prediction_list) != len(ground_truth_list):
         return metrics
@@ -255,24 +315,20 @@ def sentence_replace_all_with_unique_random_score(prediction, ground_truth, stri
     for pred_word, gt_word in zip(prediction_list, ground_truth_list):
         if pred_word == gt_word:
             if gt_word == old_word:
-                # did not replaced old word
                 num_occurences += 1
                 num_unreplaced += 1
             else:
-                # did not replace unrelated word
                 pass
         else:
             if gt_word == old_word:
-                # replaced old word
                 num_occurences += 1
                 new_words.append(pred_word)
             else:
                 replaced_unrelated = True
-            
+
     if len(new_words) != len(set(new_words)):
-        # replacements are not unique
         return metrics
-    
+
     if n_replace is None:
         metrics["score_loose"] = float(num_unreplaced == 0)
     elif n_replace < 0:
@@ -286,13 +342,13 @@ def sentence_replace_all_with_unique_random_score(prediction, ground_truth, stri
     return metrics
 
 
-def domino_score(prediction, ground_truth, strict=False):
+def _domino_score(prediction, ground_truth, strict=False):
     if strict:
         prediction_list = _parse_list(prediction, strict=True)
 
         if prediction_list is None:
             return 0.0
-        
+
         try:
             prediction_list = [int(v) for v in prediction_list]
         except ValueError:
@@ -302,17 +358,17 @@ def domino_score(prediction, ground_truth, strict=False):
 
     length = ground_truth["length"]
     start = ground_truth["start"]
-    
+
     if length != len(prediction_list):
         return 0.0
 
     if start != prediction_list[0]:
         return 0.0
-    
+
     for number in prediction_list:
         if not (number > 10 and number < 100):
             return 0.0
-    
+
     for i in range(length - 1):
         prev, next = prediction_list[i], prediction_list[i + 1]
         prev_last_digit = prev % 10
@@ -324,18 +380,28 @@ def domino_score(prediction, ground_truth, strict=False):
     return 1.0
 
 
-def latin_square_score(prediction, ground_truth, strict=False):
+def domino_score(prediction, ground_truth) -> dict[str, float]:
+    return {
+        "score": _domino_score(prediction, ground_truth, strict=False),
+        "score_strict": _domino_score(prediction, ground_truth, strict=True),
+    }
+
+
+def _latin_square_score(prediction, ground_truth, strict=False):
     symbols = set(ground_truth["symbols"])
     first_row = ground_truth.get("first_row")
     size = len(symbols)
 
-    # filter valid lines first
     pred_rows = [line.strip() for line in prediction.split("\n") if line.strip()]
-    pred_rows = [line for line in pred_rows if set([cell.strip() for cell in line.split(",")]) == symbols]
+    pred_rows = [
+        line
+        for line in pred_rows
+        if set([cell.strip() for cell in line.split(",")]) == symbols
+    ]
 
     if len(pred_rows) < size:
         return 0.0
-    
+
     pred_rows = pred_rows[:size]
     pred_rows = [line.split(",") for line in pred_rows]
     pred_rows = [[cell.strip() for cell in line] for line in pred_rows]
@@ -343,56 +409,67 @@ def latin_square_score(prediction, ground_truth, strict=False):
     rows = pred_rows
     cols = list(zip(*pred_rows))
 
-    if any(set(row) != symbols for row in rows) or any(set(col) != symbols for col in cols):
+    if any(set(row) != symbols for row in rows) or any(
+        set(col) != symbols for col in cols
+    ):
         return 0.0
-    
+
     if first_row is not None and rows[0] != first_row:
         return 0.0
 
     return 1.0
 
 
-def sentence_to_words_score(prediction, ground_truth):
+def latin_square_score(prediction, ground_truth) -> dict[str, float]:
+    score = _latin_square_score(prediction, ground_truth)
+    return {
+        "score": score,
+        "score_strict": score,
+    }
+
+
+def sentence_to_words_score(prediction, ground_truth) -> dict[str, float]:
     words = ground_truth["words"]
-    
+
     inclusion_score = all(word in prediction for word in words)
-    grammar_score = grammar_check(prediction)
-    score = inclusion_score and grammar_score
+    grammar_result = grammar_check(prediction)
+    score = inclusion_score and grammar_result
 
     return {
         "inclusion_score": float(inclusion_score),
-        "grammar_score": float(grammar_score),
-        "score": float(score)
+        "grammar_score": float(grammar_result),
+        "score": float(score),
     }
 
 
-def grammar_score(prediction, ground_truth):
+def grammar_score(prediction, ground_truth) -> dict[str, float]:
+    return {"score": float(grammar_check(prediction))}
+
+
+def startwith_score(prediction, ground_truth) -> dict[str, float]:
+    grammar_result = float(grammar_check(prediction))
+    startswith_result = float(
+        prediction.strip().strip('"').startswith(ground_truth["startwith"])
+    )
+
     return {
-        "score": float(grammar_check(prediction))
-    }
-
-def startwith_score(prediction, ground_truth):
-    grammar_score = float(grammar_check(prediction))
-    startswith_score = float(prediction.strip().strip('"').startswith(ground_truth["startwith"]))
-
-    return {
-        "grammar_score": grammar_score,
-        "startswith_score": startswith_score,
-        "score": grammar_score * startswith_score
+        "grammar_score": grammar_result,
+        "startswith_score": startswith_result,
+        "score": grammar_result * startswith_result,
     }
 
 
-def regex_match_score(prediction, ground_truth):
+def regex_match_score(prediction, ground_truth) -> dict[str, float]:
     pattern = ground_truth["pattern"]
     score = bool(re.fullmatch(pattern, prediction.strip()))
 
-    return {
-        "score": float(score)
-    }
+    return {"score": float(score)}
 
 
-def text_to_regex_score(prediction, ground_truth, strict=False):
-    prediction = prediction.split("```regex" if "```regex" in prediction else "```", 1)[-1].strip()
+def _text_to_regex_score(prediction, ground_truth):
+    prediction = prediction.split("```regex" if "```regex" in prediction else "```", 1)[
+        -1
+    ].strip()
     prediction = prediction.split("```")[0].strip()
 
     positive_examples = ground_truth["positive_examples"]
@@ -400,7 +477,7 @@ def text_to_regex_score(prediction, ground_truth, strict=False):
 
     try:
         prog = re.compile(prediction)
-    except Exception as e:
+    except Exception:
         return 0.0
 
     for positive in positive_examples:
@@ -414,8 +491,18 @@ def text_to_regex_score(prediction, ground_truth, strict=False):
     return 1.0
 
 
-def json_syntax_score(prediction, ground_truth=None, strict=False):
-    prediction = prediction.split("```json" if "```json" in prediction else "```", 1)[-1].strip()
+def text_to_regex_score(prediction, ground_truth) -> dict[str, float]:
+    score = _text_to_regex_score(prediction, ground_truth)
+    return {
+        "score": score,
+        "score_strict": score,
+    }
+
+
+def _json_syntax_score(prediction, ground_truth=None):
+    prediction = prediction.split("```json" if "```json" in prediction else "```", 1)[
+        -1
+    ].strip()
     prediction = prediction.split("```")[0].strip()
 
     if prediction == "":
@@ -424,8 +511,16 @@ def json_syntax_score(prediction, ground_truth=None, strict=False):
     try:
         json.loads(prediction)
         return 1.0
-    except Exception as e:
+    except Exception:
         return 0.0
+
+
+def json_syntax_score(prediction, ground_truth=None) -> dict[str, float]:
+    score = _json_syntax_score(prediction, ground_truth)
+    return {
+        "score": score,
+        "score_strict": score,
+    }
 
 
 class SummaryScore(Metric):
@@ -434,15 +529,17 @@ class SummaryScore(Metric):
 
     def load(self):
         if self.rouge is None:
-            self.rouge = evaluate.load('rouge')
+            self.rouge = evaluate.load("rouge")
 
-    def __call__(self, prediction, ground_truth, strict=False):
+    def __call__(self, prediction, ground_truth) -> dict[str, float]:
         self.load()
 
         prediction = prediction.strip()
         summary = ground_truth["summary"].strip()
 
-        rouge = self.rouge.compute(predictions=[prediction], references=[summary], use_stemmer=True)
+        rouge = self.rouge.compute(
+            predictions=[prediction], references=[summary], use_stemmer=True
+        )
         grammar = float(grammar_check(prediction)) if prediction != "" else 0.0
 
         metrics = {
@@ -450,7 +547,7 @@ class SummaryScore(Metric):
             "rouge2_score": rouge["rouge2"],
             "rougeL_score": rouge["rougeL"],
             "grammar_score": grammar,
-            "score": rouge["rougeL"] * grammar
+            "score": rouge["rougeL"] * grammar,
         }
 
         metrics = {k: float(v) for k, v in metrics.items()}
@@ -465,19 +562,26 @@ class ParaphraseScore(Metric):
 
     def load(self):
         if self.bleu is None:
-            self.bleu = evaluate.load('bleu')
+            self.bleu = evaluate.load("bleu")
         if self.bertscore is None:
-            self.bertscore = evaluate.load('bertscore')
+            self.bertscore = evaluate.load("bertscore")
 
-    def __call__(self, prediction, ground_truth, strict=False):
+    def __call__(self, prediction, ground_truth) -> dict[str, float]:
         self.load()
 
         prediction = prediction.strip()
         text = ground_truth["text"]
 
         if prediction != "":
-            inv_bleu = 1 - self.bleu.compute(predictions=[prediction], references=[[text]])["bleu"]
-            bertscore = self.bertscore.compute(predictions=[prediction], references=[text], lang="en")
+            inv_bleu = (
+                1
+                - self.bleu.compute(predictions=[prediction], references=[[text]])[
+                    "bleu"
+                ]
+            )
+            bertscore = self.bertscore.compute(
+                predictions=[prediction], references=[text], lang="en"
+            )
             bertscore = bertscore["f1"][0]
             grammar = float(grammar_check(prediction))
         else:
@@ -531,11 +635,17 @@ def parse_sudoku(sudoku_str, n=4, strict=False):
     return grid
 
 
-def sudoku_score(prediction, ground_truth, strict=False):
+def _sudoku_score(prediction, ground_truth, strict=False):
     prediction = parse_sudoku(prediction, strict=strict)
     ground_truth = parse_sudoku(ground_truth, strict=True)
-
     return float(prediction == ground_truth)
+
+
+def sudoku_score(prediction, ground_truth) -> dict[str, float]:
+    return {
+        "score": _sudoku_score(prediction, ground_truth, strict=False),
+        "score_strict": _sudoku_score(prediction, ground_truth, strict=True),
+    }
 
 
 parallel_bench_metric_func_map = {
