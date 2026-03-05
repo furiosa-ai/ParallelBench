@@ -8,14 +8,16 @@ from parallelbench.dataset.task import (
     config_name_to_task_name as config_name_to_task_name,
 )
 from parallelbench.dataset.metrics import Metric, parallel_bench_metric_func_map
+from parallelbench.dataset.task_utils import load_task_configs
 
 
 def get_task_names(split="test"):
-    path = Path(__file__).parent / "data" / "output" / split
-    task_names = sorted(
-        (str(p.relative_to(path)).rsplit(".", 1)[0]) for p in path.glob("*/*.jsonl")
-    )
-    task_names = [t for t in task_names if not t[0] == "_"]
+    config_dir = Path(__file__).parent / "data" / "task_configs" / split
+    task_names = []
+    for yaml_file in sorted(config_dir.glob("*.yaml")):
+        tasks = load_task_configs(str(yaml_file))
+        task_names.extend(tasks.keys())
+    task_names = sorted(t for t in task_names if not t.startswith("_"))
     return task_names
 
 

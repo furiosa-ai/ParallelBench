@@ -346,7 +346,7 @@ def generate_summary_task(rng, task_config):
         from datasets import load_dataset
 
         dataset = load_dataset("knkarthick/samsum", split="test")
-        dataset = dataset.shuffle(seed=rng.randint(0, 1e9))
+        dataset = dataset.shuffle(seed=rng.randint(0, int(1e9)))
 
         i = 0
         for sample in dataset:
@@ -379,7 +379,7 @@ def generate_paraphrase_task(rng, task_config):
         from datasets import load_dataset
 
         dataset = load_dataset("humarin/chatgpt-paraphrases", split="train")
-        dataset = dataset.shuffle(seed=rng.randint(0, 1e9))
+        dataset = dataset.shuffle(seed=rng.randint(0, int(1e9)))
 
         i = 0
         for sample in dataset:

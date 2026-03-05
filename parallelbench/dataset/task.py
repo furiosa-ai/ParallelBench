@@ -8,6 +8,7 @@ This module provides:
 
 from pathlib import Path
 import argparse
+from collections import Counter
 import json
 import random
 
@@ -64,6 +65,13 @@ def _load_task_from_hub(repo_id, split, task_name):
 
     # 첫 row에서 prompt/metric 추출하여 task_config 구성
     first_row = hub_dataset[0]
+    for required_key in ("prompt", "metric"):
+        if required_key not in first_row:
+            raise ValueError(
+                f"Hub dataset '{repo_id}' (config='{config_name}') is missing "
+                f"required column '{required_key}'. "
+                f"Available columns: {list(first_row.keys())}"
+            )
     task_config = {
         "prompt": first_row["prompt"],
         "metric": first_row["metric"],
@@ -126,10 +134,39 @@ def create_parallel_bench_task_random_samples_per_length(rng, task):
     )
     num_buckets = num_samples // samples_per_length
 
+    bucket_values = None
+    if task["type"] == "repeat" and "repeat_counts" in task:
+        bucket_values = list(task["repeat_counts"])
+    elif "lengths" in task and task["lengths"]:
+        bucket_values = list(task["lengths"])
+    elif "min_length" in task and "max_length" in task:
+        bucket_values = list(range(task["min_length"], task["max_length"] + 1))
+    elif "size" in task:
+        bucket_values = [task["size"]]
+
+    target_counts = None
+    if bucket_values is not None:
+        target_counts = {
+            k: v * samples_per_length for k, v in Counter(bucket_values).items()
+        }
+        if sum(target_counts.values()) != num_samples:
+            # 고정 길이/고정 카운트 task의 경우 전체 샘플 수를 그대로 생성하도록 보정
+            if len(target_counts) == 1:
+                only_key = next(iter(target_counts.keys()))
+                target_counts = {only_key: num_samples}
+            else:
+                raise ValueError(
+                    f"Inconsistent samples_per_length config for task={task['name']}: "
+                    f"expected {num_samples}, got {sum(target_counts.values())} from inferred buckets."
+                )
+
     data_per_length = {}
+    max_steps = max(100000, num_samples * 500)
 
     finished = False
-    for sample in tqdm(generate_parallel_bench_task_random(rng, task, infinite=True)):
+    for i, sample in enumerate(
+        tqdm(generate_parallel_bench_task_random(rng, task, infinite=True)), start=1
+    ):
         length = (
             sample["metadata"]["length"]
             if task["type"] != "repeat"
@@ -138,22 +175,50 @@ def create_parallel_bench_task_random_samples_per_length(rng, task):
         if length not in data_per_length:
             data_per_length[length] = []
 
-        if len(data_per_length[length]) < samples_per_length:
+        target_count = (
+            target_counts.get(length, 0)
+            if target_counts is not None
+            else samples_per_length
+        )
+        if len(data_per_length[length]) < target_count:
             data_per_length[length].append(sample)
 
-        if (
-            sum(len(data) == samples_per_length for data in data_per_length.values())
-            == num_buckets
-        ):
-            data_per_length = {
-                k: v for k, v in data_per_length.items() if len(v) == samples_per_length
-            }
-            finished = True
-            break
+        if target_counts is not None:
+            if all(
+                len(data_per_length.get(k, [])) >= v for k, v in target_counts.items()
+            ):
+                finished = True
+                break
+        else:
+            if (
+                sum(
+                    len(data) == samples_per_length for data in data_per_length.values()
+                )
+                == num_buckets
+            ):
+                data_per_length = {
+                    k: v
+                    for k, v in data_per_length.items()
+                    if len(v) == samples_per_length
+                }
+                finished = True
+                break
+
+        if i >= max_steps:
+            raise RuntimeError(
+                f"Task generation timed out for task={task['name']} with samples_per_length={samples_per_length}. "
+                "Please check task config (length buckets may be unreachable)."
+            )
 
     assert finished
-    lengths = sorted(data_per_length.keys())
-    data = sum([data_per_length[length] for length in lengths], [])
+    if target_counts is not None:
+        lengths = sorted(target_counts.keys())
+        data = sum(
+            [data_per_length[length][: target_counts[length]] for length in lengths], []
+        )
+    else:
+        lengths = sorted(data_per_length.keys())
+        data = sum([data_per_length[length] for length in lengths], [])
     assert len(data) == num_samples, f"Expected {num_samples} samples, got {len(data)}"
 
     return data
