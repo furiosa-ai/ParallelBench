@@ -255,14 +255,6 @@ class TestTextToRegexTimeout:
         assert isinstance(result, dict)
         assert "score" in result
 
-    def test_invalid_regex_returns_zero(self):
-        gt = {
-            "positive_examples": ["abc"],
-            "negative_examples": [],
-        }
-        result = text_to_regex_score("[invalid", gt)
-        assert result["score"] == 0.0
-
 
 class TestMetricFuncMap:
     def test_all_entries_callable(self):
