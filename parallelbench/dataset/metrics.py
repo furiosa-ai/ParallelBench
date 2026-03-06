@@ -531,7 +531,7 @@ def text_to_regex_score(prediction, ground_truth) -> dict[str, float]:
     }
 
 
-def _json_syntax_score(prediction, ground_truth=None):
+def _json_syntax_score(prediction):
     prediction = prediction.split("```json" if "```json" in prediction else "```", 1)[
         -1
     ].strip()
@@ -548,7 +548,7 @@ def _json_syntax_score(prediction, ground_truth=None):
 
 
 def json_syntax_score(prediction, ground_truth=None) -> dict[str, float]:
-    score = _json_syntax_score(prediction, ground_truth)
+    score = _json_syntax_score(prediction)
     return {
         "score": score,
         "score_strict": score,

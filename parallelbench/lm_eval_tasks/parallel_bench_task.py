@@ -10,8 +10,6 @@ from __future__ import annotations
 
 import numpy as np
 from datasets import Dataset, DatasetDict
-from functools import partial
-
 from lm_eval.api.task import ConfigurableTask
 
 from parallelbench.dataset import ParallelBench
@@ -148,7 +146,7 @@ class ParallelBenchTask(ConfigurableTask):
         """
         agg = {}
         for key in self._metric_keys:
-            agg[key] = partial(_mean_percentage, key=key)
+            agg[key] = _mean_percentage
         for key in METADATA_METRIC_KEYS:
             agg[key] = np.mean
         return agg
@@ -167,7 +165,7 @@ class ParallelBenchTask(ConfigurableTask):
         return result
 
 
-def _mean_percentage(items: list[float], key: str = "") -> float:
+def _mean_percentage(items: list[float]) -> float:
     """Compute mean and scale to percentage."""
     if not items:
         return 0.0
