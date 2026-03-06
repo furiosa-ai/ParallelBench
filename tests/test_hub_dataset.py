@@ -116,7 +116,7 @@ class TestSerializationRoundtrip:
     def test_dict_answer_roundtrip(self):
         from parallelbench.dataset.task import load_task
 
-        ds, _ = load_task("test", "text_writing/words_to_sentence_easy")
+        ds, _ = load_task("test", "waiting_line/shuffle")
         sample = ds[0]
         answer = sample["answer"]
         assert isinstance(answer, dict)
