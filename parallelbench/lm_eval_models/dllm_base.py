@@ -184,12 +184,12 @@ class DLLMBase(LM):
             return context
         return [{"role": "user", "content": context}]
 
-    def _encode_output_prefix(self, prefix_str: str) -> torch.Tensor:
-        """Encode an output prefix string into token IDs for infill mode."""
-        tokenizer = self._inner_model.tokenizer
-        return tokenizer.encode(
-            prefix_str, return_tensors="pt", add_special_tokens=False
-        )
+    def _encode_output_prefix(self, prefix_str: str) -> str:
+        """Return the output prefix string for infill mode.
+
+        Models handle their own tokenization of the prefix.
+        """
+        return prefix_str
 
     @staticmethod
     def _apply_until_truncation(text: str, gen_kwargs: dict) -> str:

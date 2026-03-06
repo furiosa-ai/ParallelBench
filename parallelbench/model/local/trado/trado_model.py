@@ -27,9 +27,8 @@ class TradoGenerationConfig(DllmGenerationConfig):
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
-    
-    valid_strategies: set = field(default_factory=lambda: set(TRADO_VALID_STRATEGIES))
 
+    valid_strategies: set = field(default_factory=lambda: set(TRADO_VALID_STRATEGIES))
 
     def to_generation_kwargs(self):
         gen_kwargs = {
@@ -46,16 +45,17 @@ class TradoGenerationConfig(DllmGenerationConfig):
         return gen_kwargs
 
 
-
 @ModelRegistry.register(
-    lambda name: name
-    in (
-        "Gen-Verse/TraDo-4B-Instruct",
-        "Gen-Verse/TraDo-8B-Instruct",
-        "Gen-Verse/TraDo-8B-Thinking",
+    lambda name: (
+        name
+        in (
+            "Gen-Verse/TraDo-4B-Instruct",
+            "Gen-Verse/TraDo-8B-Instruct",
+            "Gen-Verse/TraDo-8B-Thinking",
+        )
+        or "trado" in name.lower()
+        or "sdar" in name.lower()
     )
-    or "trado" in name.lower()
-    or "sdar" in name.lower()
 )
 class TradoModel(LocalModel):
     def __init__(self, model_name, accel_framework=None):
@@ -74,18 +74,15 @@ class TradoModel(LocalModel):
         self.tokenizer.mask_token_id = TRADO_MASK_TOKEN_ID
 
         self.mask_id = TRADO_MASK_TOKEN_ID
-        self.accel_framework = accel_framework
-
+        self._validate_and_set_framework(accel_framework)
 
     @measure_time_mem("generate")
-    def _generate(
-        self, input_ids, gen_config, output_history=False, output0_ids=None
-    ):
+    def _generate(self, input_ids, gen_config, output_history=False, output0_ids=None):
         gen_kwargs = gen_config.to_generation_kwargs()
 
         if self.accel_framework == "fast_dllm":
             raise NotImplementedError("fast_dllm is not yet supported for TraDo model.")
-        
+
         generate_fn = block_diffusion_generate
 
         if output0_ids is not None:

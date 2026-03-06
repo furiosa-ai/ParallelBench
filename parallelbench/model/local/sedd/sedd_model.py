@@ -26,8 +26,11 @@ class SeddPredictorType(str, Enum):
 class SeddGenerationConfig(DllmGenerationConfig):
     predictor: SeddPredictorType = SeddPredictorType.ANALYTIC
 
+    def _validate_remasking(self):
+        pass  # SEDD does not use remasking strategies
 
     def __post_init__(self):
+        super().__post_init__()
         assert self.block_length is None or self.block_length == self.max_tokens, (
             "Block length must be equal to max tokens if specified."
         )
@@ -52,8 +55,7 @@ class SeddModel(LocalModel):
 
         self.tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
-        self.accel_framework = accel_framework
-
+        self._validate_and_set_framework(accel_framework)
 
     @measure_time_mem("generate")
     def _generate(self, input_ids, gen_config, output_history=False):
@@ -83,7 +85,9 @@ class SeddModel(LocalModel):
 
         return input_output_ids, nfe, history
 
-    def generate(self, messages, gen_config=None, output_history=False):
+    def generate(
+        self, messages, gen_config=None, output_prefix=None, output_history=False
+    ):
         if isinstance(messages, list):
             prompt = "\n\n".join(m["content"] for m in messages) + "\n\n"
         else:

@@ -16,7 +16,7 @@ class BaseModel(ABC):
         self,
         messages: Union[List[str], str],
         gen_config: Dict = None,
-        output_prefix: Optional[torch.tensor] = None,
+        output_prefix: Optional[str] = None,
         output_history: bool = False,
     ) -> "DLLMOutput":
         """Generate output from input messages.
@@ -24,7 +24,7 @@ class BaseModel(ABC):
         Args:
             messages: Input messages in chat format
             gen_config: Generation configuration dictionary passed to the model-specific GenerationConfig
-            output_prefix: Prefix token tensor to prepend to the generated output
+            output_prefix: Prefix string to prepend to the generated output
             output_history: If True, return intermediate decoding states in history field of DLLMOutput
         Returns:
             DLLMOutput: Generated output with metadata
@@ -41,15 +41,18 @@ class ApiModel(BaseModel):
 class LocalModel(BaseModel):
     """Base class for local models that load weights via transformers."""
 
-    def __init__(self, model_name, model_class=AutoModel, accel_framework=None):
+    def _validate_and_set_framework(self, accel_framework):
+        """Validate accel_framework and set related attributes."""
         if accel_framework not in VALID_ACCEL_FRAMEWORKS:
             raise ValueError(
                 f"Invalid accel_framework: {accel_framework}. "
                 f"Valid options are: {VALID_ACCEL_FRAMEWORKS}"
             )
-
         self.accel_framework = accel_framework
         self.is_fast_dllm = self.accel_framework == "fast_dllm"
+
+    def __init__(self, model_name, model_class=AutoModel, accel_framework=None):
+        self._validate_and_set_framework(accel_framework)
 
         local_rank = os.environ.get("LOCAL_RANK")
         device_map = f"cuda:{local_rank}" if local_rank is not None else "cuda"
