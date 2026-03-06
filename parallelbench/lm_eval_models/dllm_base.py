@@ -21,7 +21,6 @@ from parallelbench.lm_eval_models.metadata_store import (
     GenerationMetadata,
     MetadataStore,
 )
-from parallelbench.utils.perf_utils import pop_perf_stats
 
 
 class DLLMBase(LM):
@@ -141,8 +140,6 @@ class DLLMBase(LM):
                 output_history=self._output_history,
             )
 
-            perf_stats = pop_perf_stats(flatten=True)
-
             store.append(
                 GenerationMetadata(
                     nfe=dllm_output.nfe,
@@ -151,7 +148,6 @@ class DLLMBase(LM):
                     decoding_order_corrs=dllm_output.decoding_order_corrs,
                     input_length=dllm_output.input_length,
                     output_length=dllm_output.output_length,
-                    perf_stats=perf_stats,
                 )
             )
 

@@ -12,7 +12,6 @@ from parallelbench.lm_eval_models.metadata_store import (
     GenerationMetadata,
     MetadataStore,
 )
-from parallelbench.utils.perf_utils import pop_perf_stats
 
 
 @register_model("parallelbench_api")
@@ -62,14 +61,11 @@ class ApiWrapper(DLLMBase):
                 gen_config=gen_config,
             )
 
-            perf_stats = pop_perf_stats(flatten=True)
-
             store.append(
                 GenerationMetadata(
                     nfe=dllm_output.nfe,
                     input_length=dllm_output.input_length,
                     output_length=dllm_output.output_length,
-                    perf_stats=perf_stats,
                 )
             )
 

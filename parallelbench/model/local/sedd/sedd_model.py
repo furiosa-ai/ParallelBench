@@ -13,7 +13,6 @@ from parallelbench.model.model_utils import (
     decode_history,
 )
 from parallelbench.model.registry import ModelRegistry
-from parallelbench.utils.perf_utils import measure_time_mem
 
 
 class SeddPredictorType(str, Enum):
@@ -57,7 +56,6 @@ class SeddModel(LocalModel):
 
         self._validate_and_set_framework(accel_framework)
 
-    @measure_time_mem("generate")
     def _generate(self, input_ids, gen_config, output_history=False):
         generate_kwargs = gen_config.to_generation_kwargs()
 

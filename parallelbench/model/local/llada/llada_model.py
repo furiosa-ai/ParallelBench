@@ -21,7 +21,6 @@ from parallelbench.model.model_utils import (
     decode_history,
 )
 from parallelbench.model.registry import ModelRegistry
-from parallelbench.utils.perf_utils import measure_time_mem
 
 
 @dataclass
@@ -140,7 +139,6 @@ class LladaModel(LocalModel):
 
         model.forward = types.MethodType(wrapped_forward, model)
 
-    @measure_time_mem("generate")
     def _generate(
         self,
         input_ids: torch.Tensor,

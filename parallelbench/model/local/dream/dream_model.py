@@ -12,7 +12,6 @@ from parallelbench.model.model_utils import (
     decode_history,
 )
 from parallelbench.model.registry import ModelRegistry
-from parallelbench.utils.perf_utils import measure_time_mem
 
 from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_STRATEGIES
 from .dream_model_utils import sample_block
@@ -123,7 +122,6 @@ class DreamModel(LocalModel):
             "apple/diffucoder-7b-cpgrpo",
         )
 
-    @measure_time_mem("generate")
     def _generate(self, input_ids, gen_config, output_history):
         self.patch_model(gen_config)
 

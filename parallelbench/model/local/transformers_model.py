@@ -4,7 +4,6 @@ import torch
 
 from parallelbench.model.base_model import BaseModel, DLLMOutput
 from parallelbench.model.generation_config import ARGenerationConfig
-from parallelbench.utils.perf_utils import measure_time_mem
 
 
 @dataclass
@@ -37,7 +36,6 @@ class TransformersModel(BaseModel):
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.chat_template_kwargs = chat_template_kwargs or {}
 
-    @measure_time_mem("generate")
     def generate(self, messages, gen_config=None, output_history=False):
         generate_kwargs = TransformersGenerationConfig(
             **gen_config

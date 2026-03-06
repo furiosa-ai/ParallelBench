@@ -29,7 +29,6 @@ class GenerationMetadata:
     decoding_order_corrs: Optional[dict] = None
     input_length: Optional[int] = None
     output_length: Optional[int] = None
-    perf_stats: Optional[dict] = None
 
 
 class MetadataStore:

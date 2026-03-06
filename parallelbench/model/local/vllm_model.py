@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import torch
 
 from parallelbench.model.base_model import BaseModel, DLLMOutput
-from parallelbench.utils.perf_utils import measure_time_mem
 
 
 @dataclass
@@ -44,7 +43,6 @@ class vllmModel(BaseModel):
             model=model_name, dtype=torch.bfloat16, max_model_len=max_model_len
         )
 
-    @measure_time_mem("generate")
     def generate(self, messages, gen_config=None, output_history=False):
         sampling_params = vllmGenerationConfig(**gen_config).to_sampling_params()
 

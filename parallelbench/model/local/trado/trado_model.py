@@ -13,7 +13,6 @@ from parallelbench.model.model_utils import (
     decode_history,
 )
 from parallelbench.model.registry import ModelRegistry
-from parallelbench.utils.perf_utils import measure_time_mem
 
 from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_STRATEGIES
 from .trado_model_utils import block_diffusion_generate
@@ -76,7 +75,6 @@ class TradoModel(LocalModel):
         self.mask_id = TRADO_MASK_TOKEN_ID
         self._validate_and_set_framework(accel_framework)
 
-    @measure_time_mem("generate")
     def _generate(self, input_ids, gen_config, output_history=False, output0_ids=None):
         gen_kwargs = gen_config.to_generation_kwargs()
 

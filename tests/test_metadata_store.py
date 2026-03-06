@@ -27,7 +27,6 @@ class TestGenerationMetadata:
         assert meta.decoding_order_corrs is None
         assert meta.input_length is None
         assert meta.output_length is None
-        assert meta.perf_stats is None
 
     def test_custom_values(self):
         meta = GenerationMetadata(nfe=42, input_length=10, output_length=20)
