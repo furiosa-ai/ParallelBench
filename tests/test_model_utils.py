@@ -1,6 +1,5 @@
 """Tests for model/model_utils.py utility functions."""
 
-from types import SimpleNamespace
 from unittest import mock
 
 import numpy as np
@@ -20,9 +19,13 @@ def _make_tokenizer(mask_token_id=126336, pad_token_id=0):
     tokenizer = mock.MagicMock()
     tokenizer.mask_token_id = mask_token_id
     tokenizer.pad_token_id = pad_token_id
-    tokenizer.decode = mock.MagicMock(side_effect=lambda ids, **kw: f"decoded:{ids.tolist()}")
+    tokenizer.decode = mock.MagicMock(
+        side_effect=lambda ids, **kw: f"decoded:{ids.tolist()}"
+    )
     tokenizer.encode = mock.MagicMock(
-        side_effect=lambda text, **kw: torch.tensor([[int(c) for c in text.split(",") if c.strip()]])
+        side_effect=lambda text, **kw: torch.tensor(
+            [[int(c) for c in text.split(",") if c.strip()]]
+        )
     )
     return tokenizer
 
@@ -190,9 +193,7 @@ def test_compute_decoding_order_correlation_from_history_has_ignore_pad_keys():
         torch.tensor([[1, 2, 3]]),
     ]
 
-    _, corr_dict = compute_decoding_order_correlation_from_history(
-        tokenizer, history
-    )
+    _, corr_dict = compute_decoding_order_correlation_from_history(tokenizer, history)
     assert "dec_order_kendall" in corr_dict
     assert "dec_order_spearman" in corr_dict
     assert "dec_order_kendall_ignore_pad" in corr_dict

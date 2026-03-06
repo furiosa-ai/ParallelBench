@@ -53,7 +53,10 @@ def get_num_transfer_tokens_maskgit(mask_index, steps, mode="linear"):
     mask_ratios = torch.tensor(ratios).to(mask_index.device)
     num_transfer_tokens = total_num - torch.floor(num_transfer_tokens * mask_ratios)
     num_transfer_tokens = torch.cat(
-        [num_transfer_tokens[:, 0:1], num_transfer_tokens[:, 1:] - num_transfer_tokens[:, :-1]],
+        [
+            num_transfer_tokens[:, 0:1],
+            num_transfer_tokens[:, 1:] - num_transfer_tokens[:, :-1],
+        ],
         axis=1,
     )
     return num_transfer_tokens.to(torch.int64)
@@ -87,7 +90,10 @@ def generate_rcr(
 
     with torch.amp.autocast("cuda", enabled=True):
         x = torch.full(
-            (1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long, device=prompt.device
+            (1, prompt.shape[1] + gen_length),
+            mask_id,
+            dtype=torch.long,
+            device=prompt.device,
         )
         x[:, : prompt.shape[1]] = prompt.clone()
         prompt_index = x != mask_id
@@ -153,9 +159,13 @@ def generate_rcr(
                             overtime_conf_wo_zeros = torch.where(
                                 overtime_confidence == 0.0, 1.0, overtime_confidence
                             )[j]
-                            num_tokens_to_mask = num_transfer_tokens[j, i + 1 :].sum().item()
+                            num_tokens_to_mask = (
+                                num_transfer_tokens[j, i + 1 :].sum().item()
+                            )
                             _, mask_select_indices = torch.topk(
-                                overtime_conf_wo_zeros, k=num_tokens_to_mask, largest=False
+                                overtime_conf_wo_zeros,
+                                k=num_tokens_to_mask,
+                                largest=False,
                             )
                             if len(mask_select_indices) == 0:
                                 break

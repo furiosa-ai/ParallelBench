@@ -6,6 +6,7 @@ import pytest
 
 from parallelbench.dataset.task_generators import TASK_GENERATORS
 from parallelbench.dataset.task import generate_parallel_bench_task_random
+from parallelbench.dataset.task_utils import _shuffle
 
 
 class TestTaskGeneratorRegistry:
@@ -80,6 +81,33 @@ class TestUnknownTaskType:
         rng = random.Random(0)
         with pytest.raises(ValueError, match="Unknown task type"):
             list(generate_parallel_bench_task_random(rng, config))
+
+
+class TestShuffleEdgeCases:
+    def test_empty_list(self):
+        rng = random.Random(42)
+        assert _shuffle(rng, []) == []
+
+    def test_single_element(self):
+        rng = random.Random(42)
+        assert _shuffle(rng, [1]) == [1]
+
+    def test_all_identical_elements(self):
+        rng = random.Random(42)
+        assert _shuffle(rng, [1, 1, 1]) == [1, 1, 1]
+
+    def test_returns_copy(self):
+        rng = random.Random(42)
+        original = [1]
+        result = _shuffle(rng, original)
+        assert result is not original
+
+    def test_normal_shuffle_differs(self):
+        rng = random.Random(42)
+        original = [1, 2, 3, 4, 5]
+        result = _shuffle(rng, original)
+        assert sorted(result) == sorted(original)
+        assert result != original
 
 
 class TestCLI:

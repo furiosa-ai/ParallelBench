@@ -79,7 +79,9 @@ class MetadataStore:
             return GenerationMetadata()
 
     def __len__(self) -> int:
-        return len(self._buffer)
+        with self._buffer_lock:
+            return len(self._buffer)
 
     def clear(self) -> None:
-        self._buffer.clear()
+        with self._buffer_lock:
+            self._buffer.clear()

@@ -39,7 +39,12 @@ class ApiModel(BaseModel):
 
 
 class LocalModel(BaseModel):
-    """Base class for local models that load weights via transformers."""
+    """Base class for local models that load weights via transformers.
+
+    Note: trust_remote_code=True is required for research models (LLaDA, Dream, etc.)
+    and is hardcoded in from_pretrained() calls. Some subclasses (SEDD, Trado) handle
+    model loading independently and bypass __init__; they also use trust_remote_code=True.
+    """
 
     def _validate_and_set_framework(self, accel_framework):
         """Validate accel_framework and set related attributes."""

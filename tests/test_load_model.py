@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from parallelbench.model.base_model import ApiModel, LocalModel
+from parallelbench.model.base_model import ApiModel
 
 
 @mock.patch("parallelbench.model.ModelRegistry.get_model_class")
@@ -34,7 +34,9 @@ def test_load_model_registry_api_model_omits_accel_framework(mock_get):
             self._args = args
             self._kwargs = kwargs
 
-        def generate(self, messages, gen_config=None, output_prefix=None, output_history=False):
+        def generate(
+            self, messages, gen_config=None, output_prefix=None, output_history=False
+        ):
             pass
 
     mock_get.return_value = FakeApiModel

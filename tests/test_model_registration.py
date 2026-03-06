@@ -18,7 +18,7 @@ import parallelbench.model.api.anthropic_model
 
 SEDD_AVAILABLE = False
 try:
-    import parallelbench.model.local.sedd.sedd_model
+    import parallelbench.model.local.sedd.sedd_model  # noqa: F401
 
     SEDD_AVAILABLE = True
 except ImportError:
@@ -60,5 +60,3 @@ def test_model_registration(model_name, expected_class_name):
     assert result_class.__name__ == expected_class_name, (
         f"Expected {expected_class_name} for '{model_name}', got {result_class.__name__}"
     )
-
-

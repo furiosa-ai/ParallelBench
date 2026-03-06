@@ -4,12 +4,16 @@ All public metric functions return dict[str, float].
 """
 
 import json
+import logging
 import re
+import signal
 
 import evaluate
 
 from parallelbench.dataset.task_utils import sentence_to_words
 from parallelbench.utils.grammar_check import grammar_check
+
+logger = logging.getLogger(__name__)
 
 
 def _parse_list(input_str, strict=False):
@@ -50,6 +54,11 @@ def _parse_list(input_str, strict=False):
 
 
 class Metric:
+    """Marker base class for stateful metric objects (e.g., SummaryScore, ParaphraseScore).
+
+    Used to distinguish class-based metrics from plain function metrics in the registry.
+    """
+
     pass
 
 
@@ -469,6 +478,14 @@ def regex_match_score(prediction, ground_truth) -> dict[str, float]:
     return {"score": float(score)}
 
 
+class _RegexTimeout(Exception):
+    pass
+
+
+def _regex_alarm_handler(signum, frame):
+    raise _RegexTimeout()
+
+
 def _text_to_regex_score(prediction, ground_truth):
     prediction = prediction.split("```regex" if "```regex" in prediction else "```", 1)[
         -1
@@ -480,18 +497,30 @@ def _text_to_regex_score(prediction, ground_truth):
 
     try:
         prog = re.compile(prediction)
-    except Exception:
+    except re.error:
         return 0.0
 
-    for positive in positive_examples:
-        if prog.fullmatch(positive) is None:
-            return 0.0
+    # Guard against catastrophic backtracking (ReDoS) from model-generated regex.
+    # signal.alarm works because lm-eval processes sequentially in the main thread (Unix-only).
+    old_handler = signal.signal(signal.SIGALRM, _regex_alarm_handler)
+    try:
+        signal.alarm(5)
 
-    for negative in negative_examples:
-        if prog.fullmatch(negative) is not None:
-            return 0.0
+        for positive in positive_examples:
+            if prog.fullmatch(positive) is None:
+                return 0.0
 
-    return 1.0
+        for negative in negative_examples:
+            if prog.fullmatch(negative) is not None:
+                return 0.0
+
+        return 1.0
+    except _RegexTimeout:
+        logger.debug("Regex execution timed out for pattern: %s", prediction[:100])
+        return 0.0
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old_handler)
 
 
 def text_to_regex_score(prediction, ground_truth) -> dict[str, float]:
@@ -514,7 +543,7 @@ def _json_syntax_score(prediction, ground_truth=None):
     try:
         json.loads(prediction)
         return 1.0
-    except Exception:
+    except (json.JSONDecodeError, ValueError):
         return 0.0
 
 

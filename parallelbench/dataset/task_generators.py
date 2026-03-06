@@ -4,6 +4,7 @@ Each generator is registered via @register_task_generator and yields sample dict
 """
 
 import logging
+from collections.abc import Callable
 
 import numpy as np
 
@@ -22,7 +23,7 @@ from parallelbench.dataset.task_utils import (
 from parallelbench.utils.grammar_check import grammar_check
 
 
-TASK_GENERATORS: dict[str, callable] = {}
+TASK_GENERATORS: dict[str, Callable] = {}
 
 
 def register_task_generator(task_type: str):

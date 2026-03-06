@@ -12,7 +12,10 @@ from parallelbench.model.generation_config import DllmGenerationConfig
 from parallelbench.model.local.generate import generate
 from parallelbench.model.local.generate_rcr import generate_rcr
 from parallelbench.model.local.generate_remdm import generate_remdm
-from parallelbench.model.local.llada.constants import LLADA_MASK_TOKEN_ID, LLADA_VALID_STRATEGIES
+from parallelbench.model.local.llada.constants import (
+    LLADA_MASK_TOKEN_ID,
+    LLADA_VALID_STRATEGIES,
+)
 from parallelbench.model.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
@@ -93,8 +96,10 @@ class LladaGenerationConfig(DllmGenerationConfig):
 
 
 @ModelRegistry.register(
-    lambda name: name in ("GSAI-ML/LLaDA-8B-Instruct", "GSAI-ML/LLaDA-1.5")
-    or "llada" in name.lower()
+    lambda name: (
+        name in ("GSAI-ML/LLaDA-8B-Instruct", "GSAI-ML/LLaDA-1.5")
+        or "llada" in name.lower()
+    )
 )
 class LladaModel(LocalModel):
     def __init__(self, model_name: str, accel_framework: Optional[str] = None):

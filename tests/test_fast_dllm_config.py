@@ -73,7 +73,9 @@ def test_steps_not_divisible_by_num_blocks_raises():
 
 
 def test_max_tokens_not_divisible_by_block_length_raises():
-    with pytest.raises(ValueError, match="max_tokens must be divisible by block_length"):
+    with pytest.raises(
+        ValueError, match="max_tokens must be divisible by block_length"
+    ):
         DllmGenerationConfig(
             remasking="random",
             steps=100,

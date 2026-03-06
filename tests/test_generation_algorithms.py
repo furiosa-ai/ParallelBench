@@ -1,11 +1,13 @@
 """Tests for generation algorithm pure functions."""
 
-import numpy as np
 import pytest
 import torch
 
 from parallelbench.model.local.generate import get_num_transfer_tokens
-from parallelbench.model.local.generate_rcr import gamma_func, get_num_transfer_tokens_maskgit
+from parallelbench.model.local.generate_rcr import (
+    gamma_func,
+    get_num_transfer_tokens_maskgit,
+)
 
 
 # -- get_num_transfer_tokens --
@@ -51,10 +53,12 @@ def test_get_num_transfer_tokens_no_masks():
 
 
 def test_get_num_transfer_tokens_batch_size_2():
-    mask_index = torch.tensor([
-        [True, True, True, True, False],
-        [True, True, False, False, False],
-    ])
+    mask_index = torch.tensor(
+        [
+            [True, True, True, True, False],
+            [True, True, False, False, False],
+        ]
+    )
     result = get_num_transfer_tokens(mask_index, steps=2)
     assert result.shape == (2, 2)
     assert result[0].sum().item() == 4
@@ -99,7 +103,9 @@ def test_gamma_func_result_clipped():
     for mode in ["linear", "cosine", "pow2"]:
         for r in [0.0, 0.25, 0.5, 0.75, 1.0]:
             result = gamma_func(r, mode)
-            assert 1e-6 <= result <= 1.0, f"gamma_func({r}, {mode}) = {result} out of range"
+            assert 1e-6 <= result <= 1.0, (
+                f"gamma_func({r}, {mode}) = {result} out of range"
+            )
 
 
 # -- get_num_transfer_tokens_maskgit --

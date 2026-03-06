@@ -3,17 +3,13 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 
-DEFAULT_VALID_STRATEGIES = {
-    "random",
-    "low_confidence",
-    "topk_margin",
-    "entropy"
-}
+DEFAULT_VALID_STRATEGIES = {"random", "low_confidence", "topk_margin", "entropy"}
 
 
 @dataclass
 class BaseGenerationConfig(ABC):
     """Common generation config shared by all model types."""
+
     accel_framework: Optional[str] = None
     max_tokens: int = 128
     temperature: float = 0.0
@@ -22,6 +18,7 @@ class BaseGenerationConfig(ABC):
 @dataclass
 class DllmGenerationConfig(BaseGenerationConfig):
     """Generation config for discrete diffusion language models (dLLMs)."""
+
     remasking: Optional[str] = None
     steps: Optional[int] = 128
     block_length: Optional[int] = None
@@ -33,13 +30,13 @@ class DllmGenerationConfig(BaseGenerationConfig):
     valid_strategies: set = field(default_factory=lambda: set(DEFAULT_VALID_STRATEGIES))
 
     def __post_init__(self):
-        if self.block_length is None: 
+        if self.block_length is None:
             self.block_length = self.max_tokens
         self._validate_dllm_gen_configs()
         self._validate_remasking()
 
     @property
-    def num_blocks(self):        
+    def num_blocks(self):
         if not isinstance(self.max_tokens, int) or self.max_tokens <= 0:
             raise ValueError("max_tokens must be a positive integer")
         if not isinstance(self.block_length, int) or self.block_length <= 0:
@@ -75,7 +72,9 @@ class DllmGenerationConfig(BaseGenerationConfig):
 
         self.is_threshold_remasking = self.remasking.endswith("_threshold")
         self.is_factor_remasking = self.remasking.endswith("_factor")
-        self.is_default_remasking = not (self.is_threshold_remasking or self.is_factor_remasking)
+        self.is_default_remasking = not (
+            self.is_threshold_remasking or self.is_factor_remasking
+        )
 
         # Validate default remasking
         if self.is_default_remasking:
@@ -84,21 +83,31 @@ class DllmGenerationConfig(BaseGenerationConfig):
                     "alg_threshold must be None or 0.0 for default remasking strategies"
                 )
             if self.alg_factor is not None and self.alg_factor != 1.0:
-                raise ValueError("alg_factor must be None or 1.0 for default remasking strategies")
+                raise ValueError(
+                    "alg_factor must be None or 1.0 for default remasking strategies"
+                )
 
         # Validate threshold remasking
         if self.is_threshold_remasking:
             if self.alg_threshold is None:
-                raise ValueError(f"alg_threshold must be provided for {self.remasking} algorithm")
+                raise ValueError(
+                    f"alg_threshold must be provided for {self.remasking} algorithm"
+                )
             if self.alg_factor is not None:
-                raise ValueError(f"alg_factor must be None for {self.remasking} algorithm")
+                raise ValueError(
+                    f"alg_factor must be None for {self.remasking} algorithm"
+                )
 
         # Validate factor remasking
         if self.is_factor_remasking:
             if self.alg_factor is None:
-                raise ValueError(f"alg_factor must be provided for {self.remasking} algorithm")
+                raise ValueError(
+                    f"alg_factor must be provided for {self.remasking} algorithm"
+                )
             if self.alg_threshold is not None:
-                raise ValueError(f"alg_threshold must be None for {self.remasking} algorithm")
+                raise ValueError(
+                    f"alg_threshold must be None for {self.remasking} algorithm"
+                )
 
     def to_generation_kwargs(self) -> dict:
         return dict(
@@ -116,6 +125,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
 @dataclass
 class ARGenerationConfig(BaseGenerationConfig):
     """Generation config for autoregressive models."""
+
     pass
 
 

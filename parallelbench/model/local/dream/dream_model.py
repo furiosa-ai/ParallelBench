@@ -20,8 +20,10 @@ from .dream_model_utils import sample_block
 
 @dataclass
 class DreamGenerationConfig(DllmGenerationConfig):
-    remasking: str = "origin" # Set the default remasking strategy to "origin" for Dream models
-    block_length: int = 128 # Set the default block length for Dream models
+    remasking: str = (
+        "origin"  # Set the default remasking strategy to "origin" for Dream models
+    )
+    block_length: int = 128  # Set the default block length for Dream models
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
@@ -30,7 +32,7 @@ class DreamGenerationConfig(DllmGenerationConfig):
 
     def __post_init__(self):
         super().__post_init__()
-        
+
         assert self.steps is None or self.steps <= self.max_tokens, (
             f"Steps must be less than or equal to max tokens. Got steps={self.steps}, max_tokens={self.max_tokens}"
         )
@@ -55,17 +57,22 @@ class DreamGenerationConfig(DllmGenerationConfig):
 
 
 @ModelRegistry.register(
-    lambda name: name
-    in (
-        "Dream-org/Dream-v0-Instruct-7B",
-        "Dream-org/Dream-Coder-v0-Instruct-7B",
-        "apple/DiffuCoder-7B-Instruct",
-        "apple/DiffuCoder-7B-cpGRPO",
-    ) or "dream" in name.lower()
+    lambda name: (
+        name
+        in (
+            "Dream-org/Dream-v0-Instruct-7B",
+            "Dream-org/Dream-Coder-v0-Instruct-7B",
+            "apple/DiffuCoder-7B-Instruct",
+            "apple/DiffuCoder-7B-cpGRPO",
+        )
+        or "dream" in name.lower()
+    )
 )
 class DreamModel(LocalModel):
     def __init__(self, model_name, accel_framework=None, eps=0):
-        super().__init__(model_name, model_class=AutoModel, accel_framework=accel_framework)
+        super().__init__(
+            model_name, model_class=AutoModel, accel_framework=accel_framework
+        )
 
         self.eps = eps
         self.mask_id = DREAM_MASK_TOKEN_ID
@@ -81,7 +88,9 @@ class DreamModel(LocalModel):
         gen_kwargs = gen_config.to_generation_kwargs()
 
         if self.accel_framework == "fast_dllm":
-            raise NotImplementedError("Fast-dLLM Dream model patching is not implemented yet.")
+            raise NotImplementedError(
+                "Fast-dLLM Dream model patching is not implemented yet."
+            )
 
         if (
             gen_kwargs.get("block_length") is not None
@@ -130,7 +139,9 @@ class DreamModel(LocalModel):
 
         return self.model.diffusion_generate(input_ids, **gen_kwargs), self.model.nfe
 
-    def generate(self, messages, output_prefix=None, gen_config=None, output_history=False):
+    def generate(
+        self, messages, output_prefix=None, gen_config=None, output_history=False
+    ):
         if isinstance(messages, list):
             prompt = self.tokenizer.apply_chat_template(
                 messages, add_generation_prompt=True, tokenize=False

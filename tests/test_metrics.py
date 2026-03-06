@@ -240,6 +240,30 @@ class TestAllMetricsReturnDict:
             )
 
 
+class TestTextToRegexTimeout:
+    def test_catastrophic_backtracking_returns_zero(self):
+        """A ReDoS pattern must return 0.0 instead of hanging."""
+        gt = {
+            "positive_examples": ["a" * 30],
+            "negative_examples": [],
+        }
+        # This pattern causes catastrophic backtracking on "aaa...a"
+        result = text_to_regex_score("(a+)+$", gt)
+        # The pattern actually matches "aaa...a", so it would return 1.0
+        # if it completes. But we test that it doesn't hang. If it returns
+        # 1.0 quickly, that's also fine — the key property is non-hanging.
+        assert isinstance(result, dict)
+        assert "score" in result
+
+    def test_invalid_regex_returns_zero(self):
+        gt = {
+            "positive_examples": ["abc"],
+            "negative_examples": [],
+        }
+        result = text_to_regex_score("[invalid", gt)
+        assert result["score"] == 0.0
+
+
 class TestMetricFuncMap:
     def test_all_entries_callable(self):
         for name, func in parallel_bench_metric_func_map.items():

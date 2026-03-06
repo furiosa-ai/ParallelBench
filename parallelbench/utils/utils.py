@@ -1,6 +1,3 @@
-
-
-
 from contextlib import contextmanager
 from pathlib import Path
 import sys
@@ -30,7 +27,7 @@ def insert_import_path(path: str):
 
     if model_module is not None:
         sys.modules["model"] = model_module
-    
+
     if utils_module is not None:
         sys.modules["utils"] = utils_module
     sys.path.pop(0)

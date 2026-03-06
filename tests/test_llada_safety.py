@@ -3,10 +3,8 @@
 import types
 from unittest import mock
 
-import pytest
 
 from parallelbench.model.local.llada.llada_model import LladaModel
-from parallelbench.model.model_utils import decode_history
 
 
 class MockModelClass:
@@ -168,5 +166,3 @@ class TestGenerateHistoryNoneSafety:
                     mock_correlation.assert_called_once()
                     assert result.decoding_order == [1, 2, 3]
                     assert result.decoding_order_corrs == {"dec_order_kendall": 0.9}
-
-

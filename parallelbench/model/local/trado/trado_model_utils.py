@@ -9,7 +9,9 @@ def top_k_logits(logits, k):
     else:
         values, _ = torch.topk(logits, k)
         min_values = values[..., -1, None]
-        return torch.where(logits < min_values, torch.full_like(logits, float("-inf")), logits)
+        return torch.where(
+            logits < min_values, torch.full_like(logits, float("-inf")), logits
+        )
 
 
 def top_p_logits(logits, p):
@@ -105,7 +107,9 @@ def block_diffusion_generate(
     # Prefill stage
     if prefill_length > 0:
         cur_x = x[:, :prefill_length]
-        cur_attn_mask = block_diffusion_attention_mask[:, :prefill_length, :prefill_length]
+        cur_attn_mask = block_diffusion_attention_mask[
+            :, :prefill_length, :prefill_length
+        ]
         if cur_attn_mask.dim() == 3:
             cur_attn_mask = cur_attn_mask[:, None, :, :]
         cur_position_ids = position_ids[:, :prefill_length]
@@ -123,9 +127,9 @@ def block_diffusion_generate(
         # threshold, set steps to max to give threshold time
         steps = decode_blocks * block_length
 
-    assert (
-        steps % decode_blocks == 0
-    ), f"Steps must be divisible by number of decode blocks. Got steps={steps}, decode_blocks={decode_blocks}"
+    assert steps % decode_blocks == 0, (
+        f"Steps must be divisible by number of decode blocks. Got steps={steps}, decode_blocks={decode_blocks}"
+    )
     denoising_steps = steps // decode_blocks
     num_transfer_tokens = get_num_transfer_tokens(block_length, denoising_steps)
 
@@ -178,10 +182,13 @@ def block_diffusion_generate(
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)
                 for j in range(cur_x.shape[0]):
                     if mask_index[j].any():
-                        first_mask_index = mask_index[j].nonzero(as_tuple=True)[0].min().item()
+                        first_mask_index = (
+                            mask_index[j].nonzero(as_tuple=True)[0].min().item()
+                        )
                         transfer_index[
                             j,
-                            first_mask_index : first_mask_index + num_transfer_tokens[step],
+                            first_mask_index : first_mask_index
+                            + num_transfer_tokens[step],
                         ] = True
                     else:
                         raise ValueError("No mask tokens found in the current block.")

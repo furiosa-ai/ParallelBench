@@ -61,9 +61,7 @@ class ModelRegistry:
                         multiple matchers match (ambiguous).
         """
         matched_classes = [
-            model_class
-            for matcher, model_class in cls._registry
-            if matcher(model_name)
+            model_class for matcher, model_class in cls._registry if matcher(model_name)
         ]
 
         if len(matched_classes) > 1:

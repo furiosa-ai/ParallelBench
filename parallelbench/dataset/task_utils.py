@@ -107,6 +107,8 @@ class RandomMathOp:
 
 
 def _shuffle(rng, x):
+    if len(x) <= 1 or len(set(x)) <= 1:
+        return x[:]
     y = x[:]
     while y == x:
         rng.shuffle(y)

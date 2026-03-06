@@ -58,9 +58,7 @@ class MercuryModel(ApiModel):
             output_json_lines = output_json_lines.split("\n\ndata: ")
             output_full = [json.loads(o) for o in output_json_lines if o.strip()]
         except (IndexError, json.JSONDecodeError) as e:
-            raise ValueError(
-                f"Failed to parse Mercury API SSE response: {e}"
-            ) from e
+            raise ValueError(f"Failed to parse Mercury API SSE response: {e}") from e
 
         history = [
             o["choices"][0]["delta"].get("content")

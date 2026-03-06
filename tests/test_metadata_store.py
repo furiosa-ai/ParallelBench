@@ -115,3 +115,54 @@ class TestMetadataStore:
             nfes.add(store.pop().nfe)
 
         assert len(nfes) == 4 * num_items
+
+    def test_len_thread_safety(self):
+        """Concurrent len() calls during append() do not raise."""
+        store = MetadataStore.instance()
+        errors = []
+
+        def append_items():
+            for i in range(200):
+                store.append(GenerationMetadata(nfe=i))
+
+        def check_len():
+            try:
+                for _ in range(200):
+                    length = len(store)
+                    assert length >= 0
+            except Exception as e:
+                errors.append(e)
+
+        t1 = threading.Thread(target=append_items)
+        t2 = threading.Thread(target=check_len)
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+
+        assert not errors, f"Errors during concurrent len(): {errors}"
+
+    def test_clear_thread_safety(self):
+        """Concurrent clear() during append() does not raise."""
+        store = MetadataStore.instance()
+        errors = []
+
+        def append_items():
+            for i in range(200):
+                store.append(GenerationMetadata(nfe=i))
+
+        def clear_store():
+            try:
+                for _ in range(50):
+                    store.clear()
+            except Exception as e:
+                errors.append(e)
+
+        t1 = threading.Thread(target=append_items)
+        t2 = threading.Thread(target=clear_store)
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+
+        assert not errors, f"Errors during concurrent clear(): {errors}"

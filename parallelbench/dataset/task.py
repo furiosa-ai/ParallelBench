@@ -51,10 +51,12 @@ def task_name_to_config_name(task_name: str) -> str:
 
 
 def config_name_to_task_name(config_name: str) -> str:
-    """config_name의 첫 번째 "-" → "/"로 변환합니다 (e.g., "waiting_line-copy" → "waiting_line/copy")."""
-    # 카테고리와 task 사이의 구분자는 첫 번째 "-"이지만,
-    # 카테고리 자체에 "_"가 포함될 수 있으므로 단순 replace 불가.
-    # Hub config name은 "category-task" 형식이므로 첫 번째 "-"를 "/"로 변환.
+    """config_name의 첫 번째 "-" → "/"로 변환합니다 (e.g., "waiting_line-copy" → "waiting_line/copy").
+
+    Convention: category names use underscores (e.g., "waiting_line", "text_writing"),
+    and the first hyphen is always the category/task separator. Task names within a
+    category must not contain hyphens to ensure correct roundtrip conversion.
+    """
     return config_name.replace("-", "/", 1)
 
 
@@ -266,7 +268,7 @@ def create_parallel_bench_task(split, task, output_file, rng=None, no_save=False
             create_parallel_bench_task_random(
                 rng=rng, task={**task, "icl_example_count": 0}
             )
-            for t in range(task["icl_example_count"])
+            for _ in range(task["icl_example_count"])
         ]
 
         for i, sample in enumerate(data):

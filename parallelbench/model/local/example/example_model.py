@@ -6,24 +6,26 @@ import torch
 from parallelbench.model.base_model import DLLMOutput, LocalModel
 from parallelbench.model.generation_config import DllmGenerationConfig
 from parallelbench.model.model_utils import decode_history
-from parallelbench.model.registry import ModelRegistry
 
 
 @dataclass
 class ExampleGenerationConfig(DllmGenerationConfig):
     example_field: str = "example_default_value"
-    
+
     def _validate_remasking(self):
         super()._validate_remasking()
         # Add any additional validation for example_field if needed
         assert isinstance(self.example_field, str), "example_field must be a string."
-        
+
     def to_generation_kwargs(self):
         gen_kwargs = super().to_generation_kwargs()
-        gen_kwargs.update({
-            "example_field": self.example_field,
-        })
+        gen_kwargs.update(
+            {
+                "example_field": self.example_field,
+            }
+        )
         return gen_kwargs
+
 
 class ExampleModel(LocalModel):
     """
@@ -33,7 +35,10 @@ class ExampleModel(LocalModel):
     real deployment, add an appropriate @ModelRegistry.register(...) decorator
     with a predicate that matches your desired model name(s).
     """
-    def __init__(self, model_name: str, accel_framework: Optional[str] = None, **kwargs):
+
+    def __init__(
+        self, model_name: str, accel_framework: Optional[str] = None, **kwargs
+    ):
         super().__init__(model_name, accel_framework=accel_framework, **kwargs)
         # Initialize the model here (e.g., load weights, set up tokenizer, etc.)
 
@@ -53,10 +58,9 @@ class ExampleModel(LocalModel):
         Returns:
             DLLMOutput: Generated output with metadata.
         """
-        
-        
+
         # Do something here
-        
+
         output = "generated output"
         input_ids = torch.tensor([[0, 1, 2]])  # Dummy input
         output_ids = torch.tensor([[0, 1, 2, 3, 4]])  # Dummy output
@@ -64,8 +68,7 @@ class ExampleModel(LocalModel):
         history = []  # Dummy history
         decoding_order = []  # Dummy decoding order
         decoding_order_corrs = []  # Dummy decoding order correlations
-        
-        
+
         return DLLMOutput(
             output=output,
             input_ids=input_ids,

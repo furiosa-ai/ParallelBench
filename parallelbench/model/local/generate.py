@@ -41,7 +41,10 @@ def get_num_transfer_tokens(mask_index, steps):
     remainder = mask_num % steps
 
     num_transfer_tokens = (
-        torch.zeros(mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64) + base
+        torch.zeros(
+            mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64
+        )
+        + base
     )
 
     for i in range(mask_num.size(0)):
@@ -49,11 +52,12 @@ def get_num_transfer_tokens(mask_index, steps):
 
     return num_transfer_tokens
 
+
 @torch.no_grad()
 def generate(
     *args,
-    use_fast_dllm_cache:bool=False,
-    use_fast_dllm_dual_cache:bool=False,
+    use_fast_dllm_cache: bool = False,
+    use_fast_dllm_dual_cache: bool = False,
     **kwargs,
 ):
     if use_fast_dllm_cache:
@@ -94,7 +98,9 @@ def generate_with_no_cache(
         remasking: Remasking strategy. 'low_confidence' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
-    x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
+    x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
+        model.device
+    )
     x[:, : prompt.shape[1]] = prompt.clone()
 
     if output0_ids is not None:
@@ -120,8 +126,7 @@ def generate_with_no_cache(
         block_mask_index = (
             x[
                 :,
-                prompt.shape[1]
-                + num_block * block_length : prompt.shape[1]
+                prompt.shape[1] + num_block * block_length : prompt.shape[1]
                 + (num_block + 1) * block_length,
             ]
             == mask_id
@@ -151,7 +156,14 @@ def generate_with_no_cache(
                 )
             else:
                 x0, transfer_index = get_transfer_index_dynamic(
-                    logits, temperature, remasking, mask_index, x, None, factor, alg_temp=alg_temp
+                    logits,
+                    temperature,
+                    remasking,
+                    mask_index,
+                    x,
+                    None,
+                    factor,
+                    alg_temp=alg_temp,
                 )
             x[transfer_index] = x0[transfer_index]
 
@@ -162,8 +174,7 @@ def generate_with_no_cache(
             if (
                 x[
                     :,
-                    prompt.shape[1]
-                    + num_block * block_length : prompt.shape[1]
+                    prompt.shape[1] + num_block * block_length : prompt.shape[1]
                     + (num_block + 1) * block_length,
                 ]
                 == mask_id
@@ -200,8 +211,10 @@ def generate_with_prefix_cache(
         cfg_scale: Unsupervised classifier-free guidance scale.
         remasking: Remasking strategy. 'low_confidence' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
-    """    
-    x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
+    """
+    x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
+        model.device
+    )
     x[:, : prompt.shape[1]] = prompt.clone()
 
     assert gen_length % block_length == 0
@@ -260,7 +273,9 @@ def generate_with_prefix_cache(
         for i in range(len(past_key_values)):
             new_past_key_values.append(())
             for j in range(len(past_key_values[i])):
-                new_past_key_values[i] += (past_key_values[i][j][:, :, :current_block_start],)
+                new_past_key_values[i] += (
+                    past_key_values[i][j][:, :, :current_block_start],
+                )
 
         past_key_values = new_past_key_values
 
@@ -272,7 +287,9 @@ def generate_with_prefix_cache(
             mask_index[:, block_length:] = 0
 
             logits = model(
-                x[:, current_block_start:], past_key_values=past_key_values, use_cache=True
+                x[:, current_block_start:],
+                past_key_values=past_key_values,
+                use_cache=True,
             ).logits
             nfe += 1
 
@@ -338,7 +355,9 @@ def generate_with_dual_cache(
         remasking: Remasking strategy. 'low_confidence' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
-    x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
+    x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
+        model.device
+    )
     x[:, : prompt.shape[1]] = prompt.clone()
 
     assert gen_length % block_length == 0
@@ -431,7 +450,9 @@ def generate_with_dual_cache(
                     factor,
                     alg_temp=alg_temp,
                 )
-            x[:, current_block_start:current_block_end][transfer_index] = x0[transfer_index]
+            x[:, current_block_start:current_block_end][transfer_index] = x0[
+                transfer_index
+            ]
 
             if history is not None:
                 history.append(x[:, input_length:].cpu().clone())
@@ -469,7 +490,9 @@ def get_transfer_index(
         except (ValueError, RuntimeError):
             x0_p, x0 = p.max(dim=-1)
         except Exception as e:
-            warnings.warn(f"Unexpected exception {e} when sampling tokens, using argmax instead.")
+            warnings.warn(
+                f"Unexpected exception {e} when sampling tokens, using argmax instead."
+            )
             x0_p, x0 = p.max(dim=-1)
     else:
         x0_p, x0 = p.max(dim=-1)
@@ -517,7 +540,9 @@ def get_transfer_index(
         else:
             confidence[j] = confidence[j] / alg_temp
             confidence[j] = F.softmax(confidence[j], dim=-1)
-            select_index = torch.multinomial(confidence[j], num_samples=num_transfer_tokens[j])
+            select_index = torch.multinomial(
+                confidence[j], num_samples=num_transfer_tokens[j]
+            )
 
         transfer_index[j, select_index] = True
         if threshold is not None:
@@ -528,7 +553,14 @@ def get_transfer_index(
 
 
 def get_transfer_index_dynamic(
-    logits, temperature, remasking, mask_index, x, num_transfer_tokens, factor=1, alg_temp=None
+    logits,
+    temperature,
+    remasking,
+    mask_index,
+    x,
+    num_transfer_tokens,
+    factor=1,
+    alg_temp=None,
 ):
     assert alg_temp is not None
 
@@ -547,7 +579,9 @@ def get_transfer_index_dynamic(
         except (ValueError, RuntimeError):
             x0_p, x0 = p.max(dim=-1)
         except Exception as e:
-            warnings.warn(f"Unexpected exception {e} when sampling tokens, using argmax instead.")
+            warnings.warn(
+                f"Unexpected exception {e} when sampling tokens, using argmax instead."
+            )
             x0_p, x0 = p.max(dim=-1)
     else:
         x0_p, x0 = p.max(dim=-1)
@@ -586,7 +620,9 @@ def get_transfer_index_dynamic(
 
         # at least one token is transferred
         threshs[0] = -1
-        sorted_confidence = torch.sort(confidence[j][mask_index[j]], dim=-1, descending=True)[0]
+        sorted_confidence = torch.sort(
+            confidence[j][mask_index[j]], dim=-1, descending=True
+        )[0]
         assert len(sorted_confidence) == len(threshs)
         for top_i in range(len(threshs)):
             if sorted_confidence[top_i] < threshs[top_i]:

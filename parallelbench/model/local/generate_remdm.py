@@ -21,7 +21,10 @@ def get_num_transfer_tokens(mask_index, steps):
     remainder = mask_num % steps
 
     num_transfer_tokens = (
-        torch.zeros(mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64) + base
+        torch.zeros(
+            mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64
+        )
+        + base
     )
 
     for i in range(mask_num.size(0)):
@@ -61,7 +64,9 @@ def generate_remdm(
 
     input_length = prompt.shape[1]
 
-    xt = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(model.device)
+    xt = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
+        model.device
+    )
     xt[:, : prompt.shape[1]] = prompt.clone()
 
     if output0_ids is not None:
@@ -83,7 +88,9 @@ def generate_remdm(
 
     remask_thres = max(min(int(block_length * remask_thres_ratio), block_length - 1), 1)
     is_remasking_steps = [False] * steps_per_block
-    is_remasking_steps[remask_thres:remask_thres] = [True] * remdm_steps  # insert remasking steps
+    is_remasking_steps[remask_thres:remask_thres] = [
+        True
+    ] * remdm_steps  # insert remasking steps
 
     for num_block in range(num_blocks):
         conf_cache = torch.ones_like(xt, dtype=torch.float64) * np.inf
@@ -91,18 +98,21 @@ def generate_remdm(
         block_mask_index = (
             xt[
                 :,
-                prompt.shape[1]
-                + num_block * block_length: prompt.shape[1]
-                + (num_block + 1) * block_length
+                prompt.shape[1] + num_block * block_length : prompt.shape[1]
+                + (num_block + 1) * block_length,
             ]
             == mask_id
         )
-        num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps_per_block)[0].tolist()
+        num_transfer_tokens = get_num_transfer_tokens(
+            block_mask_index, steps_per_block
+        )[0].tolist()
 
         for i, is_remasking_step in enumerate(is_remasking_steps):
             if is_remasking_step:
                 remask_index = torch.zeros_like(xt, dtype=torch.bool, device=xt.device)
-                _, mask_indices = torch.topk(conf_cache, k=remdm_number, largest=False, dim=1)
+                _, mask_indices = torch.topk(
+                    conf_cache, k=remdm_number, largest=False, dim=1
+                )
                 remask_index[0, mask_indices] = True
                 conf_cache[remask_index] = np.inf
                 xt[remask_index] = mask_id
@@ -121,7 +131,9 @@ def generate_remdm(
             else:
                 p = F.softmax(logits.to(torch.float64) / temperature, dim=-1)
                 x0 = _sample_categorical(p)
-            x0_p = torch.squeeze(torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1)  # b, l
+            x0_p = torch.squeeze(
+                torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1
+            )  # b, l
 
             x0_p[:, prompt_len + (num_block + 1) * block_length :] = -np.inf
             x0 = torch.where(mask_index, x0, xt)

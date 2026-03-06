@@ -132,11 +132,11 @@ def test_dllm_to_generation_kwargs():
 
 def test_transformers_generation_config_no_crash():
     """TransformersGenerationConfig (inherits ARGenerationConfig) should not crash."""
-    from parallelbench.model.local.transformers_model import TransformersGenerationConfig
+    from parallelbench.model.local.transformers_model import (
+        TransformersGenerationConfig,
+    )
 
     config = TransformersGenerationConfig()
     assert config.max_tokens == 128
     kwargs = config.to_generate_kwargs()
     assert "max_new_tokens" in kwargs
-
-

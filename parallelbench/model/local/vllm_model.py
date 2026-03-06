@@ -13,7 +13,10 @@ class vllmGenerationConfig:
 
     def to_sampling_params(self):
         from vllm import SamplingParams
-        assert self.temperature == 0.0, "vllmGenerationConfig only supports temperature=0.0"
+
+        assert self.temperature == 0.0, (
+            "vllmGenerationConfig only supports temperature=0.0"
+        )
 
         return SamplingParams(
             best_of=1,
@@ -33,9 +36,13 @@ class vllmModel(BaseModel):
         from vllm import LLM
 
         # assert "Qwen3" not in model_name, "vllm does not support Qwen3 models without thinking"
-        assert chat_template_kwargs is None, "vllm does not support chat template kwargs"
+        assert chat_template_kwargs is None, (
+            "vllm does not support chat template kwargs"
+        )
 
-        self.model = LLM(model=model_name, dtype=torch.bfloat16, max_model_len=max_model_len)
+        self.model = LLM(
+            model=model_name, dtype=torch.bfloat16, max_model_len=max_model_len
+        )
 
     @measure_time_mem("generate")
     def generate(self, messages, gen_config=None, output_history=False):
@@ -50,5 +57,5 @@ class vllmModel(BaseModel):
             output_ids=None,
             pad_token_id=None,
             nfe=0,
-            history=None
+            history=None,
         )

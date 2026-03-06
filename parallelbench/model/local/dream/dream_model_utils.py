@@ -31,12 +31,14 @@ class DreamGenerationConfig(GenerationConfig):
         # diffusion specific params
         self.eps: float = kwargs.pop("eps", 1e-3)
         self.steps: int = kwargs.pop("steps", 512)
-        self.alg: str = kwargs.pop("alg", 'origin')
+        self.alg: str = kwargs.pop("alg", "origin")
         self.alg_temp: Optional[float] = kwargs.pop("alg_temp", None)
 
         # Parameters that define the output variables of `generate`
         self.num_return_sequences: int = kwargs.pop("num_return_sequences", 1)
-        self.return_dict_in_generate: bool = kwargs.pop("return_dict_in_generate", False)
+        self.return_dict_in_generate: bool = kwargs.pop(
+            "return_dict_in_generate", False
+        )
         self.output_history: bool = kwargs.pop("output_history", False)
 
         # Special tokens that can be used at generation time
@@ -85,6 +87,7 @@ def top_p_logits(logits, top_p=None):
     logits = logits.masked_fill(mask, torch.finfo(logits.dtype).min)
     return logits
 
+
 def top_k_logits(logits, top_k=None):
     top_k = min(top_k, logits.size(-1))  # Safety check
     # Remove all tokens with a probability less than the last token of the top-k
@@ -93,8 +96,14 @@ def top_k_logits(logits, top_k=None):
     return logits
 
 
-def sample_tokens(logits, temperature=0.0, top_p=None, top_k=None, margin_confidence=False, neg_entropy=False):
-
+def sample_tokens(
+    logits,
+    temperature=0.0,
+    top_p=None,
+    top_k=None,
+    margin_confidence=False,
+    neg_entropy=False,
+):
     if temperature > 0:
         logits = logits / temperature
     if top_p is not None and top_p < 1:
@@ -110,24 +119,26 @@ def sample_tokens(logits, temperature=0.0, top_p=None, top_k=None, margin_confid
         except (ValueError, RuntimeError):
             confidence, x0 = probs.max(dim=-1)
         except Exception as e:
-            warnings.warn(f"Unexpected exception {e} when sampling tokens, using argmax instead.")
+            warnings.warn(
+                f"Unexpected exception {e} when sampling tokens, using argmax instead."
+            )
             confidence, x0 = probs.max(dim=-1)
     else:
         confidence, x0 = probs.max(dim=-1)
-    
+
     if margin_confidence:
         sorted_probs, _ = torch.sort(probs, dim=-1, descending=True)
         # Extract top1 and top2 probabilities
-        top1_probs = sorted_probs[:, 0] 
-        top2_probs = sorted_probs[:, 1] 
+        top1_probs = sorted_probs[:, 0]
+        top2_probs = sorted_probs[:, 1]
         # Calculate confidence as top1 - top2
-        confidence = top1_probs - top2_probs 
-    
+        confidence = top1_probs - top2_probs
+
     if neg_entropy:
         epsilon = 1e-10
         log_probs = torch.log(probs + epsilon)
         confidence = torch.sum(probs * log_probs, dim=-1)
-    
+
     return confidence, x0
 
 
@@ -140,12 +151,18 @@ def sample_block(
     factor: Optional[float] = None,
     block_length: Optional[int] = 32,
     generation_tokens_hook_func: Optional[callable] = None,
-    generation_logits_hook_func: Optional[callable] = None
+    generation_logits_hook_func: Optional[callable] = None,
 ) -> Union[DreamModelOutput, torch.LongTensor]:
     # init values
-    assert not (threshold is not None and factor is not None), "threshold and factor cannot be both set"
-    assert generation_tokens_hook_func is None or generation_tokens_hook_func(0, 0, 0) == 0, "generation_tokens_hook_func is not supported in block generation"
-    assert generation_logits_hook_func is None or generation_logits_hook_func(0, 0, 0) == 0, "generation_logits_hook_func is not supported in block generation"
+    assert not (threshold is not None and factor is not None), (
+        "threshold and factor cannot be both set"
+    )
+    assert (
+        generation_tokens_hook_func is None or generation_tokens_hook_func(0, 0, 0) == 0
+    ), "generation_tokens_hook_func is not supported in block generation"
+    assert (
+        generation_logits_hook_func is None or generation_logits_hook_func(0, 0, 0) == 0
+    ), "generation_logits_hook_func is not supported in block generation"
 
     output_history = generation_config.output_history
     return_dict_in_generate = generation_config.return_dict_in_generate
@@ -168,20 +185,28 @@ def sample_block(
     if block_length is None:
         block_length = gen_length  # Default: single block (original behavior)
 
-    assert gen_length % block_length == 0, f"gen_length ({gen_length}) must be divisible by block_length ({block_length})"
+    assert gen_length % block_length == 0, (
+        f"gen_length ({gen_length}) must be divisible by block_length ({block_length})"
+    )
     num_blocks = gen_length // block_length
 
     if steps is not None:
-        assert steps % num_blocks == 0, f"steps ({steps}) must be divisible by num_blocks ({num_blocks})"
+        assert steps % num_blocks == 0, (
+            f"steps ({steps}) must be divisible by num_blocks ({num_blocks})"
+        )
         steps_per_block = steps // num_blocks
-        timesteps = torch.linspace(1, generation_config.eps, steps_per_block + 1, device=x.device)
+        timesteps = torch.linspace(
+            1, generation_config.eps, steps_per_block + 1, device=x.device
+        )
     else:
         steps_per_block = None
         timesteps = None
 
     if attention_mask is not None and torch.any(attention_mask == 0.0):
         # we do not mask the [MASK] tokens so value = 1.0
-        attention_mask = F.pad(attention_mask, (0, max_length - attention_mask.shape[1]), value=1.0)
+        attention_mask = F.pad(
+            attention_mask, (0, max_length - attention_mask.shape[1]), value=1.0
+        )
         tok_idx = attention_mask.long().cumsum(-1) - 1
         tok_idx.masked_fill_(attention_mask == 0, 1)
         # attention_mask is of shape [B, N]
@@ -195,9 +220,9 @@ def sample_block(
         attention_mask = "full"
 
     if alg == "low_confidence_threshold":
-        assert (
-            threshold is not None
-        ), "threshold must be provided for low_confidence_threshold algorithm"
+        assert threshold is not None, (
+            "threshold must be provided for low_confidence_threshold algorithm"
+        )
         alg = "low_confidence"
     else:
         pass
@@ -205,30 +230,45 @@ def sample_block(
 
     # Process each block
     for num_block in range(num_blocks):
-
         current_block_start = input_ids.shape[1] + num_block * block_length
         current_block_end = current_block_start + block_length
 
         i = 0
         while True:
-            mask_index = torch.full((1, x.shape[1]), False, dtype=torch.bool, device=x.device)
-            mask_index[:, current_block_start:current_block_end] = (x[:, current_block_start:current_block_end] == mask_token_id)
+            mask_index = torch.full(
+                (1, x.shape[1]), False, dtype=torch.bool, device=x.device
+            )
+            mask_index[:, current_block_start:current_block_end] = (
+                x[:, current_block_start:current_block_end] == mask_token_id
+            )
 
             model_output = self(x, attention_mask, tok_idx)
 
             logits = model_output.logits
-            logits = torch.cat([logits[:,:1], logits[:, :-1]], dim=1)
+            logits = torch.cat([logits[:, :1], logits[:, :-1]], dim=1)
 
             mask_index[:, current_block_end:] = False
-            if alg == 'origin':
+            if alg == "origin":
                 t = timesteps[i]
                 s = timesteps[i + 1]
                 mask_logits = logits[mask_index]
 
                 p_transfer = 1 - s / t if i < steps_per_block - 1 else 1
-                x0 = torch.zeros_like(x[mask_index], device=self.device, dtype=torch.long) + mask_token_id
-                transfer_index_t_s = torch.rand(*x0.shape, device=self.device) < p_transfer
-                _, x0[transfer_index_t_s]= sample_tokens(mask_logits[transfer_index_t_s], temperature=temperature, top_p=top_p, top_k=top_k)
+                x0 = (
+                    torch.zeros_like(
+                        x[mask_index], device=self.device, dtype=torch.long
+                    )
+                    + mask_token_id
+                )
+                transfer_index_t_s = (
+                    torch.rand(*x0.shape, device=self.device) < p_transfer
+                )
+                _, x0[transfer_index_t_s] = sample_tokens(
+                    mask_logits[transfer_index_t_s],
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                )
                 x[mask_index] = x0.clone()
 
                 i += 1
@@ -236,56 +276,92 @@ def sample_block(
                 mask_logits = logits[mask_index]
 
                 if alg == "low_confidence":
-                    confidence, x0 = sample_tokens(mask_logits, temperature=temperature, top_p=top_p, top_k=top_k)
-                elif alg == 'topk_margin':
-                    confidence, x0 = sample_tokens(mask_logits, temperature=temperature, top_p=top_p, top_k=top_k, margin_confidence=True)
-                elif alg == 'entropy':
-                    confidence, x0 = sample_tokens(mask_logits, temperature, top_p=top_p, top_k=top_k, neg_entropy=True)
-                elif alg == 'random':
-                    confidence, x0 = sample_tokens(mask_logits, temperature, top_p=top_p, top_k=top_k)
+                    confidence, x0 = sample_tokens(
+                        mask_logits, temperature=temperature, top_p=top_p, top_k=top_k
+                    )
+                elif alg == "topk_margin":
+                    confidence, x0 = sample_tokens(
+                        mask_logits,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
+                        margin_confidence=True,
+                    )
+                elif alg == "entropy":
+                    confidence, x0 = sample_tokens(
+                        mask_logits,
+                        temperature,
+                        top_p=top_p,
+                        top_k=top_k,
+                        neg_entropy=True,
+                    )
+                elif alg == "random":
+                    confidence, x0 = sample_tokens(
+                        mask_logits, temperature, top_p=top_p, top_k=top_k
+                    )
                     confidence = torch.rand_like(confidence)
                 else:
                     raise RuntimeError(f"Unknown alg: {alg}")
 
-                full_confidence = torch.full_like(x, -torch.inf, device=self.device, dtype=logits.dtype)
+                full_confidence = torch.full_like(
+                    x, -torch.inf, device=self.device, dtype=logits.dtype
+                )
                 full_confidence[mask_index] = confidence
                 full_confidence[:, current_block_end:] = -torch.inf
 
                 if factor is not None:
-                    x_ = torch.zeros_like(x, device=self.device, dtype=torch.long) + mask_token_id
+                    x_ = (
+                        torch.zeros_like(x, device=self.device, dtype=torch.long)
+                        + mask_token_id
+                    )
                     x_[mask_index] = x0.clone()
 
-                    current_transfer_tokens = (x[:, current_block_start:current_block_end] == mask_token_id).sum(1)
-                    transfer_index = torch.zeros_like(x_, device=x.device, dtype=torch.bool)
+                    current_transfer_tokens = (
+                        x[:, current_block_start:current_block_end] == mask_token_id
+                    ).sum(1)
+                    transfer_index = torch.zeros_like(
+                        x_, device=x.device, dtype=torch.bool
+                    )
 
                     for j in range(full_confidence.shape[0]):
-                        ns=list(range(1,current_transfer_tokens[j]+1))
-                        es=[factor/(n+1) for n in ns]
-                        threshs=[1-e for e in es]
+                        ns = list(range(1, current_transfer_tokens[j] + 1))
+                        es = [factor / (n + 1) for n in ns]
+                        threshs = [1 - e for e in es]
 
                         # at least one token is transferred
-                        threshs[0]=-1
-                        sorted_confidence=torch.sort(full_confidence[j][mask_index[j]],dim=-1,descending=True)[0]
-                        assert len(sorted_confidence)==len(threshs)
+                        threshs[0] = -1
+                        sorted_confidence = torch.sort(
+                            full_confidence[j][mask_index[j]], dim=-1, descending=True
+                        )[0]
+                        assert len(sorted_confidence) == len(threshs)
                         for top_i in range(len(threshs)):
-                            if sorted_confidence[top_i]<threshs[top_i]:
+                            if sorted_confidence[top_i] < threshs[top_i]:
                                 break
 
-                        if top_i == 0 or top_i == len(threshs)-1:
-                            top_i+=1
+                        if top_i == 0 or top_i == len(threshs) - 1:
+                            top_i += 1
 
                         _, select_index = torch.topk(full_confidence[j], k=top_i)
                         transfer_index[j, select_index] = True
 
                     x[transfer_index] = x_[transfer_index]
                 elif threshold is not None:
-                    x_ = torch.zeros_like(x, device=self.device, dtype=torch.long) + mask_token_id
+                    x_ = (
+                        torch.zeros_like(x, device=self.device, dtype=torch.long)
+                        + mask_token_id
+                    )
                     x_[mask_index] = x0.clone()
 
-                    current_transfer_tokens = (x[:, current_block_start:current_block_end] == mask_token_id).sum()
-                    transfer_index = torch.zeros_like(x_, device=x.device, dtype=torch.bool)
+                    current_transfer_tokens = (
+                        x[:, current_block_start:current_block_end] == mask_token_id
+                    ).sum()
+                    transfer_index = torch.zeros_like(
+                        x_, device=x.device, dtype=torch.bool
+                    )
 
-                    selected_confidence, select_index = torch.topk(full_confidence, current_transfer_tokens)
+                    selected_confidence, select_index = torch.topk(
+                        full_confidence, current_transfer_tokens
+                    )
 
                     select_index = select_index.to(x.device)
                     transfer_index[0, select_index[0]] = True
@@ -299,27 +375,44 @@ def sample_block(
 
                     t = timesteps[i]
                     s = timesteps[i + 1]
-                    number_transfer_tokens = int(num_mask_token * (1 - s / t)) if i < steps_per_block - 1 else int(num_mask_token)
+                    number_transfer_tokens = (
+                        int(num_mask_token * (1 - s / t))
+                        if i < steps_per_block - 1
+                        else int(num_mask_token)
+                    )
 
                     if number_transfer_tokens > 0:
                         if alg_temp is None or alg_temp == 0:
-                            _, transfer_index = torch.topk(full_confidence, number_transfer_tokens)
+                            _, transfer_index = torch.topk(
+                                full_confidence, number_transfer_tokens
+                            )
                         else:
                             full_confidence = full_confidence / alg_temp
                             full_confidence = F.softmax(full_confidence, dim=-1)
-                            transfer_index = torch.multinomial(full_confidence, num_samples=number_transfer_tokens)
+                            transfer_index = torch.multinomial(
+                                full_confidence, num_samples=number_transfer_tokens
+                            )
 
-                        x_ = torch.zeros_like(x, device=self.device, dtype=torch.long) + mask_token_id
+                        x_ = (
+                            torch.zeros_like(x, device=self.device, dtype=torch.long)
+                            + mask_token_id
+                        )
                         x_[mask_index] = x0.clone()
-                        row_indices = torch.arange(x.size(0), device=self.device).unsqueeze(1).expand_as(transfer_index)
+                        row_indices = (
+                            torch.arange(x.size(0), device=self.device)
+                            .unsqueeze(1)
+                            .expand_as(transfer_index)
+                        )
 
-                        x[row_indices,transfer_index] = x_[row_indices,transfer_index]
+                        x[row_indices, transfer_index] = x_[row_indices, transfer_index]
                     i += 1
 
             if histories is not None:
                 histories.append(x.clone())
 
-            if (x[:, current_block_start:current_block_end] == mask_token_id).sum() == 0:
+            if (
+                x[:, current_block_start:current_block_end] == mask_token_id
+            ).sum() == 0:
                 break
 
     if return_dict_in_generate:

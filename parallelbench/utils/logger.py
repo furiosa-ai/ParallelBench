@@ -12,7 +12,7 @@ class Logger:
 
     def log_table(self, table_name, df):
         raise NotImplementedError
-    
+
     def finish(self):
         raise NotImplementedError
 
@@ -29,15 +29,30 @@ class WandbLogger(Logger):
             api = wandb.Api()
             runs = list(api.runs(project, {"config.cfg_file": cfg_file}))
             if len(runs) > 0:
-                raise FileExistsError(f"Found {len(runs)} runs with cfg_file {cfg_file}")
+                raise FileExistsError(
+                    f"Found {len(runs)} runs with cfg_file {cfg_file}"
+                )
 
         if resume:
             api = wandb.Api()
             runs = list(api.runs(project, {"config.cfg_file": cfg_file}))
             assert len(runs) == 1, f"Found {len(runs)} runs with cfg_file {cfg_file}"
-            wandb.init(project=project, entity=entity, id=runs[0].id, resume="must", config=config, settings=wandb.Settings(init_timeout=1200))
+            wandb.init(
+                project=project,
+                entity=entity,
+                id=runs[0].id,
+                resume="must",
+                config=config,
+                settings=wandb.Settings(init_timeout=1200),
+            )
         else:
-            wandb.init(project=project, entity=entity, name=name, config=config, settings=wandb.Settings(init_timeout=1200))
+            wandb.init(
+                project=project,
+                entity=entity,
+                name=name,
+                config=config,
+                settings=wandb.Settings(init_timeout=1200),
+            )
 
     def log_table(self, table_name, df):
         df = df.copy()
@@ -59,8 +74,6 @@ class WandbLogger(Logger):
         wandb.finish()
 
 
-
-
 class ClearMLLogger(Logger):
     def __init__(self, project, entity, name, config, resume=False, exist_ok=True):
         super().__init__()
@@ -70,22 +83,36 @@ class ClearMLLogger(Logger):
         self.step = -1
 
         from clearml import Task
+
         if not exist_ok:
             assert False
-            
+
             api = Task.get_api()
-            runs = api.get_tasks(project_name=project, filters={"config.cfg_file": cfg_file})
+            runs = api.get_tasks(
+                project_name=project, filters={"config.cfg_file": cfg_file}
+            )
             if len(runs) > 0:
-                raise FileExistsError(f"Found {len(runs)} runs with cfg_file {cfg_file}")
-            
+                raise FileExistsError(
+                    f"Found {len(runs)} runs with cfg_file {cfg_file}"
+                )
+
         if resume:
             assert False
-            runs = Task.get_tasks(project_name=project, filters={"config.cfg_file": cfg_file})
+            runs = Task.get_tasks(
+                project_name=project, filters={"config.cfg_file": cfg_file}
+            )
             assert len(runs) == 1, f"Found {len(runs)} runs with cfg_file {cfg_file}"
-            Task.resume(task_id=runs[0].id, project_name=project, task_name=name, config=config)
+            Task.resume(
+                task_id=runs[0].id, project_name=project, task_name=name, config=config
+            )
 
         else:
-            Task.init(project_name=project, task_name=name, config=config, auto_connect_frameworks=False)
+            Task.init(
+                project_name=project,
+                task_name=name,
+                config=config,
+                auto_connect_frameworks=False,
+            )
 
     def log_table(self, table_name, df):
         table = wandb.Table(dataframe=df)
@@ -120,7 +147,9 @@ class NoLogger(Logger):
 
 def create_logger(logger_type, cfg, resume=False, run_prefix=None, **kwargs):
     # run_name = cfg["cfg_file"].split("/", 2)[-1].replace("/", "_").replace(".yaml", "")
-    run_name = cfg["cfg_file"].replace("cfg/", "").replace("temp/", "").replace(".yaml", "")
+    run_name = (
+        cfg["cfg_file"].replace("cfg/", "").replace("temp/", "").replace(".yaml", "")
+    )
 
     if run_prefix is not None:
         run_name = f"{run_prefix}/{run_name}"
@@ -131,5 +160,12 @@ def create_logger(logger_type, cfg, resume=False, run_prefix=None, **kwargs):
         "none": NoLogger,
     }[logger_type]
 
-    logger = logger_class(project=WANDB_PROJECT, entity=WANDB_ENTITY, name=run_name, config=cfg, resume=resume, **kwargs)
+    logger = logger_class(
+        project=WANDB_PROJECT,
+        entity=WANDB_ENTITY,
+        name=run_name,
+        config=cfg,
+        resume=resume,
+        **kwargs,
+    )
     return logger

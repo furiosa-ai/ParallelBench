@@ -1,6 +1,8 @@
 from parallelbench.model.base_model import ApiModel, BaseModel, LocalModel
+
 # Local models
 from parallelbench.model.local import DreamModel, LladaModel, TradoModel, SeddModel
+
 # API models
 from parallelbench.model.api import AnthropicModel, MercuryModel
 from parallelbench.model.registry import ModelRegistry
