@@ -169,4 +169,6 @@ class ParallelBenchTask(ConfigurableTask):
 
 def _mean_percentage(items: list[float], key: str = "") -> float:
     """Compute mean and scale to percentage."""
+    if not items:
+        return 0.0
     return sum(items) / len(items) * 100.0

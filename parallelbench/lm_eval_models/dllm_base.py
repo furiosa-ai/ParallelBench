@@ -198,8 +198,9 @@ class DLLMBase(LM):
         if isinstance(until, str):
             until = [until]
 
+        min_idx = len(text)
         for stop_seq in until:
             idx = text.find(stop_seq)
             if idx != -1:
-                text = text[:idx]
-        return text
+                min_idx = min(min_idx, idx)
+        return text[:min_idx]

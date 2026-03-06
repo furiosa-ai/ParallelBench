@@ -461,7 +461,10 @@ def startwith_score(prediction, ground_truth) -> dict[str, float]:
 
 def regex_match_score(prediction, ground_truth) -> dict[str, float]:
     pattern = ground_truth["pattern"]
-    score = bool(re.fullmatch(pattern, prediction.strip()))
+    try:
+        score = bool(re.fullmatch(pattern, prediction.strip()))
+    except re.error:
+        score = False
 
     return {"score": float(score)}
 

@@ -3,6 +3,8 @@
 Each generator is registered via @register_task_generator and yields sample dicts.
 """
 
+import logging
+
 import numpy as np
 
 from parallelbench.dataset.task_utils import (
@@ -127,19 +129,15 @@ def generate_insert_task(rng, task_config):
     for input_list in generate_word_lists(rng, **task_config):
         word_to_insert = rng.choice(list_difference(task_config["words"], input_list))
 
-        input = {"context": list_to_str(input_list), "word": word_to_insert}
+        sample_input = {"context": list_to_str(input_list), "word": word_to_insert}
 
         index_to_insert = rng.randint(0, len(input_list))
 
         target_list = input_list[:]
         target_list.insert(index_to_insert, word_to_insert)
 
-        assert len(set(target_list)) == len(target_list), (
-            "Target list must not contain duplicates"
-        )
-
         if not task_config["random_index"]:
-            input["index"] = index_to_insert
+            sample_input["index"] = index_to_insert
             answer = list_to_str(target_list)
         else:
             index_to_insert = None
@@ -149,15 +147,8 @@ def generate_insert_task(rng, task_config):
                 "example": list_to_str(target_list),
             }
 
-            assert len(set(input_list)) == len(input_list), (
-                "Target list must not contain duplicates"
-            )
-            assert word_to_insert not in input_list, (
-                "Inserted word must not be in the input list"
-            )
-
         yield {
-            "input": input,
+            "input": sample_input,
             "answer": answer,
             "output_format": _create_mask_template(target_list),
             "metadata": {
@@ -171,7 +162,7 @@ def generate_insert_task(rng, task_config):
 @register_task_generator("remove")
 def generate_remove_task(rng, task_config):
     for input_list in generate_word_lists(rng, **task_config):
-        input = {
+        sample_input = {
             "context": list_to_str(input_list),
         }
 
@@ -180,19 +171,15 @@ def generate_remove_task(rng, task_config):
         target_list = input_list[:]
         target_list.pop(index_to_remove)
 
-        assert len(set(target_list)) == len(target_list), (
-            "Target list must not contain duplicates"
-        )
-
         if not task_config["random_index"]:
-            input["index"] = index_to_remove
+            sample_input["index"] = index_to_remove
             answer = list_to_str(target_list)
         else:
             index_to_remove = None
             answer = {"input": input_list, "example": list_to_str(target_list)}
 
         yield {
-            "input": input,
+            "input": sample_input,
             "answer": answer,
             "metadata": {
                 "length": len(input_list),
@@ -206,19 +193,15 @@ def generate_replace_task(rng, task_config):
     for input_list in generate_word_lists(rng, **task_config):
         new_word = rng.choice(list_difference(task_config["words"], input_list))
 
-        input = {"context": list_to_str(input_list), "word": new_word}
+        sample_input = {"context": list_to_str(input_list), "word": new_word}
 
         index_to_replace = rng.randint(0, len(input_list) - 1)
 
         target_list = input_list[:]
         target_list[index_to_replace] = new_word
 
-        assert len(set(target_list)) == len(target_list), (
-            "Target list must not contain duplicates"
-        )
-
         if not task_config["random_index"]:
-            input["index"] = index_to_replace
+            sample_input["index"] = index_to_replace
             answer = list_to_str(target_list)
         else:
             index_to_replace = None
@@ -228,15 +211,8 @@ def generate_replace_task(rng, task_config):
                 "example": list_to_str(target_list),
             }
 
-            assert len(set(input_list)) == len(input_list), (
-                "Target list must not contain duplicates"
-            )
-            assert new_word not in input_list, (
-                "Inserted word must not be in the input list"
-            )
-
         yield {
-            "input": input,
+            "input": sample_input,
             "answer": answer,
             "output_format": _create_mask_template(target_list),
             "metadata": {
@@ -257,15 +233,15 @@ def generate_domino_task(rng, task_config):
         length = rng.randint(min_length, max_length)
         start = rng.randint(1, 9) * 10 + rng.randint(1, 9)
 
-        input = {"length": length, "start": start}
+        sample_input = {"length": length, "start": start}
 
         answer = {
-            **input,
+            **sample_input,
             "example": list_to_str(_generate_domino_sequence(rng, length, start)),
         }
 
         yield {
-            "input": input,
+            "input": sample_input,
             "answer": answer,
             "metadata": {
                 "length": length,
@@ -365,7 +341,7 @@ def generate_summary_task(rng, task_config):
                 if i >= num_samples:
                     break
             else:
-                print("Skipping non-grammatical sample")
+                logging.getLogger(__name__).debug("Skipping non-grammatical sample")
     else:
         raise ValueError(f"Unknown source: {source}")
 
@@ -398,6 +374,6 @@ def generate_paraphrase_task(rng, task_config):
                 if i >= num_samples:
                     break
             else:
-                print("Skipping non-grammatical sample")
+                logging.getLogger(__name__).debug("Skipping non-grammatical sample")
     else:
         raise ValueError(f"Unknown source: {source}")

@@ -33,7 +33,11 @@ class GenerationMetadata:
 
 
 class MetadataStore:
-    """Thread-safe global singleton for buffering generation metadata.
+    """Global singleton for buffering generation metadata.
+
+    Thread-safety: singleton creation uses double-checked locking. The append/pop
+    operations are guarded by an instance-level lock to prevent race conditions
+    (e.g., check-then-pop on an empty buffer).
 
     Usage in model wrapper:
         MetadataStore.instance().append(GenerationMetadata(nfe=42, ...))
@@ -47,6 +51,7 @@ class MetadataStore:
 
     def __init__(self) -> None:
         self._buffer: deque[GenerationMetadata] = deque()
+        self._buffer_lock = threading.Lock()
 
     @classmethod
     def instance(cls) -> MetadataStore:
@@ -63,13 +68,15 @@ class MetadataStore:
             cls._instance = None
 
     def append(self, metadata: GenerationMetadata) -> None:
-        self._buffer.append(metadata)
+        with self._buffer_lock:
+            self._buffer.append(metadata)
 
     def pop(self) -> GenerationMetadata:
         """Pop the oldest metadata entry. Returns empty metadata if buffer is empty."""
-        if self._buffer:
-            return self._buffer.popleft()
-        return GenerationMetadata()
+        with self._buffer_lock:
+            if self._buffer:
+                return self._buffer.popleft()
+            return GenerationMetadata()
 
     def __len__(self) -> int:
         return len(self._buffer)

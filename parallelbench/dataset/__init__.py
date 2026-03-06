@@ -78,13 +78,16 @@ class ParallelBench:
             messages_icl = [item for sublist in messages_icl for item in sublist]
             messages = messages_icl + messages
 
-        input = dict(messages=messages)
+        sample_input = dict(messages=messages)
 
         if self.infill:
-            input["output_prefix"] = sample["output_format"]
+            sample_input["output_prefix"] = sample["output_format"]
 
         return dict(
-            input=input, label=sample["answer"], index=idx, metadata=sample["metadata"]
+            input=sample_input,
+            label=sample["answer"],
+            index=idx,
+            metadata=sample["metadata"],
         )
 
     def compute_metrics(

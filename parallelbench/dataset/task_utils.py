@@ -190,9 +190,7 @@ def _get_task_file(split, task_name):
 
 def str_to_seed(seed_str, offset=0):
     seed = int(hashlib.sha256(seed_str.encode()).hexdigest(), 16) + offset
-    return seed % (
-        2**16 - 1
-    )  # Ensure seed is within the range of a 32-bit unsigned integer
+    return seed % (2**16 - 1)  # Ensure seed is within a 16-bit range
 
 
 def list_difference(list1, list2):

@@ -129,9 +129,8 @@ def create_parallel_bench_task_random(rng, task):
 def create_parallel_bench_task_random_samples_per_length(rng, task):
     samples_per_length = task["samples_per_length"]
     num_samples = task["num_samples"]
-    assert num_samples % samples_per_length == 0, (
-        "num_samples must be divisible by samples_per_length"
-    )
+    if num_samples % samples_per_length != 0:
+        raise ValueError("num_samples must be divisible by samples_per_length")
     num_buckets = num_samples // samples_per_length
 
     bucket_values = None
@@ -210,7 +209,11 @@ def create_parallel_bench_task_random_samples_per_length(rng, task):
                 "Please check task config (length buckets may be unreachable)."
             )
 
-    assert finished
+    if not finished:
+        raise RuntimeError(
+            f"Task generation did not finish for task={task['name']}. "
+            "Check task config for unreachable constraints."
+        )
     if target_counts is not None:
         lengths = sorted(target_counts.keys())
         data = sum(
@@ -219,13 +222,18 @@ def create_parallel_bench_task_random_samples_per_length(rng, task):
     else:
         lengths = sorted(data_per_length.keys())
         data = sum([data_per_length[length] for length in lengths], [])
-    assert len(data) == num_samples, f"Expected {num_samples} samples, got {len(data)}"
+    if len(data) != num_samples:
+        raise RuntimeError(f"Expected {num_samples} samples, got {len(data)}")
 
     return data
 
 
 def _create_task(rng, task):
-    print(f"Creating task {task['name']} with seed {task['seed']}...")
+    import logging
+
+    logging.getLogger(__name__).info(
+        f"Creating task {task['name']} with seed {task['seed']}..."
+    )
     if task.get("samples_per_length", 0) > 0:
         data = create_parallel_bench_task_random_samples_per_length(rng, task)
     else:
@@ -302,7 +310,9 @@ def main(task, **kwargs):
             tasks = list(load_task_configs(t).values())
             loaded_tasks.extend(list(zip([split] * len(tasks), tasks)))
         else:
-            assert False
+            raise ValueError(
+                f"Unsupported task format: '{t}'. Expected format: '<split>/all'"
+            )
 
     for split, t in loaded_tasks:
         create_parallel_bench_task(split=split, task=t, **kwargs)

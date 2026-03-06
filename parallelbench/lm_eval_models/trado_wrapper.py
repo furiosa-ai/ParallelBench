@@ -8,8 +8,7 @@ from lm_eval.api.registry import register_model
 
 from parallelbench.model.base_model import BaseModel
 
-# FIXME: Consider using ModelRegistry.get_model_class() instead of direct import
-#  to reduce coupling between lm_eval_models/ and model/ internals.
+# NOTE: Uses direct import for explicit model class selection.
 from parallelbench.model.local.trado.trado_model import TradoModel
 from parallelbench.lm_eval_models.dllm_base import DLLMBase
 
