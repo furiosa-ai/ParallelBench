@@ -176,8 +176,8 @@ def load_task_configs(task_config_file):
     tasks = {f"{task_config_file.stem}/{k}": v for k, v in tasks.items()}
     tasks = {
         task_name: {
-            **cfg,
             **merge_global_config(global_config, task_name),
+            **cfg,
             "name": task_name,
         }
         for task_name, cfg in tasks.items()

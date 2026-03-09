@@ -16,23 +16,20 @@ tasks:
     lengths: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     prompt: "Paraphrase the following sentence. Only output the final result.\n\nSentence: {text}\n\nParaphrase:"
   words_to_sentence_easy:
-    type: words_to_sentence
+    type: prebuilt
+    source: test/text_writing/words_to_sentence_easy.jsonl
+    samples_per_length: 0
     metric: sentence_to_words_score
-    words: common_words.yaml
-    min_length: 3
-    max_length: 5
-    prompt: "Write a grammatically correct English sentence using all of the following words: {words}. Only output the final result."
+    prompt: "Construct a single, coherent sentence using the words {words}."
   words_to_sentence_medium:
-    type: words_to_sentence
+    type: prebuilt
+    source: test/text_writing/words_to_sentence_medium.jsonl
+    samples_per_length: 0
     metric: sentence_to_words_score
-    words: common_words.yaml
-    min_length: 5
-    max_length: 8
-    prompt: "Write a grammatically correct English sentence using all of the following words: {words}. Only output the final result."
+    prompt: "Construct a single, coherent sentence using the words {words}."
   words_to_sentence_hard:
-    type: words_to_sentence
+    type: prebuilt
+    source: test/text_writing/words_to_sentence_hard.jsonl
+    samples_per_length: 0
     metric: sentence_to_words_score
-    words: common_words.yaml
-    min_length: 8
-    max_length: 12
-    prompt: "Write a grammatically correct English sentence using all of the following words: {words}. Only output the final result."
+    prompt: "Construct a single, coherent sentence using the words {words}."

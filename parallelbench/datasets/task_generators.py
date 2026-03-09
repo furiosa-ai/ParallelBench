@@ -425,3 +425,19 @@ def generate_words_to_sentence_task(rng, task_config):
                 "length": len(selected_words),
             },
         }
+
+
+@register_task_generator("prebuilt")
+def load_prebuilt_task(rng, task_config):
+    """Load pre-generated task data from a JSONL file."""
+    import json
+    from pathlib import Path
+
+    source = task_config["source"]
+    source_path = Path(__file__).parent / "data" / "output" / source
+    if not source_path.exists():
+        raise FileNotFoundError(f"Prebuilt data not found: {source_path}")
+
+    with open(source_path) as f:
+        for line in f:
+            yield json.loads(line)
