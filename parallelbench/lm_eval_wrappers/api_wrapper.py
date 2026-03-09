@@ -1,39 +1,34 @@
-"""lm-eval wrapper for autoregressive models (Transformers/vLLM backends)."""
+"""lm-eval wrapper for API-based models (Anthropic, Mercury, etc.)."""
 
 from __future__ import annotations
 
 from lm_eval.api.instance import Instance
 from lm_eval.api.registry import register_model
 
+from parallelbench.models import load_model
 from parallelbench.models.base_model import BaseModel, DLLMOutput
-
-# NOTE: Uses direct imports instead of ModelRegistry dispatch for explicit backend selection.
-# See https://github.com/<owner>/ParallelBench/issues/XX for potential refactor.
-from parallelbench.models.local.transformers_model import TransformersModel
-from parallelbench.models.local.vllm_model import vllmModel
-from parallelbench.lm_eval_models.dllm_base import DLLMBase
-from parallelbench.lm_eval_models.metadata_store import (
+from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
+from parallelbench.lm_eval_wrappers.metadata_store import (
     GenerationMetadata,
     MetadataStore,
 )
 
 
-@register_model("parallelbench_ar")
-class ARWrapper(DLLMBase):
-    """lm-eval wrapper for autoregressive models.
+@register_model("parallelbench_api")
+class ApiWrapper(DLLMBase):
+    """lm-eval wrapper for API-based models.
 
-    model_args:
-        backend: str  - "transformers" or "vllm" (default: "transformers")
+    Uses model/registry.py dispatch to load the correct API model
+    (AnthropicModel, MercuryModel, etc.) by name.
     """
 
     def __init__(
         self,
         model_path: str,
-        backend: str = "transformers",
         **kwargs,
     ) -> None:
-        self._backend = backend
-        # AR models don't use dLLM-specific params
+        # API models don't use dLLM-specific params
+        kwargs.pop("accel_framework", None)
         kwargs.pop("remasking", None)
         kwargs.pop("steps", None)
         kwargs.pop("block_length", None)
@@ -44,9 +39,7 @@ class ARWrapper(DLLMBase):
         super().__init__(model_path=model_path, output_history=False, **kwargs)
 
     def _create_inner_model(self) -> BaseModel:
-        if self._backend == "vllm":
-            return vllmModel(model_name=self.model_path)
-        return TransformersModel(model_name=self.model_path)
+        return load_model(model_name=self.model_path)
 
     def _build_generation_config(self) -> dict:
         return {
@@ -55,7 +48,6 @@ class ARWrapper(DLLMBase):
         }
 
     def generate_until(self, requests: list[Instance]) -> list[str]:
-        """AR models generate without history tracking."""
         results: list[str] = []
         store = MetadataStore.instance()
 
@@ -67,7 +59,6 @@ class ARWrapper(DLLMBase):
             dllm_output: DLLMOutput = self._inner_model.generate(
                 messages=messages,
                 gen_config=gen_config,
-                output_history=False,
             )
 
             store.append(

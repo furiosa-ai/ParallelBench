@@ -14,7 +14,7 @@ from lm_eval.api.task import ConfigurableTask
 
 from parallelbench.datasets import ParallelBench
 from parallelbench.datasets.metrics import Metric
-from parallelbench.lm_eval_models.metadata_store import MetadataStore
+from parallelbench.lm_eval_wrappers.metadata_store import MetadataStore
 from parallelbench.tasks.utils import (
     METADATA_METRIC_KEYS,
     compute_sample_metrics,

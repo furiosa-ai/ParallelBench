@@ -45,12 +45,12 @@ flash-attn = [
 ]
 
 [project.entry-points."lm_eval.models"]
-parallelbench_llada = "parallelbench.lm_eval_models.llada_wrapper:LLaDAWrapper"
-parallelbench_dream = "parallelbench.lm_eval_models.dream_wrapper:DreamWrapper"
-parallelbench_sedd = "parallelbench.lm_eval_models.sedd_wrapper:SEDDWrapper"
-parallelbench_trado = "parallelbench.lm_eval_models.trado_wrapper:TradoWrapper"
-parallelbench_ar = "parallelbench.lm_eval_models.ar_wrapper:ARWrapper"
-parallelbench_api = "parallelbench.lm_eval_models.api_wrapper:ApiWrapper"
+parallelbench_llada = "parallelbench.lm_eval_wrappers.llada_wrapper:LLaDAWrapper"
+parallelbench_dream = "parallelbench.lm_eval_wrappers.dream_wrapper:DreamWrapper"
+parallelbench_sedd = "parallelbench.lm_eval_wrappers.sedd_wrapper:SEDDWrapper"
+parallelbench_trado = "parallelbench.lm_eval_wrappers.trado_wrapper:TradoWrapper"
+parallelbench_ar = "parallelbench.lm_eval_wrappers.ar_wrapper:ARWrapper"
+parallelbench_api = "parallelbench.lm_eval_wrappers.api_wrapper:ApiWrapper"
 
 [project.scripts]
 pb = "parallelbench.cli:main"

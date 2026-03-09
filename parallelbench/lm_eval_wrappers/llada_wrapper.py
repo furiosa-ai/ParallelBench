@@ -10,7 +10,7 @@ from parallelbench.models.base_model import BaseModel
 
 # NOTE: Uses direct import for explicit model class selection.
 from parallelbench.models.local.llada.llada_model import LladaModel
-from parallelbench.lm_eval_models.dllm_base import DLLMBase
+from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
 
 @register_model("parallelbench_llada")

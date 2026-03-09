@@ -17,7 +17,7 @@ from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 
 from parallelbench.models.base_model import BaseModel, DLLMOutput
-from parallelbench.lm_eval_models.metadata_store import (
+from parallelbench.lm_eval_wrappers.metadata_store import (
     GenerationMetadata,
     MetadataStore,
 )

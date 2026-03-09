@@ -1,4 +1,4 @@
-"""lm-eval wrapper for TraDo (Transformer Diffusion) models."""
+"""lm-eval wrapper for DREAM (Diffusion Reasoning with Entropy-Aware Masking) models."""
 
 from __future__ import annotations
 
@@ -9,15 +9,16 @@ from lm_eval.api.registry import register_model
 from parallelbench.models.base_model import BaseModel
 
 # NOTE: Uses direct import for explicit model class selection.
-from parallelbench.models.local.trado.trado_model import TradoModel
-from parallelbench.lm_eval_models.dllm_base import DLLMBase
+from parallelbench.models.local.dream.dream_model import DreamModel
+from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
 
-@register_model("parallelbench_trado")
-class TradoWrapper(DLLMBase):
-    """lm-eval wrapper around TradoModel.
+@register_model("parallelbench_dream")
+class DreamWrapper(DLLMBase):
+    """lm-eval wrapper around DreamModel.
 
     Extra model_args:
+        eps: float               - Epsilon parameter for diffusion
         top_p: float             - Top-p sampling threshold
         top_k: float             - Top-k sampling threshold
     """
@@ -26,11 +27,13 @@ class TradoWrapper(DLLMBase):
         self,
         model_path: str,
         accel_framework: Optional[str] = None,
-        remasking: str = "random",
+        remasking: str = "origin",
+        eps: float = 0,
         top_p: Optional[float] = None,
         top_k: Optional[float] = None,
         **kwargs,
     ) -> None:
+        self._eps = eps
         self._top_p = top_p
         self._top_k = top_k
         super().__init__(
@@ -41,9 +44,10 @@ class TradoWrapper(DLLMBase):
         )
 
     def _create_inner_model(self) -> BaseModel:
-        return TradoModel(
+        return DreamModel(
             model_name=self.model_path,
             accel_framework=self.accel_framework,
+            eps=self._eps,
         )
 
     def _build_generation_config(self) -> dict:

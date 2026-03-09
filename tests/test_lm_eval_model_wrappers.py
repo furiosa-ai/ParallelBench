@@ -6,7 +6,7 @@ import pytest
 import torch
 
 from parallelbench.models.base_model import DLLMOutput
-from parallelbench.lm_eval_models.metadata_store import MetadataStore
+from parallelbench.lm_eval_wrappers.metadata_store import MetadataStore
 
 
 @pytest.fixture(autouse=True)
@@ -42,42 +42,42 @@ def _make_mock_instance(context="What is 2+2?", gen_kwargs=None):
 
 class TestDLLMBase:
     def test_apply_until_truncation_basic(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         text = "Hello world\n\nMore text"
         result = DLLMBase._apply_until_truncation(text, {"until": ["\n\n"]})
         assert result == "Hello world"
 
     def test_apply_until_truncation_multiple_stops(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         text = "Hello. More text\n\nEven more"
         result = DLLMBase._apply_until_truncation(text, {"until": ["\n\n", "."]})
         assert result == "Hello"
 
     def test_apply_until_truncation_no_match(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         text = "Hello world"
         result = DLLMBase._apply_until_truncation(text, {"until": ["\n\n"]})
         assert result == "Hello world"
 
     def test_apply_until_truncation_empty_until(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         text = "Hello world"
         result = DLLMBase._apply_until_truncation(text, {})
         assert result == "Hello world"
 
     def test_context_to_messages_string(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         # Instantiate via subclass mock - just test the static/class methods
         result = DLLMBase._context_to_messages(None, "What is 2+2?")
         assert result == [{"role": "user", "content": "What is 2+2?"}]
 
     def test_context_to_messages_list(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         msgs = [
             {"role": "user", "content": "Hello"},
@@ -87,7 +87,7 @@ class TestDLLMBase:
         assert result is msgs
 
     def test_loglikelihood_raises(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         # Create a minimal mock subclass
         class MockWrapper(DLLMBase):
@@ -100,7 +100,7 @@ class TestDLLMBase:
                 wrapper.loglikelihood([])
 
     def test_loglikelihood_rolling_raises(self):
-        from parallelbench.lm_eval_models.dllm_base import DLLMBase
+        from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
         class MockWrapper(DLLMBase):
             def _create_inner_model(self):
@@ -115,13 +115,13 @@ class TestDLLMBase:
 class TestLLaDAWrapperIntegration:
     """Test LLaDAWrapper with mocked LladaModel."""
 
-    @patch("parallelbench.lm_eval_models.llada_wrapper.LladaModel")
+    @patch("parallelbench.lm_eval_wrappers.llada_wrapper.LladaModel")
     def test_generate_until_basic(self, MockLladaModel):
         mock_model = MagicMock()
         mock_model.generate.return_value = _make_dllm_output("4\n\nmore stuff")
         MockLladaModel.return_value = mock_model
 
-        from parallelbench.lm_eval_models.llada_wrapper import LLaDAWrapper
+        from parallelbench.lm_eval_wrappers.llada_wrapper import LLaDAWrapper
 
         wrapper = LLaDAWrapper(
             model_path="GSAI-ML/LLaDA-1.5",
@@ -143,13 +143,13 @@ class TestLLaDAWrapperIntegration:
         assert meta.nfe == 42
         assert meta.decoding_order_corrs["dec_order_kendall"] == 0.5
 
-    @patch("parallelbench.lm_eval_models.llada_wrapper.LladaModel")
+    @patch("parallelbench.lm_eval_wrappers.llada_wrapper.LladaModel")
     def test_generation_config_passed_correctly(self, MockLladaModel):
         mock_model = MagicMock()
         mock_model.generate.return_value = _make_dllm_output("result")
         MockLladaModel.return_value = mock_model
 
-        from parallelbench.lm_eval_models.llada_wrapper import LLaDAWrapper
+        from parallelbench.lm_eval_wrappers.llada_wrapper import LLaDAWrapper
 
         wrapper = LLaDAWrapper(
             model_path="GSAI-ML/LLaDA-1.5",
@@ -171,13 +171,13 @@ class TestLLaDAWrapperIntegration:
         assert gen_config["remasking"] == "random"
         assert gen_config["temperature"] == 0.5
 
-    @patch("parallelbench.lm_eval_models.llada_wrapper.LladaModel")
+    @patch("parallelbench.lm_eval_wrappers.llada_wrapper.LladaModel")
     def test_llada_specific_params(self, MockLladaModel):
         mock_model = MagicMock()
         mock_model.generate.return_value = _make_dllm_output("result")
         MockLladaModel.return_value = mock_model
 
-        from parallelbench.lm_eval_models.llada_wrapper import LLaDAWrapper
+        from parallelbench.lm_eval_wrappers.llada_wrapper import LLaDAWrapper
 
         wrapper = LLaDAWrapper(
             model_path="GSAI-ML/LLaDA-1.5",
@@ -198,13 +198,13 @@ class TestLLaDAWrapperIntegration:
 
 
 class TestDreamWrapperIntegration:
-    @patch("parallelbench.lm_eval_models.dream_wrapper.DreamModel")
+    @patch("parallelbench.lm_eval_wrappers.dream_wrapper.DreamModel")
     def test_generate_until_basic(self, MockDreamModel):
         mock_model = MagicMock()
         mock_model.generate.return_value = _make_dllm_output("dream output")
         MockDreamModel.return_value = mock_model
 
-        from parallelbench.lm_eval_models.dream_wrapper import DreamWrapper
+        from parallelbench.lm_eval_wrappers.dream_wrapper import DreamWrapper
 
         wrapper = DreamWrapper(
             model_path="Dream-org/Dream-v0-Instruct-7B",
