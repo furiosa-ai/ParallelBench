@@ -5,8 +5,8 @@ from __future__ import annotations
 from lm_eval.api.instance import Instance
 from lm_eval.api.registry import register_model
 
-from parallelbench.model import load_model
-from parallelbench.model.base_model import BaseModel, DLLMOutput
+from parallelbench.models import load_model
+from parallelbench.models.base_model import BaseModel, DLLMOutput
 from parallelbench.lm_eval_models.dllm_base import DLLMBase
 from parallelbench.lm_eval_models.metadata_store import (
     GenerationMetadata,

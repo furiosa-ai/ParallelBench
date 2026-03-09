@@ -3,49 +3,51 @@
 from unittest import mock
 
 
-@mock.patch("parallelbench.model.local.generate.generate_with_no_cache")
+@mock.patch("parallelbench.models.local.generate.generate_with_no_cache")
 def test_generate_default_calls_no_cache(mock_no_cache):
-    from parallelbench.model.local.generate import generate
+    from parallelbench.models.local.generate import generate
 
     sentinel = object()
     mock_no_cache.return_value = sentinel
 
-    result = generate("parallelbench.model", "prompt", steps=10)
-    mock_no_cache.assert_called_once_with("parallelbench.model", "prompt", steps=10)
+    result = generate("parallelbench.models", "prompt", steps=10)
+    mock_no_cache.assert_called_once_with("parallelbench.models", "prompt", steps=10)
     assert result is sentinel
 
 
-@mock.patch("parallelbench.model.local.generate.generate_with_prefix_cache")
+@mock.patch("parallelbench.models.local.generate.generate_with_prefix_cache")
 def test_generate_fast_dllm_cache_calls_prefix_cache(mock_prefix_cache):
-    from parallelbench.model.local.generate import generate
+    from parallelbench.models.local.generate import generate
 
     sentinel = object()
     mock_prefix_cache.return_value = sentinel
 
     result = generate(
-        "parallelbench.model", "prompt", use_fast_dllm_cache=True, steps=10
+        "parallelbench.models", "prompt", use_fast_dllm_cache=True, steps=10
     )
-    mock_prefix_cache.assert_called_once_with("parallelbench.model", "prompt", steps=10)
+    mock_prefix_cache.assert_called_once_with(
+        "parallelbench.models", "prompt", steps=10
+    )
     assert result is sentinel
 
 
-@mock.patch("parallelbench.model.local.generate.generate_with_dual_cache")
+@mock.patch("parallelbench.models.local.generate.generate_with_dual_cache")
 def test_generate_fast_dllm_dual_cache_calls_dual_cache(mock_dual_cache):
-    from parallelbench.model.local.generate import generate
+    from parallelbench.models.local.generate import generate
 
     sentinel = object()
     mock_dual_cache.return_value = sentinel
 
     result = generate(
-        "parallelbench.model", "prompt", use_fast_dllm_dual_cache=True, steps=10
+        "parallelbench.models", "prompt", use_fast_dllm_dual_cache=True, steps=10
     )
-    mock_dual_cache.assert_called_once_with("parallelbench.model", "prompt", steps=10)
+    mock_dual_cache.assert_called_once_with("parallelbench.models", "prompt", steps=10)
     assert result is sentinel
 
 
-@mock.patch("parallelbench.model.local.generate.generate_with_no_cache")
+@mock.patch("parallelbench.models.local.generate.generate_with_no_cache")
 def test_generate_passes_kwargs_to_no_cache(mock_no_cache):
-    from parallelbench.model.local.generate import generate
+    from parallelbench.models.local.generate import generate
 
     generate("m", "p", steps=5, temperature=0.8, remasking="random")
     mock_no_cache.assert_called_once_with(
@@ -53,9 +55,9 @@ def test_generate_passes_kwargs_to_no_cache(mock_no_cache):
     )
 
 
-@mock.patch("parallelbench.model.local.generate.generate_with_prefix_cache")
+@mock.patch("parallelbench.models.local.generate.generate_with_prefix_cache")
 def test_generate_passes_kwargs_to_prefix_cache(mock_prefix_cache):
-    from parallelbench.model.local.generate import generate
+    from parallelbench.models.local.generate import generate
 
     # use_fast_dllm_cache should be consumed by generate(), not forwarded
     generate("m", "p", use_fast_dllm_cache=True, steps=5, temperature=0.8)

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from parallelbench.dataset.task import (
+from parallelbench.datasets.task import (
     PARALLEL_BENCH_MASK_TOKEN as PARALLEL_BENCH_MASK_TOKEN,
     create_parallel_bench_task as create_parallel_bench_task,
     load_task,
@@ -8,8 +8,8 @@ from parallelbench.dataset.task import (
     task_name_to_config_name as task_name_to_config_name,
     config_name_to_task_name as config_name_to_task_name,
 )
-from parallelbench.dataset.metrics import Metric, parallel_bench_metric_func_map
-from parallelbench.dataset.task_utils import load_task_configs
+from parallelbench.datasets.metrics import Metric, parallel_bench_metric_func_map
+from parallelbench.datasets.task_utils import load_task_configs
 
 
 def get_task_names(split="test"):

@@ -3,9 +3,9 @@ from typing import Optional, Union
 
 import torch
 
-from parallelbench.model.base_model import DLLMOutput, LocalModel
-from parallelbench.model.generation_config import DllmGenerationConfig
-from parallelbench.model.model_utils import decode_history
+from parallelbench.models.base_model import DLLMOutput, LocalModel
+from parallelbench.models.generation_config import DllmGenerationConfig
+from parallelbench.models.model_utils import decode_history
 
 
 @dataclass

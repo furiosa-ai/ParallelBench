@@ -3,8 +3,8 @@
 import pytest
 import torch
 
-from parallelbench.model.local.generate import get_num_transfer_tokens
-from parallelbench.model.local.generate_rcr import (
+from parallelbench.models.local.generate import get_num_transfer_tokens
+from parallelbench.models.local.generate_rcr import (
     gamma_func,
     get_num_transfer_tokens_maskgit,
 )

@@ -1,12 +1,12 @@
-"""Tests for parallelbench.dataset.task_generators registry and generation."""
+"""Tests for parallelbench.datasets.task_generators registry and generation."""
 
 import random
 
 import pytest
 
-from parallelbench.dataset.task_generators import TASK_GENERATORS
-from parallelbench.dataset.task import generate_parallel_bench_task_random
-from parallelbench.dataset.task_utils import _shuffle
+from parallelbench.datasets.task_generators import TASK_GENERATORS
+from parallelbench.datasets.task import generate_parallel_bench_task_random
+from parallelbench.datasets.task_utils import _shuffle
 
 
 class TestTaskGeneratorRegistry:
@@ -115,7 +115,7 @@ class TestCLI:
         import subprocess
 
         result = subprocess.run(
-            ["uv", "run", "python", "-m", "parallelbench.dataset.task", "--help"],
+            ["uv", "run", "python", "-m", "parallelbench.datasets.task", "--help"],
             capture_output=True,
             text=True,
             timeout=30,

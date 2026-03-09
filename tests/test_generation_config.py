@@ -2,7 +2,7 @@
 
 import pytest
 
-from parallelbench.model.generation_config import (
+from parallelbench.models.generation_config import (
     DllmGenerationConfig,
     ARGenerationConfig,
 )
@@ -132,7 +132,7 @@ def test_dllm_to_generation_kwargs():
 
 def test_transformers_generation_config_no_crash():
     """TransformersGenerationConfig (inherits ARGenerationConfig) should not crash."""
-    from parallelbench.model.local.transformers_model import (
+    from parallelbench.models.local.transformers_model import (
         TransformersGenerationConfig,
     )
 

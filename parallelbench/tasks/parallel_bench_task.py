@@ -12,10 +12,10 @@ import numpy as np
 from datasets import Dataset, DatasetDict
 from lm_eval.api.task import ConfigurableTask
 
-from parallelbench.dataset import ParallelBench
-from parallelbench.dataset.metrics import Metric
+from parallelbench.datasets import ParallelBench
+from parallelbench.datasets.metrics import Metric
 from parallelbench.lm_eval_models.metadata_store import MetadataStore
-from parallelbench.lm_eval_tasks.utils import (
+from parallelbench.tasks.utils import (
     METADATA_METRIC_KEYS,
     compute_sample_metrics,
     get_metric_keys_for_task,

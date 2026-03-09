@@ -24,11 +24,11 @@ from pathlib import Path
 
 from datasets import Dataset, DatasetDict
 
-from parallelbench.dataset.task import (
+from parallelbench.datasets.task import (
     create_parallel_bench_task,
     task_name_to_config_name,
 )
-from parallelbench.dataset.task_utils import load_task_configs
+from parallelbench.datasets.task_utils import load_task_configs
 
 
 def serialize_column(value):

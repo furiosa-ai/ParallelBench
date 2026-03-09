@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from parallelbench.dataset.task import (
+from parallelbench.datasets.task import (
     _try_json_loads,
     task_name_to_config_name,
     config_name_to_task_name,
@@ -85,7 +85,7 @@ class TestSerializationRoundtrip:
 
     @pytest.fixture
     def local_task_data(self):
-        from parallelbench.dataset.task import load_task
+        from parallelbench.datasets.task import load_task
 
         ds, config = load_task("test", "waiting_line/copy")
         return ds, config
@@ -114,7 +114,7 @@ class TestSerializationRoundtrip:
         assert _try_json_loads(answer) is not None
 
     def test_dict_answer_roundtrip(self):
-        from parallelbench.dataset.task import load_task
+        from parallelbench.datasets.task import load_task
 
         ds, _ = load_task("test", "waiting_line/shuffle")
         sample = ds[0]

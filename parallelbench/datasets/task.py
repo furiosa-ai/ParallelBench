@@ -19,13 +19,13 @@ import yaml
 
 from datasets import Dataset, load_dataset
 
-from parallelbench.dataset.task_utils import (
+from parallelbench.datasets.task_utils import (
     _get_task_file,
     load_task_configs,
     load_words_from_file,
     str_to_seed,
 )
-from parallelbench.dataset.task_generators import TASK_GENERATORS
+from parallelbench.datasets.task_generators import TASK_GENERATORS
 
 # Ensure all generators are registered by importing the module
 

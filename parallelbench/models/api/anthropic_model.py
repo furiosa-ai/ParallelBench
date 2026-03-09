@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from parallelbench.model.base_model import ApiModel, DLLMOutput
-from parallelbench.model.generation_config import ApiGenerationConfig
-from parallelbench.model.registry import ModelRegistry
+from parallelbench.models.base_model import ApiModel, DLLMOutput
+from parallelbench.models.generation_config import ApiGenerationConfig
+from parallelbench.models.registry import ModelRegistry
 
 
 @dataclass

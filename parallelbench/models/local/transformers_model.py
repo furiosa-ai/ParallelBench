@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 import torch
 
-from parallelbench.model.base_model import BaseModel, DLLMOutput
-from parallelbench.model.generation_config import ARGenerationConfig
+from parallelbench.models.base_model import BaseModel, DLLMOutput
+from parallelbench.models.generation_config import ARGenerationConfig
 
 
 @dataclass

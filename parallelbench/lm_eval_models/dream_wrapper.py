@@ -6,10 +6,10 @@ from typing import Optional
 
 from lm_eval.api.registry import register_model
 
-from parallelbench.model.base_model import BaseModel
+from parallelbench.models.base_model import BaseModel
 
 # NOTE: Uses direct import for explicit model class selection.
-from parallelbench.model.local.dream.dream_model import DreamModel
+from parallelbench.models.local.dream.dream_model import DreamModel
 from parallelbench.lm_eval_models.dllm_base import DLLMBase
 
 

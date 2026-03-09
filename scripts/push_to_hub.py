@@ -15,8 +15,8 @@ import pandas as pd
 import yaml
 from datasets import Dataset, DatasetDict
 
-from parallelbench.dataset.task import task_name_to_config_name
-from parallelbench.dataset import PARALLEL_BENCH_TASKS
+from parallelbench.datasets.task import task_name_to_config_name
+from parallelbench.datasets import PARALLEL_BENCH_TASKS
 
 
 DATA_DIR = (

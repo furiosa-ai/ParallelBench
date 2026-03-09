@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import torch
 
-from parallelbench.model.base_model import BaseModel, DLLMOutput
+from parallelbench.models.base_model import BaseModel, DLLMOutput
 
 
 @dataclass

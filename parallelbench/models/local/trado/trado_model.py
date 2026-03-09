@@ -5,14 +5,14 @@ import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from parallelbench.dataset.task import PARALLEL_BENCH_MASK_TOKEN
-from parallelbench.model.base_model import DLLMOutput, LocalModel
-from parallelbench.model.generation_config import DllmGenerationConfig
-from parallelbench.model.model_utils import (
+from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
+from parallelbench.models.base_model import DLLMOutput, LocalModel
+from parallelbench.models.generation_config import DllmGenerationConfig
+from parallelbench.models.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
 )
-from parallelbench.model.registry import ModelRegistry
+from parallelbench.models.registry import ModelRegistry
 
 from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_STRATEGIES
 from .trado_model_utils import block_diffusion_generate

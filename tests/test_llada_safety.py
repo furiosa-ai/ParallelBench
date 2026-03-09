@@ -4,7 +4,7 @@ import types
 from unittest import mock
 
 
-from parallelbench.model.local.llada.llada_model import LladaModel
+from parallelbench.models.local.llada.llada_model import LladaModel
 
 
 class MockModelClass:
@@ -105,10 +105,10 @@ class TestGenerateHistoryNoneSafety:
         output_ids = torch.tensor([[1, 2, 3]])
         with mock.patch.object(llada, "_generate", return_value=(output_ids, 10, None)):
             with mock.patch(
-                "parallelbench.model.local.llada.llada_model.compute_decoding_order_correlation_from_history"
+                "parallelbench.models.local.llada.llada_model.compute_decoding_order_correlation_from_history"
             ) as mock_correlation:
                 with mock.patch(
-                    "parallelbench.model.local.llada.llada_model.decode_history",
+                    "parallelbench.models.local.llada.llada_model.decode_history",
                     return_value=None,
                 ):
                     llada.tokenizer.batch_decode.return_value = ["output"]
@@ -144,11 +144,11 @@ class TestGenerateHistoryNoneSafety:
             llada, "_generate", return_value=(output_ids, 10, mock_history)
         ):
             with mock.patch(
-                "parallelbench.model.local.llada.llada_model.compute_decoding_order_correlation_from_history",
+                "parallelbench.models.local.llada.llada_model.compute_decoding_order_correlation_from_history",
                 return_value=([1, 2, 3], {"dec_order_kendall": 0.9}),
             ) as mock_correlation:
                 with mock.patch(
-                    "parallelbench.model.local.llada.llada_model.decode_history",
+                    "parallelbench.models.local.llada.llada_model.decode_history",
                     return_value=["decoded"],
                 ):
                     llada.tokenizer.batch_decode.return_value = ["output"]

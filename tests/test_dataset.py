@@ -1,14 +1,14 @@
-"""Tests for parallelbench.dataset module (ParallelBench class and supporting utilities)."""
+"""Tests for parallelbench.datasets module (ParallelBench class and supporting utilities)."""
 
 import pytest
 
-from parallelbench.dataset import (
+from parallelbench.datasets import (
     ParallelBench,
     get_task_names,
     PARALLEL_BENCH_TASKS,
     PARALLEL_BENCH_MASK_TOKEN,
 )
-from parallelbench.dataset.task import load_task
+from parallelbench.datasets.task import load_task
 
 
 class TestGetTaskNames:
@@ -30,8 +30,8 @@ class TestMaskToken:
         assert PARALLEL_BENCH_MASK_TOKEN == "[MASK]"
 
     def test_importable_from_both_paths(self):
-        from parallelbench.dataset import PARALLEL_BENCH_MASK_TOKEN as token1
-        from parallelbench.dataset.task import PARALLEL_BENCH_MASK_TOKEN as token2
+        from parallelbench.datasets import PARALLEL_BENCH_MASK_TOKEN as token1
+        from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN as token2
 
         assert token1 == token2
 

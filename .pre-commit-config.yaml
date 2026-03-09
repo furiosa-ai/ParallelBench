@@ -22,7 +22,7 @@ repos:
       - id: check-added-large-files
         exclude: 'uv\.lock$'
       - id: check-yaml
-        exclude: ^parallelbench/lm_eval_tasks/
+        exclude: ^parallelbench/tasks/
       - id: check-json
         exclude: ^\.vscode/
       - id: check-toml

@@ -1,4 +1,4 @@
-"""Tests for parallelbench.dataset.metrics functions.
+"""Tests for parallelbench.datasets.metrics functions.
 
 Validates metric correctness and return type consistency.
 All public metric functions must return dict[str, float].
@@ -6,7 +6,7 @@ All public metric functions must return dict[str, float].
 
 import pytest
 
-from parallelbench.dataset.metrics import (
+from parallelbench.datasets.metrics import (
     _parse_list,
     list_match_score,
     domino_score,
@@ -38,7 +38,7 @@ class TestParseList:
         assert _parse_list('["a", "b", "c"]', strict=True) == ["a", "b", "c"]
 
     def test_round_trip(self):
-        from parallelbench.dataset.task_utils import list_to_str
+        from parallelbench.datasets.task_utils import list_to_str
 
         original = ["hello", "world", "foo"]
         serialized = list_to_str(original)

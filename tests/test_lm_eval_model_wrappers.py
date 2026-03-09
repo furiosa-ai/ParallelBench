@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import torch
 
-from parallelbench.model.base_model import DLLMOutput
+from parallelbench.models.base_model import DLLMOutput
 from parallelbench.lm_eval_models.metadata_store import MetadataStore
 
 

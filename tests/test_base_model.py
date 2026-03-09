@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 import torch
 
-from parallelbench.model.base_model import BaseModel, DLLMOutput, LocalModel
+from parallelbench.models.base_model import BaseModel, DLLMOutput, LocalModel
 
 
 def test_subclass_without_generate_cannot_be_instantiated():
@@ -67,11 +67,11 @@ def _create_local_model(accel_framework=None, model_name="test-model"):
 
     with (
         mock.patch(
-            "parallelbench.model.base_model.AutoModel.from_pretrained",
+            "parallelbench.models.base_model.AutoModel.from_pretrained",
             return_value=mock_model,
         ),
         mock.patch(
-            "parallelbench.model.base_model.AutoTokenizer.from_pretrained",
+            "parallelbench.models.base_model.AutoTokenizer.from_pretrained",
             return_value=mock_tokenizer,
         ),
     ):
@@ -111,11 +111,11 @@ def test_calls_from_pretrained_with_correct_args():
 
     with (
         mock.patch(
-            "parallelbench.model.base_model.AutoModel.from_pretrained",
+            "parallelbench.models.base_model.AutoModel.from_pretrained",
             return_value=mock_model,
         ) as mock_from_pretrained,
         mock.patch(
-            "parallelbench.model.base_model.AutoTokenizer.from_pretrained",
+            "parallelbench.models.base_model.AutoTokenizer.from_pretrained",
             return_value=mock_tokenizer,
         ),
     ):
@@ -146,11 +146,11 @@ def test_calls_model_eval():
 
     with (
         mock.patch(
-            "parallelbench.model.base_model.AutoModel.from_pretrained",
+            "parallelbench.models.base_model.AutoModel.from_pretrained",
             return_value=mock_model,
         ),
         mock.patch(
-            "parallelbench.model.base_model.AutoTokenizer.from_pretrained",
+            "parallelbench.models.base_model.AutoTokenizer.from_pretrained",
             return_value=mock_tokenizer,
         ),
     ):

@@ -4,12 +4,12 @@ from unittest import mock
 
 import pytest
 
-from parallelbench.model.base_model import ApiModel
+from parallelbench.models.base_model import ApiModel
 
 
-@mock.patch("parallelbench.model.ModelRegistry.get_model_class")
+@mock.patch("parallelbench.models.ModelRegistry.get_model_class")
 def test_load_model_registry_local_model_passes_accel_framework(mock_get):
-    from parallelbench.model import load_model
+    from parallelbench.models import load_model
 
     # Create a real class so issubclass() works
     class FakeLocalModel:
@@ -24,9 +24,9 @@ def test_load_model_registry_local_model_passes_accel_framework(mock_get):
     assert result.kwargs == {"accel_framework": "fast_dllm", "extra_arg": 42}
 
 
-@mock.patch("parallelbench.model.ModelRegistry.get_model_class")
+@mock.patch("parallelbench.models.ModelRegistry.get_model_class")
 def test_load_model_registry_api_model_omits_accel_framework(mock_get):
-    from parallelbench.model import load_model
+    from parallelbench.models import load_model
 
     # Create a real class that is a subclass of ApiModel
     class FakeApiModel(ApiModel):
@@ -47,36 +47,44 @@ def test_load_model_registry_api_model_omits_accel_framework(mock_get):
     assert result._kwargs == {"api_key": "xyz"}
 
 
-@mock.patch("parallelbench.model.ModelRegistry.get_model_class", side_effect=ValueError)
-@mock.patch("parallelbench.model.vllmModel")
+@mock.patch(
+    "parallelbench.models.ModelRegistry.get_model_class", side_effect=ValueError
+)
+@mock.patch("parallelbench.models.vllmModel")
 def test_load_model_fallback_to_vllm(mock_vllm, mock_get):
-    from parallelbench.model import load_model
+    from parallelbench.models import load_model
 
     load_model("unknown-model", accel_framework="vllm")
     mock_vllm.assert_called_once_with("unknown-model")
 
 
-@mock.patch("parallelbench.model.ModelRegistry.get_model_class", side_effect=ValueError)
-@mock.patch("parallelbench.model.TransformersModel")
+@mock.patch(
+    "parallelbench.models.ModelRegistry.get_model_class", side_effect=ValueError
+)
+@mock.patch("parallelbench.models.TransformersModel")
 def test_load_model_fallback_to_transformers(mock_transformers, mock_get):
-    from parallelbench.model import load_model
+    from parallelbench.models import load_model
 
     load_model("unknown-model", accel_framework="transformers")
     mock_transformers.assert_called_once_with("unknown-model")
 
 
-@mock.patch("parallelbench.model.ModelRegistry.get_model_class", side_effect=ValueError)
+@mock.patch(
+    "parallelbench.models.ModelRegistry.get_model_class", side_effect=ValueError
+)
 def test_load_model_raises_when_no_match_and_no_fallback(mock_get):
-    from parallelbench.model import load_model
+    from parallelbench.models import load_model
 
     with pytest.raises(ValueError, match="not supported"):
         load_model("unknown-model")
 
 
-@mock.patch("parallelbench.model.ModelRegistry.get_model_class", side_effect=ValueError)
-@mock.patch("parallelbench.model.vllmModel")
+@mock.patch(
+    "parallelbench.models.ModelRegistry.get_model_class", side_effect=ValueError
+)
+@mock.patch("parallelbench.models.vllmModel")
 def test_load_model_pops_accel_framework_from_fallback_kwargs(mock_vllm, mock_get):
-    from parallelbench.model import load_model
+    from parallelbench.models import load_model
 
     load_model("unknown-model", accel_framework="vllm", batch_size=4)
     # accel_framework should have been popped, not forwarded to vllmModel

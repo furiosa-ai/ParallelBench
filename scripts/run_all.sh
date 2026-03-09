@@ -6,7 +6,7 @@
 set -euo pipefail
 
 OUTPUT_DIR="${1:-results}"
-INCLUDE_PATH="parallelbench/lm_eval_tasks"
+INCLUDE_PATH="parallelbench/tasks"
 LIMIT=4
 BATCH_SIZE=1
 

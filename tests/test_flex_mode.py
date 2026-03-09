@@ -2,8 +2,8 @@
 
 import pytest
 
-from parallelbench.dataset import ParallelBench
-from parallelbench.dataset.task import load_task_flex, _flex_seed
+from parallelbench.datasets import ParallelBench
+from parallelbench.datasets.task import load_task_flex, _flex_seed
 
 
 class TestFlexSeed:

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Callable
 
-from parallelbench.dataset.metrics import Metric, parallel_bench_metric_func_map
+from parallelbench.datasets.metrics import Metric, parallel_bench_metric_func_map
 
 
 def compute_sample_metrics(

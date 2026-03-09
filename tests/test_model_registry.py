@@ -7,18 +7,18 @@ and that all model classes are correctly registered with their matcher functions
 
 import pytest
 
-from parallelbench.model.registry import ModelRegistry
+from parallelbench.models.registry import ModelRegistry
 
 # Import all model modules at module level to trigger decorator registration
-import parallelbench.model.api.mercury_model  # noqa: F401
-import parallelbench.model.local.dream.dream_model  # noqa: F401
-import parallelbench.model.local.trado.trado_model  # noqa: F401
-import parallelbench.model.local.llada.llada_model  # noqa: F401
-import parallelbench.model.api.anthropic_model  # noqa: F401
+import parallelbench.models.api.mercury_model  # noqa: F401
+import parallelbench.models.local.dream.dream_model  # noqa: F401
+import parallelbench.models.local.trado.trado_model  # noqa: F401
+import parallelbench.models.local.llada.llada_model  # noqa: F401
+import parallelbench.models.api.anthropic_model  # noqa: F401
 
 SEDD_AVAILABLE = False
 try:
-    import parallelbench.model.local.sedd.sedd_model  # noqa: F401
+    import parallelbench.models.local.sedd.sedd_model  # noqa: F401
 
     SEDD_AVAILABLE = True
 except ImportError:

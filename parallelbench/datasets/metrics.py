@@ -10,7 +10,7 @@ import signal
 
 import evaluate
 
-from parallelbench.dataset.task_utils import sentence_to_words
+from parallelbench.datasets.task_utils import sentence_to_words
 from parallelbench.utils.grammar_check import grammar_check
 
 logger = logging.getLogger(__name__)

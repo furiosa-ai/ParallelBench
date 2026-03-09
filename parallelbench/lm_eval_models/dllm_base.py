@@ -16,7 +16,7 @@ from accelerate import Accelerator
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 
-from parallelbench.model.base_model import BaseModel, DLLMOutput
+from parallelbench.models.base_model import BaseModel, DLLMOutput
 from parallelbench.lm_eval_models.metadata_store import (
     GenerationMetadata,
     MetadataStore,

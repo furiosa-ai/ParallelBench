@@ -5,12 +5,12 @@ from __future__ import annotations
 from lm_eval.api.instance import Instance
 from lm_eval.api.registry import register_model
 
-from parallelbench.model.base_model import BaseModel, DLLMOutput
+from parallelbench.models.base_model import BaseModel, DLLMOutput
 
 # NOTE: Uses direct imports instead of ModelRegistry dispatch for explicit backend selection.
 # See https://github.com/<owner>/ParallelBench/issues/XX for potential refactor.
-from parallelbench.model.local.transformers_model import TransformersModel
-from parallelbench.model.local.vllm_model import vllmModel
+from parallelbench.models.local.transformers_model import TransformersModel
+from parallelbench.models.local.vllm_model import vllmModel
 from parallelbench.lm_eval_models.dllm_base import DLLMBase
 from parallelbench.lm_eval_models.metadata_store import (
     GenerationMetadata,

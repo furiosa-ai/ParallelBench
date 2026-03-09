@@ -4,8 +4,8 @@ import shutil
 
 import pytest
 
-from parallelbench.dataset.task import create_parallel_bench_task
-from parallelbench.dataset.task_utils import _get_task_file, load_task_configs
+from parallelbench.datasets.task import create_parallel_bench_task
+from parallelbench.datasets.task_utils import _get_task_file, load_task_configs
 
 
 # Tasks that tests depend on for local file loading

@@ -8,7 +8,7 @@ from collections.abc import Callable
 
 import numpy as np
 
-from parallelbench.dataset.task_utils import (
+from parallelbench.datasets.task_utils import (
     ALPHABET_CHARS,
     RandomMathOp,
     _generate_domino_sequence,
@@ -40,7 +40,7 @@ def register_task_generator(task_type: str):
 
 def _create_mask_template(lst):
     """Create a [MASK] token template matching the length of the given list."""
-    from parallelbench.dataset.task import PARALLEL_BENCH_MASK_TOKEN
+    from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
 
     return list_to_str([PARALLEL_BENCH_MASK_TOKEN] * len(lst))
 

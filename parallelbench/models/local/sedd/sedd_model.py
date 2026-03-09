@@ -6,13 +6,13 @@ from sedd import sampling
 from sedd.load_model import load_model
 from transformers import GPT2TokenizerFast
 
-from parallelbench.model.base_model import DLLMOutput, LocalModel
-from parallelbench.model.generation_config import DllmGenerationConfig
-from parallelbench.model.model_utils import (
+from parallelbench.models.base_model import DLLMOutput, LocalModel
+from parallelbench.models.generation_config import DllmGenerationConfig
+from parallelbench.models.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
 )
-from parallelbench.model.registry import ModelRegistry
+from parallelbench.models.registry import ModelRegistry
 
 
 class SeddPredictorType(str, Enum):

@@ -4,7 +4,7 @@ import importlib.util
 
 import pytest
 
-from parallelbench.lm_eval_tasks.utils import (
+from parallelbench.tasks.utils import (
     METADATA_METRIC_KEYS,
     compute_sample_metrics,
     get_metric_keys_for_task,

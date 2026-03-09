@@ -1,13 +1,13 @@
-from parallelbench.model.base_model import ApiModel, BaseModel, LocalModel
+from parallelbench.models.base_model import ApiModel, BaseModel, LocalModel
 
 # Local models
-from parallelbench.model.local import DreamModel, LladaModel, TradoModel, SeddModel
+from parallelbench.models.local import DreamModel, LladaModel, TradoModel, SeddModel
 
 # API models
-from parallelbench.model.api import AnthropicModel, MercuryModel
-from parallelbench.model.registry import ModelRegistry
-from parallelbench.model.local.transformers_model import TransformersModel
-from parallelbench.model.local.vllm_model import vllmModel
+from parallelbench.models.api import AnthropicModel, MercuryModel
+from parallelbench.models.registry import ModelRegistry
+from parallelbench.models.local.transformers_model import TransformersModel
+from parallelbench.models.local.vllm_model import vllmModel
 
 
 __all__ = [
