@@ -15,7 +15,7 @@ WAITING_LINE_TASKS=$(echo parallel_bench_waiting_line_{copy,reverse,sort,shuffle
 WAITING_LINE_N15_TASKS=$(echo parallel_bench_waiting_line_n15_{copy,reverse,sort,shuffle,insert_index,insert_random,remove_index,remove_random,replace_index,replace_random} | tr ' ' ',')
 WORDS_TASKS=$(echo parallel_bench_text_writing_words_to_sentence_{easy,easy_n{1,3,4,5,6,7},medium,medium_n{1,3,4,5,6,7},hard,hard_n{1,3,4,5,6,7}} | tr ' ' ',')
 TEXT_WRITING_TASKS="parallel_bench_text_writing_paraphrasing,parallel_bench_text_writing_summarization"
-PUZZLE_TASKS="parallel_bench_puzzles_sudoku_n4_12,parallel_bench_puzzles_latin_square_n4"
+PUZZLE_TASKS="parallel_bench_puzzles_sudoku_n4,parallel_bench_puzzles_latin_square_n4"
 
 # max_tokens=32
 TASKS_32="${WAITING_LINE_TASKS},${WAITING_LINE_N15_TASKS}"

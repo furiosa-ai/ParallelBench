@@ -16,7 +16,7 @@ class TestConfigNameConversion:
         "task_name,expected",
         [
             ("waiting_line/copy", "waiting_line-copy"),
-            ("puzzles/sudoku_n4_12", "puzzles-sudoku_n4_12"),
+            ("puzzles/sudoku_n4", "puzzles-sudoku_n4"),
             ("text_writing/summarization", "text_writing-summarization"),
             (
                 "text_writing/words_to_sentence_easy",
@@ -31,7 +31,7 @@ class TestConfigNameConversion:
         "config_name,expected",
         [
             ("waiting_line-copy", "waiting_line/copy"),
-            ("puzzles-sudoku_n4_12", "puzzles/sudoku_n4_12"),
+            ("puzzles-sudoku_n4", "puzzles/sudoku_n4"),
             ("text_writing-summarization", "text_writing/summarization"),
         ],
     )
@@ -42,7 +42,7 @@ class TestConfigNameConversion:
         "task_name",
         [
             "waiting_line/copy",
-            "puzzles/sudoku_n4_12",
+            "puzzles/sudoku_n4",
             "text_writing/words_to_sentence_easy",
         ],
     )

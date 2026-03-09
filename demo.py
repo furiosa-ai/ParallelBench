@@ -30,7 +30,7 @@ TASKS_MAX_TOKENS = {
     "text_writing/words_to_sentence_medium": 64,
     # Logic puzzle tasks
     "puzzles/latin_square_n4": 64,
-    "puzzles/sudoku_n4_12": 64,
+    "puzzles/sudoku_n4": 64,
 }
 
 

@@ -173,7 +173,7 @@ print(f"Metrics: {metrics}")
     - `text_writing/words_to_sentence_hard`
 - **Puzzles**
     - `puzzles/latin_square_n4`
-    - `puzzles/sudoku_n4_12`
+    - `puzzles/sudoku_n4`
 
 ### Models
 

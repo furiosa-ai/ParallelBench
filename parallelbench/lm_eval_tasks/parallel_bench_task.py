@@ -1,6 +1,6 @@
 """ParallelBench task implementation for lm-eval-harness.
 
-Each ParallelBench task (e.g. waiting_line/copy, puzzles/sudoku_n4_12) is defined
+Each ParallelBench task (e.g. waiting_line/copy, puzzles/sudoku_n4) is defined
 by a YAML file that sets metadata.parallel_bench_task to the task identifier.
 This class loads data from the existing ParallelBench dataset, formats prompts,
 and computes metrics using the existing metric functions.
