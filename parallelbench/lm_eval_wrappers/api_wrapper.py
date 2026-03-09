@@ -27,24 +27,15 @@ class ApiWrapper(DLLMBase):
         model_path: str,
         **kwargs,
     ) -> None:
-        # API models don't use dLLM-specific params
-        kwargs.pop("accel_framework", None)
-        kwargs.pop("remasking", None)
-        kwargs.pop("steps", None)
-        kwargs.pop("block_length", None)
-        kwargs.pop("alg_temp", None)
-        kwargs.pop("alg_threshold", None)
-        kwargs.pop("alg_factor", None)
-        kwargs.pop("output_history", None)
         super().__init__(model_path=model_path, output_history=False, **kwargs)
 
     def _create_inner_model(self) -> BaseModel:
         return load_model(model_name=self.model_path)
 
-    def _build_generation_config(self) -> dict:
+    def _build_generation_config(self, gen_kwargs: dict) -> dict:
         return {
-            "max_tokens": self._max_tokens,
-            "temperature": self._temperature,
+            "max_tokens": int(gen_kwargs.get("max_tokens", 128)),
+            "temperature": float(gen_kwargs.get("temperature", 0.0)),
         }
 
     def generate_until(self, requests: list[Instance]) -> list[str]:
@@ -54,7 +45,7 @@ class ApiWrapper(DLLMBase):
         for request in requests:
             context, gen_kwargs = request.args
             messages = self._context_to_messages(context)
-            gen_config = self._build_generation_config()
+            gen_config = self._build_generation_config(gen_kwargs)
 
             dllm_output: DLLMOutput = self._inner_model.generate(
                 messages=messages,

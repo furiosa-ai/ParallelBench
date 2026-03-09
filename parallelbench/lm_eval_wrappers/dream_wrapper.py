@@ -27,7 +27,6 @@ class DreamWrapper(DLLMBase):
         self,
         model_path: str,
         accel_framework: Optional[str] = None,
-        remasking: str = "origin",
         eps: float = 0,
         top_p: Optional[float] = None,
         top_k: Optional[float] = None,
@@ -39,7 +38,6 @@ class DreamWrapper(DLLMBase):
         super().__init__(
             model_path=model_path,
             accel_framework=accel_framework,
-            remasking=remasking,
             **kwargs,
         )
 
@@ -50,8 +48,10 @@ class DreamWrapper(DLLMBase):
             eps=self._eps,
         )
 
-    def _build_generation_config(self) -> dict:
-        config = super()._build_generation_config()
+    def _build_generation_config(self, gen_kwargs: dict) -> dict:
+        if "remasking" not in gen_kwargs:
+            gen_kwargs = {**gen_kwargs, "remasking": "origin"}
+        config = super()._build_generation_config(gen_kwargs)
         if self._top_p is not None:
             config["top_p"] = self._top_p
         if self._top_k is not None:

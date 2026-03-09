@@ -28,35 +28,28 @@ class DLLMBase(LM):
 
     Subclasses must implement:
         _create_inner_model() -> BaseModel
-        _create_generation_config(gen_kwargs) -> dict
 
     Constructor model_args (passed via --model_args):
         model_path: str          - HuggingFace model name/path
         accel_framework: str     - None, "fast_dllm", etc.
-        steps: int               - Diffusion steps
-        max_tokens: int          - Maximum generation length
-        block_length: int        - Block length for semi-AR generation
-        remasking: str           - Remasking strategy
-        temperature: float       - Sampling temperature
-        alg_temp: float          - Algorithm temperature
-        alg_threshold: float     - Confidence threshold
-        alg_factor: float        - Dynamic remasking factor
         output_history: bool     - Whether to track generation history
         infill: bool             - Whether to use infill mode
+
+    Generation parameters (passed via --gen_kwargs or task YAML generation_kwargs):
+        steps: int               - Diffusion steps (default: 128)
+        max_tokens: int          - Maximum generation length (default: 128)
+        block_length: int        - Block length for semi-AR generation (default: 128)
+        remasking: str           - Remasking strategy (default: "random")
+        temperature: float       - Sampling temperature (default: 0.0)
+        alg_temp: float          - Algorithm temperature (default: 0.0)
+        alg_threshold: float     - Confidence threshold
+        alg_factor: float        - Dynamic remasking factor
     """
 
     def __init__(
         self,
         model_path: str,
         accel_framework: Optional[str] = None,
-        steps: int = 128,
-        max_tokens: int = 128,
-        block_length: int = 128,
-        remasking: str = "random",
-        temperature: float = 0.0,
-        alg_temp: float = 0.0,
-        alg_threshold: Optional[float] = None,
-        alg_factor: Optional[float] = None,
         output_history: bool = True,
         infill: bool = False,
         batch_size: int = 1,
@@ -72,14 +65,6 @@ class DLLMBase(LM):
 
         self.model_path = model_path
         self.accel_framework = accel_framework
-        self._steps = steps
-        self._max_tokens = max_tokens
-        self._block_length = block_length
-        self._remasking = remasking
-        self._temperature = temperature
-        self._alg_temp = alg_temp
-        self._alg_threshold = alg_threshold
-        self._alg_factor = alg_factor
         self._output_history = output_history
         self._infill = infill
         self._batch_size = batch_size
@@ -96,23 +81,25 @@ class DLLMBase(LM):
         """Instantiate and return the inner ParallelBench model."""
         ...
 
-    def _build_generation_config(self) -> dict:
-        """Build generation config dict from stored parameters.
+    def _build_generation_config(self, gen_kwargs: dict) -> dict:
+        """Build generation config dict from gen_kwargs.
 
-        Subclasses can override to add model-specific parameters.
+        Reads generation parameters from gen_kwargs (task YAML generation_kwargs
+        merged with --gen_kwargs CLI). Subclasses can override to change defaults
+        or add model-specific parameters.
         """
         config = {
-            "steps": self._steps,
-            "max_tokens": self._max_tokens,
-            "block_length": self._block_length,
-            "remasking": self._remasking,
-            "temperature": self._temperature,
-            "alg_temp": self._alg_temp,
+            "steps": int(gen_kwargs.get("steps", 128)),
+            "max_tokens": int(gen_kwargs.get("max_tokens", 128)),
+            "block_length": int(gen_kwargs.get("block_length", 128)),
+            "remasking": gen_kwargs.get("remasking", "random"),
+            "temperature": float(gen_kwargs.get("temperature", 0.0)),
+            "alg_temp": float(gen_kwargs.get("alg_temp", 0.0)),
         }
-        if self._alg_threshold is not None:
-            config["alg_threshold"] = self._alg_threshold
-        if self._alg_factor is not None:
-            config["alg_factor"] = self._alg_factor
+        if "alg_threshold" in gen_kwargs:
+            config["alg_threshold"] = float(gen_kwargs["alg_threshold"])
+        if "alg_factor" in gen_kwargs:
+            config["alg_factor"] = float(gen_kwargs["alg_factor"])
         return config
 
     # ─── lm-eval LM interface ────────────────────────────────────────────
@@ -125,7 +112,7 @@ class DLLMBase(LM):
             context, gen_kwargs = request.args
 
             messages = self._context_to_messages(context)
-            gen_config = self._build_generation_config()
+            gen_config = self._build_generation_config(gen_kwargs)
 
             output_prefix = None
             if self._infill and hasattr(request, "doc") and request.doc:

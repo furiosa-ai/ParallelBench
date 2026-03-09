@@ -14,6 +14,8 @@ import copy
 import json
 from pathlib import Path
 
+import yaml
+
 import pandas as pd
 from datasets import Dataset, DatasetDict
 
@@ -125,6 +127,17 @@ def generate(
             out_path.parent.mkdir(parents=True, exist_ok=True)
             pd.DataFrame(rows).to_json(out_path, orient="records", lines=True)
             print(f"    Saved to {out_path}")
+
+            # Save task_config.yaml alongside JSONL for load_task() compatibility
+            out_task_config_file = out_path.parent / "task_config.yaml"
+            if out_task_config_file.exists():
+                with open(out_task_config_file, "r") as f:
+                    out_task_config = yaml.safe_load(f) or {}
+            else:
+                out_task_config = {}
+            out_task_config[task_name] = task_config
+            with open(out_task_config_file, "w") as f:
+                yaml.dump(out_task_config, f)
 
         if push:
             config_name = task_name_to_config_name(task_name)

@@ -26,7 +26,6 @@ class TradoWrapper(DLLMBase):
         self,
         model_path: str,
         accel_framework: Optional[str] = None,
-        remasking: str = "random",
         top_p: Optional[float] = None,
         top_k: Optional[float] = None,
         **kwargs,
@@ -36,7 +35,6 @@ class TradoWrapper(DLLMBase):
         super().__init__(
             model_path=model_path,
             accel_framework=accel_framework,
-            remasking=remasking,
             **kwargs,
         )
 
@@ -46,8 +44,8 @@ class TradoWrapper(DLLMBase):
             accel_framework=self.accel_framework,
         )
 
-    def _build_generation_config(self) -> dict:
-        config = super()._build_generation_config()
+    def _build_generation_config(self, gen_kwargs: dict) -> dict:
+        config = super()._build_generation_config(gen_kwargs)
         if self._top_p is not None:
             config["top_p"] = self._top_p
         if self._top_k is not None:

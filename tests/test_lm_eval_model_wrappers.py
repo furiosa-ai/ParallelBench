@@ -125,13 +125,21 @@ class TestLLaDAWrapperIntegration:
 
         wrapper = LLaDAWrapper(
             model_path="GSAI-ML/LLaDA-1.5",
-            steps=32,
-            max_tokens=32,
-            block_length=32,
-            remasking="low_confidence",
         )
 
-        instances = [_make_mock_instance("What is 2+2?")]
+        instances = [
+            _make_mock_instance(
+                "What is 2+2?",
+                gen_kwargs={
+                    "until": ["\n\n"],
+                    "do_sample": False,
+                    "steps": 32,
+                    "max_tokens": 32,
+                    "block_length": 32,
+                    "remasking": "low_confidence",
+                },
+            )
+        ]
         results = wrapper.generate_until(instances)
 
         assert len(results) == 1
@@ -153,14 +161,21 @@ class TestLLaDAWrapperIntegration:
 
         wrapper = LLaDAWrapper(
             model_path="GSAI-ML/LLaDA-1.5",
-            steps=64,
-            max_tokens=128,
-            block_length=64,
-            remasking="random",
-            temperature=0.5,
         )
 
-        instances = [_make_mock_instance()]
+        instances = [
+            _make_mock_instance(
+                gen_kwargs={
+                    "until": ["\n\n"],
+                    "do_sample": False,
+                    "steps": 64,
+                    "max_tokens": 128,
+                    "block_length": 64,
+                    "remasking": "random",
+                    "temperature": 0.5,
+                }
+            )
+        ]
         wrapper.generate_until(instances)
 
         call_kwargs = mock_model.generate.call_args
@@ -181,15 +196,22 @@ class TestLLaDAWrapperIntegration:
 
         wrapper = LLaDAWrapper(
             model_path="GSAI-ML/LLaDA-1.5",
-            steps=32,
-            max_tokens=32,
-            block_length=32,
-            remasking="remdm",
             remdm_steps=4,
             remdm_number=2,
         )
 
-        instances = [_make_mock_instance()]
+        instances = [
+            _make_mock_instance(
+                gen_kwargs={
+                    "until": ["\n\n"],
+                    "do_sample": False,
+                    "steps": 32,
+                    "max_tokens": 32,
+                    "block_length": 32,
+                    "remasking": "remdm",
+                }
+            )
+        ]
         wrapper.generate_until(instances)
 
         gen_config = mock_model.generate.call_args.kwargs["gen_config"]
@@ -208,13 +230,20 @@ class TestDreamWrapperIntegration:
 
         wrapper = DreamWrapper(
             model_path="Dream-org/Dream-v0-Instruct-7B",
-            steps=32,
-            max_tokens=32,
-            block_length=32,
-            remasking="origin",
         )
 
-        instances = [_make_mock_instance()]
+        instances = [
+            _make_mock_instance(
+                gen_kwargs={
+                    "until": ["\n\n"],
+                    "do_sample": False,
+                    "steps": 32,
+                    "max_tokens": 32,
+                    "block_length": 32,
+                    "remasking": "origin",
+                }
+            )
+        ]
         results = wrapper.generate_until(instances)
 
         assert len(results) == 1

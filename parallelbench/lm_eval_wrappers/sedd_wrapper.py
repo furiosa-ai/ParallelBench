@@ -24,15 +24,11 @@ class SEDDWrapper(DLLMBase):
         self,
         model_path: str,
         accel_framework: Optional[str] = None,
-        remasking: str = "random",
-        temperature: float = 1.0,
         **kwargs,
     ) -> None:
         super().__init__(
             model_path=model_path,
             accel_framework=accel_framework,
-            remasking=remasking,
-            temperature=temperature,
             **kwargs,
         )
 
@@ -42,7 +38,9 @@ class SEDDWrapper(DLLMBase):
             accel_framework=self.accel_framework,
         )
 
-    def _build_generation_config(self) -> dict:
-        config = super()._build_generation_config()
+    def _build_generation_config(self, gen_kwargs: dict) -> dict:
+        if "temperature" not in gen_kwargs:
+            gen_kwargs = {**gen_kwargs, "temperature": 1.0}
+        config = super()._build_generation_config(gen_kwargs)
         config["block_length"] = config["max_tokens"]
         return config

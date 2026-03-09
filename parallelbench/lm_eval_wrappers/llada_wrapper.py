@@ -27,7 +27,6 @@ class LLaDAWrapper(DLLMBase):
         self,
         model_path: str,
         accel_framework: Optional[str] = None,
-        remasking: str = "low_confidence",
         remdm_steps: Optional[int] = None,
         remdm_number: Optional[int] = None,
         rcr_overtime_conf: Optional[bool] = None,
@@ -39,7 +38,6 @@ class LLaDAWrapper(DLLMBase):
         super().__init__(
             model_path=model_path,
             accel_framework=accel_framework,
-            remasking=remasking,
             **kwargs,
         )
 
@@ -49,8 +47,10 @@ class LLaDAWrapper(DLLMBase):
             accel_framework=self.accel_framework,
         )
 
-    def _build_generation_config(self) -> dict:
-        config = super()._build_generation_config()
+    def _build_generation_config(self, gen_kwargs: dict) -> dict:
+        if "remasking" not in gen_kwargs:
+            gen_kwargs = {**gen_kwargs, "remasking": "low_confidence"}
+        config = super()._build_generation_config(gen_kwargs)
         if self._remdm_steps is not None:
             config["remdm_steps"] = self._remdm_steps
         if self._remdm_number is not None:
