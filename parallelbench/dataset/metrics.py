@@ -18,6 +18,8 @@ logger = logging.getLogger(__name__)
 
 def _parse_list(input_str, strict=False):
     """Parse a string representation of a list into an actual list."""
+    if isinstance(input_str, list):
+        return input_str
 
     if "[" in input_str:
         input_str = input_str.rsplit("[", 1)[1]
@@ -635,6 +637,9 @@ class ParaphraseScore(Metric):
 
 def parse_sudoku(sudoku_str, n=4, strict=False):
     assert n == 4
+
+    if isinstance(sudoku_str, list):
+        return sudoku_str
 
     sudoku_str = sudoku_str.strip()
 
