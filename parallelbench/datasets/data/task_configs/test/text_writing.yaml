@@ -17,19 +17,19 @@ tasks:
     prompt: "Paraphrase the following sentence. Only output the final result.\n\nSentence: {text}\n\nParaphrase:"
   words_to_sentence_easy:
     type: prebuilt
-    source: test/text_writing/words_to_sentence_easy.jsonl
+    source: words_to_sentence/words_to_sentence_easy.jsonl
     samples_per_length: 0
     metric: sentence_to_words_score
     prompt: "Construct a single, coherent sentence using the words {words}."
   words_to_sentence_medium:
     type: prebuilt
-    source: test/text_writing/words_to_sentence_medium.jsonl
+    source: words_to_sentence/words_to_sentence_medium.jsonl
     samples_per_length: 0
     metric: sentence_to_words_score
     prompt: "Construct a single, coherent sentence using the words {words}."
   words_to_sentence_hard:
     type: prebuilt
-    source: test/text_writing/words_to_sentence_hard.jsonl
+    source: words_to_sentence/words_to_sentence_hard.jsonl
     samples_per_length: 0
     metric: sentence_to_words_score
     prompt: "Construct a single, coherent sentence using the words {words}."

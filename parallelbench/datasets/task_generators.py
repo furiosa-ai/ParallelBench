@@ -434,7 +434,7 @@ def load_prebuilt_task(rng, task_config):
     from pathlib import Path
 
     source = task_config["source"]
-    source_path = Path(__file__).parent / "data" / "output" / source
+    source_path = Path(__file__).parent / "data" / "resources" / source
     if not source_path.exists():
         raise FileNotFoundError(f"Prebuilt data not found: {source_path}")
 
