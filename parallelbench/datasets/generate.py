@@ -1,10 +1,10 @@
 """Generate ParallelBench data and optionally push to HuggingFace Hub.
 
 Usage via CLI:
-    pb data --split test --output_dir ./output
-    pb data --split test --push --repo_id org/name
-    pb data --split test --output_dir ./output --push --repo_id org/name
-    pb data --split test --dry_run
+    pb data --output_dir ./output
+    pb data --push --repo_id org/name
+    pb data --output_dir ./output --push --repo_id org/name
+    pb data --dry_run
 """
 
 from __future__ import annotations
@@ -31,13 +31,13 @@ def _serialize_column(value):
     return value
 
 
-def _load_all_tasks(split: str) -> dict[str, dict]:
-    """Load all task configs for a given split.
+def _load_all_tasks() -> dict[str, dict]:
+    """Load all task configs.
 
-    Discovers YAML files under data/task_configs/<split>/ and returns
+    Discovers YAML files under data/task_configs/test/ and returns
     a flat dict mapping task_name -> task_config.
     """
-    config_dir = Path(__file__).resolve().parent / "data" / "task_configs" / split
+    config_dir = Path(__file__).resolve().parent / "data" / "task_configs" / "test"
     if not config_dir.exists():
         return {}
 
@@ -71,7 +71,6 @@ def _build_hub_dataset(task_name: str, task_config: dict, rows: list[dict]) -> D
 
 
 def generate(
-    split: str = "test",
     output_dir: str | None = None,
     push: bool = False,
     repo_id: str | None = None,
@@ -81,7 +80,6 @@ def generate(
     """Generate ParallelBench data, optionally saving locally and/or pushing to Hub.
 
     Args:
-        split: Dataset split to generate ("test", "train").
         output_dir: Directory to save JSONL files. None to skip local save.
         push: Whether to push to HuggingFace Hub.
         repo_id: HuggingFace repo ID (required when push=True).
@@ -91,12 +89,13 @@ def generate(
     Returns:
         Dict mapping task_name -> list of generated rows.
     """
-    tasks = _load_all_tasks(split)
+    split = "test"
+    tasks = _load_all_tasks()
     if not tasks:
-        print(f"No task configs found for split '{split}'")
+        print("No task configs found")
         return {}
 
-    print(f"Found {len(tasks)} tasks for split '{split}'")
+    print(f"Found {len(tasks)} tasks")
 
     all_rows = {}
     failed = []
@@ -150,12 +149,6 @@ def main():
         description="Generate ParallelBench data and optionally push to HuggingFace Hub."
     )
     parser.add_argument(
-        "--split",
-        type=str,
-        default="test",
-        help="Dataset split to generate (default: test)",
-    )
-    parser.add_argument(
         "--output_dir",
         type=str,
         help="Directory to save generated JSONL files",
@@ -189,7 +182,6 @@ def main():
         parser.error("Specify --output_dir, --push, or --dry_run")
 
     generate(
-        split=args.split,
         output_dir=args.output_dir,
         push=args.push,
         repo_id=args.repo_id,

@@ -17,7 +17,7 @@ class TestGenerateArgumentValidation:
                 main()
 
     def test_no_output_or_push_or_dry_run_raises(self):
-        with mock.patch.object(sys, "argv", ["prog", "--split", "test"]):
+        with mock.patch.object(sys, "argv", ["prog"]):
             with pytest.raises(SystemExit):
                 main()
 
@@ -29,7 +29,6 @@ class TestGenerateArgumentValidation:
             with mock.patch.object(sys, "argv", ["prog", "--dry_run"]):
                 main()
             mock_gen.assert_called_once_with(
-                split="test",
                 output_dir=None,
                 push=False,
                 repo_id=None,
@@ -42,7 +41,7 @@ class TestGenerateFunction:
     """Test the generate() function logic."""
 
     def test_dry_run_returns_data_without_saving(self, tmp_path):
-        result = generate(split="test", dry_run=True)
+        result = generate(dry_run=True)
         assert len(result) > 0
         for task_name, rows in result.items():
             assert isinstance(rows, list)
@@ -50,7 +49,6 @@ class TestGenerateFunction:
 
     def test_output_dir_saves_jsonl_files(self, tmp_path):
         result = generate(
-            split="test",
             output_dir=str(tmp_path),
         )
         assert len(result) > 0
@@ -59,9 +57,9 @@ class TestGenerateFunction:
             assert jsonl_path.exists(), f"Expected {jsonl_path} to exist"
             assert jsonl_path.stat().st_size > 0
 
-    def test_empty_split_returns_empty(self):
-        result = generate(split="nonexistent_split", dry_run=True)
-        assert result == {}
+    def test_generate_returns_data(self):
+        result = generate(dry_run=True)
+        assert len(result) > 0
 
     def test_push_calls_hub(self):
         """Verify push triggers push_to_hub with correct args."""
@@ -78,7 +76,6 @@ class TestGenerateFunction:
             mock_dd.return_value = mock_dd_instance
 
             generate(
-                split="test",
                 push=True,
                 repo_id="test-org/test-repo",
                 private=True,

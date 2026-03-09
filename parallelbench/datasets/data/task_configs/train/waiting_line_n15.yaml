@@ -1,9 +1,0 @@
-global_config:
-  seed: 123
-  words: first_last_names.yaml
-  num_samples: 1000
-  samples_per_length:
-    default: 1000
-  min_length: 15
-  max_length: 15
-tasks_from: ../test/waiting_line_n15.yaml
