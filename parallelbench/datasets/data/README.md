@@ -17,6 +17,7 @@ Included:
   - `train/puzzles.yaml`
 - `resources/`: generation resources used by current configs
   - `first_last_names.yaml`
+  - `common_words.yaml`
 
 Excluded on purpose:
 - `output/`: pre-generated JSONL datasets

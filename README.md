@@ -108,7 +108,7 @@ Here's a simple example of how to load a model and run it on a **ParallelBench**
 ```python
 import torch
 from transformers import AutoModel, AutoTokenizer
-from dataset.parallel_bench import ParallelBench
+from parallelbench.datasets import ParallelBench
 
 # 1. Load the model and tokenizer
 model = AutoModel.from_pretrained(
@@ -199,19 +199,25 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 
 ## 🛠️ Create Your Own Tasks
 
-You can easily generate custom tasks from YAML configuration files. For example, to create new `copy` and `reverse` tasks:
+You can easily generate custom tasks from YAML configuration files. For example, to generate the test split and save locally:
 
 ```bash
-PYTHONPATH=. python dataset/parallel_bench/data/task.py --task test/copy_reverse/all
+pb data --split test --output_dir ./output
 ```
 
-This command uses the configurations specified in `dataset/parallel_bench/data/task_configs/`.
+To generate and push directly to HuggingFace Hub:
+
+```bash
+pb data --split test --push --repo_id org/parallel_bench
+```
+
+This command uses the configurations specified in `parallelbench/datasets/data/task_configs/`.
 
 ***
 
 ## 🧩 Adding Custom Models
 
-You can integrate your own diffusion LLM by following the example in `model/local/example/`. This directory contains:
+You can integrate your own diffusion LLM by following the example in `parallelbench/models/local/example/`. This directory contains:
 
 - **`example_model.py`**: Template for implementing a custom model class that inherits from `LocalModel`
 - **`constants.py`**: Example constants such as mask token IDs and valid remasking strategies
@@ -225,9 +231,9 @@ You can integrate your own diffusion LLM by following the example in `model/loca
 Example structure:
 
 ```python
-from model.base_model import DLLMOutput, LocalModel
-from model.generation_config import DllmGenerationConfig
-from model.registry import ModelRegistry
+from parallelbench.models.base_model import DLLMOutput, LocalModel
+from parallelbench.models.generation_config import DllmGenerationConfig
+from parallelbench.models.registry import ModelRegistry
 
 @dataclass
 class CustomGenerationConfig(DllmGenerationConfig):
@@ -247,7 +253,7 @@ class CustomModel(LocalModel):
         return DLLMOutput(...)
 ```
 
-See `model/local/example/` for a working example.
+See `parallelbench/models/local/example/` for a working example.
 
 ## 🚀 Running Evaluations
 
@@ -268,62 +274,51 @@ For logging results, log in to Weights & Biases:
 uv run wandb login
 ```
 
-All experiments are launched using the `run_all.py` script. The general command structure is:
+Evaluations are launched using the `pb eval` CLI (built on [lm-eval-harness](https://github.com/EleutherAI/lm-evaluation-harness)). The general command structure is:
+
 ```bash
-python run_all.py eval.py --device <gpu_ids> --cfg <path_to_config_file>
+pb eval --model <wrapper> \
+  --model_args model_path=<model>,steps=128,max_tokens=128,block_length=128,remasking=<strategy> \
+  --tasks <task_names> \
+  --include_path parallelbench/tasks \
+  --batch_size 1
 ```
 
-### Main Benchmark Reproduction
-This section covers the commands to reproduce the main benchmark results from our paper. The following commands run evaluation on **two GPUs**.
+### Single Task Example
 
-- **LLaDA 1.5**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/llada_1_5_all_tasks_list.yaml
-  ```
-- **Dream**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/dream_all_tasks_list.yaml
-  ```
-- **Diffucoder**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/diffucoder_all_tasks_list.yaml
-  ```
-- **LLaDA 1.0**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/llada_1_0_all_tasks_list.yaml
-  ```
+```bash
+pb eval --model parallelbench_llada \
+  --model_args model_path=GSAI-ML/LLaDA-1.5,steps=32,max_tokens=32,block_length=1,remasking=random \
+  --tasks parallel_bench_waiting_line_copy \
+  --include_path parallelbench/tasks \
+  --batch_size 1
+```
 
-### dLLM vs. Autoregressive LLM Comparison
-This section includes the commands for the comparative analysis between our models and other strong LLM baselines.
+### Full Benchmark
 
-- **LLaDA 1.5**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/llada_1_5_all_tasks_list.yaml
-  ```
-- **Dream**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/dream_all_tasks_list.yaml
-  ```
-- **Diffucoder**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/diffucoder_all_tasks_list.yaml
-  ```
-- **LLaDA 1.0**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/llada_1_0_all_tasks_list.yaml
-  ```
-- **Mercury** (requires single GPU):
-  ```bash
-  python run_all.py eval.py --device 0 --cfg cfg/paper/dllm_vs_llm/mercury_all_tasks_list.yaml
-  ```
-- **Haiku** (requires single GPU):
-  ```bash
-  python run_all.py eval.py --device 0 --cfg cfg/paper/dllm_vs_llm/haiku_all_tasks_list.yaml
-  ```
-- **LLM Baselines** (via vLLM):
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/llm_all_tasks_list.yaml
-  ```
+```bash
+pb eval --model parallelbench_llada \
+  --model_args model_path=GSAI-ML/LLaDA-1.5,steps=128,max_tokens=128,block_length=128,remasking=low_confidence \
+  --tasks parallel_bench \
+  --include_path parallelbench/tasks
+```
+
+### Multi-GPU Evaluation
+
+```bash
+accelerate launch -m parallelbench.cli.eval --model parallelbench_llada \
+  --model_args model_path=GSAI-ML/LLaDA-1.5,steps=128,max_tokens=128,block_length=128 \
+  --tasks parallel_bench \
+  --include_path parallelbench/tasks
+```
+
+### Run All Models
+
+To run all supported models at once, use the provided script:
+
+```bash
+bash scripts/run_all.sh [output_dir]
+```
 
 
 ### Results
