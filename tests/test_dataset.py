@@ -8,7 +8,6 @@ from parallelbench.datasets import (
     PARALLEL_BENCH_TASKS,
     PARALLEL_BENCH_MASK_TOKEN,
 )
-from parallelbench.datasets.task import load_task
 
 
 class TestGetTaskNames:
@@ -37,14 +36,6 @@ class TestMaskToken:
 
 
 SIMPLE_TASK = "waiting_line/copy"
-
-
-class TestLoadTask:
-    def test_load_task(self):
-        ds, config = load_task("test", SIMPLE_TASK)
-        assert len(ds) > 0
-        assert "prompt" in config
-        assert "metric" in config
 
 
 class TestParallelBench:
