@@ -60,7 +60,7 @@ for task_entry in "${TASK_GROUPS[@]}"; do
         echo "[$CURRENT/$TOTAL_RUNS] $name | max_tokens=$MAX_TOKENS"
         echo "============================================"
 
-        uv run accelerate launch --main_process_port 0 -m parallelbench.cli \
+        uv run accelerate launch --main_process_port 0 -m parallelbench.cli.eval \
             --model "$wrapper" \
             --model_args "model_path=$model_path,steps=$MAX_TOKENS,max_tokens=$MAX_TOKENS,block_length=$MAX_TOKENS,$extra" \
             --tasks "$TASKS" \
@@ -79,7 +79,7 @@ for task_entry in "${TASK_GROUPS[@]}"; do
         echo "[$CURRENT/$TOTAL_RUNS] $name | max_tokens=$MAX_TOKENS"
         echo "============================================"
 
-        uv run accelerate launch --main_process_port 0 -m parallelbench.cli \
+        uv run accelerate launch --main_process_port 0 -m parallelbench.cli.eval \
             --model "$wrapper" \
             --model_args "model_path=$model_path,max_tokens=$MAX_TOKENS" \
             --tasks "$TASKS" \

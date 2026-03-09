@@ -53,7 +53,7 @@ parallelbench_ar = "parallelbench.lm_eval_models.ar_wrapper:ARWrapper"
 parallelbench_api = "parallelbench.lm_eval_models.api_wrapper:ApiWrapper"
 
 [project.scripts]
-parallelbench = "parallelbench.cli:main"
+pb = "parallelbench.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["parallelbench*"]
