@@ -9,6 +9,7 @@ This module provides:
 from pathlib import Path
 import argparse
 from collections import Counter
+import hashlib
 import json
 import random
 
@@ -109,6 +110,84 @@ def load_task(split, task_name, from_hub=None):
     task = Dataset.from_pandas(pd.read_json(path_or_buf=task_file, lines=True))
 
     return task, task_config
+
+
+def load_task_flex(split, task_name, flex_config):
+    """Generate task data on-the-fly with custom difficulty overrides.
+
+    Unlike load_task() which loads pre-generated JSONL data, this function
+    generates data dynamically using the base task config merged with
+    flex_config overrides (e.g., min_length, max_length, num_samples).
+
+    Args:
+        split: Dataset split ("test" or "train").
+        task_name: Task identifier (e.g., "waiting_line/copy").
+        flex_config: Dict of config overrides for difficulty control.
+
+    Returns:
+        Tuple of (Dataset, task_config dict).
+    """
+    category = task_name.split("/")[0]
+    all_configs = load_task_configs(f"{split}/{category}")
+    if task_name not in all_configs:
+        available = sorted(all_configs.keys())
+        raise ValueError(
+            f"Unknown task for flex mode: '{task_name}'. "
+            f"Available tasks in '{category}': {available}"
+        )
+
+    task_config = {**all_configs[task_name], **flex_config}
+
+    # Disable samples_per_length bucketing unless explicitly set in flex_config,
+    # because flex num_samples is unlikely to be divisible by the default value.
+    if "samples_per_length" not in flex_config:
+        task_config["samples_per_length"] = 0
+
+    # Inject seed — _create_task reads task['seed'] at line 237
+    seed = _flex_seed(task_name, flex_config)
+    task_config["seed"] = seed
+    rng = random.Random(seed)
+
+    # Load words from file if needed — create_parallel_bench_task does this at lines 258-260
+    if "words" in task_config and isinstance(task_config["words"], str):
+        task_config["words"] = load_words_from_file(task_config["words"])
+
+    data = _create_task(rng, task_config)
+
+    # Handle ICL examples if configured
+    if task_config.get("icl_example_count", 0) > 0:
+        icl_datasets = [
+            create_parallel_bench_task_random(
+                rng=rng, task={**task_config, "icl_example_count": 0}
+            )
+            for _ in range(task_config["icl_example_count"])
+        ]
+        for i, sample in enumerate(data):
+            sample["input"]["icl_examples"] = [
+                icl_dataset[i] for icl_dataset in icl_datasets
+            ]
+
+    ds = Dataset.from_list(data)
+    return ds, task_config
+
+
+def _flex_seed(task_name, flex_config):
+    """Compute a deterministic seed from task name + flex config.
+
+    Incorporates the flex_config hash so that different difficulty
+    parameters produce different (but reproducible) data.
+
+    Args:
+        task_name: Task identifier (e.g., "waiting_line/copy").
+        flex_config: Dict of config overrides.
+
+    Returns:
+        Integer seed in range [0, 2**16 - 1).
+    """
+    config_str = json.dumps(flex_config, sort_keys=True)
+    combined = task_name + ":" + config_str
+    seed = int(hashlib.sha256(combined.encode()).hexdigest(), 16)
+    return seed % (2**16 - 1)
 
 
 def generate_parallel_bench_task_random(rng, task_config, infinite=False):

@@ -14,11 +14,13 @@ from parallelbench.dataset.task_utils import (
     _generate_domino_sequence,
     _shuffle,
     generate_latin_square,
+    generate_sudoku_grid,
     generate_word_lists,
     latin_square_to_str,
     list_difference,
     list_to_str,
     repeat_list,
+    sudoku_grid_to_str,
 )
 from parallelbench.utils.grammar_check import grammar_check
 
@@ -294,6 +296,39 @@ def generate_latin_square_task(rng, task_config):
         }
 
 
+@register_task_generator("sudoku")
+def generate_sudoku_task(rng, task_config):
+    size = task_config["size"]
+    num_holes = task_config["num_holes"]
+    num_samples = task_config["num_samples"]
+
+    total_cells = size * size
+    if num_holes > total_cells:
+        raise ValueError(f"num_holes ({num_holes}) exceeds total cells ({total_cells})")
+
+    for _ in range(num_samples):
+        grid = generate_sudoku_grid(rng, size)
+        answer_str = sudoku_grid_to_str(grid)
+
+        cells = [(r, c) for r in range(size) for c in range(size)]
+        holes = rng.sample(cells, num_holes)
+
+        puzzle = [row[:] for row in grid]
+        for r, c in holes:
+            puzzle[r][c] = "_"
+
+        puzzle_str = "\n".join("".join(str(cell) for cell in row) for row in puzzle)
+
+        yield {
+            "input": {"size": size, "puzzle": puzzle_str},
+            "answer": answer_str,
+            "metadata": {
+                "length": size,
+                "num_holes": num_holes,
+            },
+        }
+
+
 @register_task_generator("rec_cumsum")
 def generate_rec_cumsum_task(rng, task_config):
     return (
@@ -378,3 +413,15 @@ def generate_paraphrase_task(rng, task_config):
                 logging.getLogger(__name__).debug("Skipping non-grammatical sample")
     else:
         raise ValueError(f"Unknown source: {source}")
+
+
+@register_task_generator("words_to_sentence")
+def generate_words_to_sentence_task(rng, task_config):
+    for selected_words in generate_word_lists(rng, **task_config):
+        yield {
+            "input": {"words": ", ".join(selected_words)},
+            "answer": {"words": selected_words},
+            "metadata": {
+                "length": len(selected_words),
+            },
+        }

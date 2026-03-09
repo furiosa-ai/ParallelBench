@@ -53,9 +53,14 @@ class ParallelBenchTask(ConfigurableTask):
                 "ParallelBenchTask requires metadata.parallel_bench_task in YAML config"
             )
 
+        flex_config = metadata.get("flex_config")
         from_hub = (config or {}).get("dataset_path")
+        # dataset_path (Hub) takes priority over flex_config so that
+        # adding dataset_path to a flex-enabled YAML switches to paper-reproduce mode.
+        if from_hub:
+            flex_config = None
         self._parallel_bench = ParallelBench(
-            task=task_name, split="test", from_hub=from_hub
+            task=task_name, split="test", from_hub=from_hub, flex_config=flex_config
         )
         self._metric_name = self._parallel_bench.metric_name
 

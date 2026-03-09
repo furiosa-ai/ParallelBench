@@ -15,3 +15,24 @@ tasks:
     metric: paraphrase_score
     lengths: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     prompt: "Paraphrase the following sentence. Only output the final result.\n\nSentence: {text}\n\nParaphrase:"
+  words_to_sentence_easy:
+    type: words_to_sentence
+    metric: sentence_to_words_score
+    words: common_words.yaml
+    min_length: 3
+    max_length: 5
+    prompt: "Write a grammatically correct English sentence using all of the following words: {words}. Only output the final result."
+  words_to_sentence_medium:
+    type: words_to_sentence
+    metric: sentence_to_words_score
+    words: common_words.yaml
+    min_length: 5
+    max_length: 8
+    prompt: "Write a grammatically correct English sentence using all of the following words: {words}. Only output the final result."
+  words_to_sentence_hard:
+    type: words_to_sentence
+    metric: sentence_to_words_score
+    words: common_words.yaml
+    min_length: 8
+    max_length: 12
+    prompt: "Write a grammatically correct English sentence using all of the following words: {words}. Only output the final result."

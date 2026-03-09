@@ -315,6 +315,50 @@ def generate_latin_square(rng, symbols):
     return final_square
 
 
+def generate_sudoku_grid(rng, size=4):
+    """Generate a valid completed sudoku grid via randomized backtracking."""
+    box_size = int(size**0.5)
+    assert box_size * box_size == size, "Size must be a perfect square (4, 9, 16, ...)"
+
+    grid = [[0] * size for _ in range(size)]
+    digits = list(range(1, size + 1))
+
+    def is_valid(row, col, num):
+        if num in grid[row]:
+            return False
+        if any(grid[r][col] == num for r in range(size)):
+            return False
+        box_row, box_col = (row // box_size) * box_size, (col // box_size) * box_size
+        for r in range(box_row, box_row + box_size):
+            for c in range(box_col, box_col + box_size):
+                if grid[r][c] == num:
+                    return False
+        return True
+
+    def fill():
+        for row in range(size):
+            for col in range(size):
+                if grid[row][col] == 0:
+                    candidates = digits[:]
+                    rng.shuffle(candidates)
+                    for num in candidates:
+                        if is_valid(row, col, num):
+                            grid[row][col] = num
+                            if fill():
+                                return True
+                            grid[row][col] = 0
+                    return False
+        return True
+
+    fill()
+    return grid
+
+
+def sudoku_grid_to_str(grid):
+    """Convert a sudoku grid to a newline-separated string of digits."""
+    return "\n".join("".join(str(cell) for cell in row) for row in grid)
+
+
 def latin_square_to_str(square):
     return "\n".join(",".join(str(cell) for cell in row) for row in square)
 

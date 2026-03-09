@@ -9,3 +9,9 @@ tasks:
     metric: latin_square_score
     size: 4
     prompt: "Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV without header."
+  sudoku_n4:
+    type: sudoku
+    metric: sudoku_score
+    size: 4
+    num_holes: 8
+    prompt: "Solve the following {size}x{size} Sudoku puzzle. Replace each _ with a digit from 1 to {size}. Only output the final result.\n\n{puzzle}"

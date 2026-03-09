@@ -4,6 +4,7 @@ from parallelbench.dataset.task import (
     PARALLEL_BENCH_MASK_TOKEN as PARALLEL_BENCH_MASK_TOKEN,
     create_parallel_bench_task as create_parallel_bench_task,
     load_task,
+    load_task_flex,
     task_name_to_config_name as task_name_to_config_name,
     config_name_to_task_name as config_name_to_task_name,
 )
@@ -26,11 +27,20 @@ PARALLEL_BENCH_TASKS = get_task_names()
 
 class ParallelBench:
     def __init__(
-        self, task, split="test", num_samples=None, infill=False, from_hub=None
+        self,
+        task,
+        split="test",
+        num_samples=None,
+        infill=False,
+        from_hub=None,
+        flex_config=None,
     ):
         self.task = task
         self.infill = infill
-        self.ds, task_config = load_task(split, task, from_hub=from_hub)
+        if flex_config is not None:
+            self.ds, task_config = load_task_flex(split, task, flex_config=flex_config)
+        else:
+            self.ds, task_config = load_task(split, task, from_hub=from_hub)
 
         self.prompt = task_config["prompt"]
         self.metric_name = task_config["metric"]
