@@ -1,0 +1,8 @@
+group: parallel_bench_text_writing
+group_alias: "ParallelBench - Text Writing"
+task:
+  - parallel_bench_text_writing_paraphrasing
+  - parallel_bench_text_writing_summarization
+  - parallel_bench_text_writing_words_to_sentence_easy
+  - parallel_bench_text_writing_words_to_sentence_medium
+  - parallel_bench_text_writing_words_to_sentence_hard

@@ -2,6 +2,5 @@ group: parallel_bench
 group_alias: ParallelBench
 task:
   - parallel_bench_waiting_line
-  - parallel_bench_waiting_line_n15
   - parallel_bench_text_writing
   - parallel_bench_puzzles

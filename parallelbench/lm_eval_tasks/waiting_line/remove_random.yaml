@@ -1,10 +1,8 @@
+include: _base.yml
 task: parallel_bench_waiting_line_remove_random
-class: !function ../parallel_bench_task.ParallelBenchTask
-output_type: generate_until
-generation_kwargs:
-  until:
-    - "\n\n"
-  do_sample: false
-test_split: test
 metadata:
   parallel_bench_task: "waiting_line/remove_random"
+  flex_config:
+    min_length: 3
+    max_length: 6
+    num_samples: 100
