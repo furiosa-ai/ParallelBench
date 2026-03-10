@@ -27,6 +27,7 @@ METRIC_KEYS = [
     "score",
     "score_strict",
     "nfe",
+    "tokens_per_step",
     "input_length",
     "output_length",
     "dec_order_kendall",
@@ -59,7 +60,6 @@ CSV_COLUMNS = [
     "task",
     *GENERATION_KWARGS_KEYS,
     *METRIC_KEYS,
-    "tokens_per_step",
     "n_samples",
     "results_file",
 ]
@@ -98,13 +98,14 @@ def _extract_rows_from_results(results_file: Path) -> list[dict]:
                 value = ""
             row[metric] = value
 
-        # Compute tokens per step
-        try:
-            nfe = float(row["nfe"])
-            max_tokens = int(row["max_tokens"])
-            row["tokens_per_step"] = f"{max_tokens / nfe:.1f}" if nfe > 0 else ""
-        except (ValueError, TypeError):
-            row["tokens_per_step"] = ""
+        # Fallback: compute tokens_per_step from gen_kwargs if not in metrics
+        if not row.get("tokens_per_step"):
+            try:
+                nfe = float(row["nfe"])
+                max_tokens = int(row["max_tokens"])
+                row["tokens_per_step"] = max_tokens / nfe if nfe > 0 else ""
+            except (ValueError, TypeError):
+                row["tokens_per_step"] = ""
 
         task_n_samples = n_samples.get(task_name, {})
         row["n_samples"] = task_n_samples.get("effective", "")
@@ -174,6 +175,11 @@ def _format_value(key: str, value) -> str:
     if key == "nfe":
         try:
             return f"{float(value):.0f}"
+        except (ValueError, TypeError):
+            return str(value)
+    if key == "tokens_per_step":
+        try:
+            return f"{float(value):.1f}"
         except (ValueError, TypeError):
             return str(value)
     return str(value)

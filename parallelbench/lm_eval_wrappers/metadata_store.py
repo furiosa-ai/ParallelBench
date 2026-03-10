@@ -24,6 +24,7 @@ class GenerationMetadata:
     """Metadata captured from a single dLLM generation call."""
 
     nfe: int = 0
+    tokens_per_step: Optional[float] = None
     history: Optional[list] = None
     decoding_order: Optional[torch.Tensor] = None
     decoding_order_corrs: Optional[dict] = None

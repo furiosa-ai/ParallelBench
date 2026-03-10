@@ -122,6 +122,11 @@ class ParallelBenchTask(ConfigurableTask):
         metadata = MetadataStore.instance().pop()
 
         sample_metrics["nfe"] = float(metadata.nfe)
+        sample_metrics["tokens_per_step"] = (
+            float(metadata.tokens_per_step)
+            if metadata.tokens_per_step is not None
+            else 0.0
+        )
         sample_metrics["input_length"] = float(metadata.input_length or 0)
         sample_metrics["output_length"] = float(metadata.output_length or 0)
 
@@ -161,6 +166,7 @@ class ParallelBenchTask(ConfigurableTask):
         for key in self._metric_keys:
             result[key] = True
         result["nfe"] = False
+        result["tokens_per_step"] = True
         result["input_length"] = None
         result["output_length"] = None
         result["dec_order_kendall"] = None

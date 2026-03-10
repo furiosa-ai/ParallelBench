@@ -7,6 +7,9 @@ aggregate_metric_list:
   - metric: nfe
     aggregation: mean
     weight_by_size: true
+  - metric: tokens_per_step
+    aggregation: mean
+    weight_by_size: true
 task:
   - parallel_bench_puzzles_sudoku_n4
   - parallel_bench_puzzles_latin_square_n4
