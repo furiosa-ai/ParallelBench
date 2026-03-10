@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from lm_eval.api.registry import register_model
 
 from parallelbench.models.base_model import BaseModel
@@ -15,31 +13,7 @@ from parallelbench.lm_eval_wrappers.dllm_base import DLLMBase
 
 @register_model("parallelbench_llada")
 class LLaDAWrapper(DLLMBase):
-    """lm-eval wrapper around LladaModel.
-
-    Extra model_args (in addition to DLLMBase args):
-        remdm_steps: int         - ReMDM variant steps
-        remdm_number: int        - ReMDM variant number
-        rcr_overtime_conf: bool  - RCR variant overtime confidence
-    """
-
-    def __init__(
-        self,
-        model_path: str,
-        accel_framework: Optional[str] = None,
-        remdm_steps: Optional[int] = None,
-        remdm_number: Optional[int] = None,
-        rcr_overtime_conf: Optional[bool] = None,
-        **kwargs,
-    ) -> None:
-        self._remdm_steps = remdm_steps
-        self._remdm_number = remdm_number
-        self._rcr_overtime_conf = rcr_overtime_conf
-        super().__init__(
-            model_path=model_path,
-            accel_framework=accel_framework,
-            **kwargs,
-        )
+    """lm-eval wrapper around LladaModel."""
 
     def _create_inner_model(self) -> BaseModel:
         return LladaModel(
@@ -49,12 +23,5 @@ class LLaDAWrapper(DLLMBase):
 
     def _build_generation_config(self, gen_kwargs: dict) -> dict:
         if "remasking" not in gen_kwargs:
-            gen_kwargs = {**gen_kwargs, "remasking": "low_confidence"}
-        config = super()._build_generation_config(gen_kwargs)
-        if self._remdm_steps is not None:
-            config["remdm_steps"] = self._remdm_steps
-        if self._remdm_number is not None:
-            config["remdm_number"] = self._remdm_number
-        if self._rcr_overtime_conf is not None:
-            config["rcr_overtime_conf"] = self._rcr_overtime_conf
-        return config
+            gen_kwargs = {**gen_kwargs, "remasking": "confidence_topk"}
+        return super()._build_generation_config(gen_kwargs)

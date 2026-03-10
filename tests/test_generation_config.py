@@ -50,12 +50,12 @@ def test_dllm_generation_config_valid():
 def test_dllm_generation_config_threshold_remasking():
     """Test threshold-based remasking strategies with custom valid_strategies."""
     config = DllmGenerationConfig(
-        remasking="low_confidence_threshold",
+        remasking="confidence_threshold",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_threshold=0.5,
-        valid_strategies={"low_confidence", "low_confidence_threshold"},
+        valid_strategies={"confidence_topk", "confidence_threshold"},
     )
     assert config.is_threshold_remasking is True
     assert config.is_default_remasking is False
@@ -64,12 +64,12 @@ def test_dllm_generation_config_threshold_remasking():
 def test_dllm_generation_config_factor_remasking():
     """Test factor-based remasking strategies with custom valid_strategies."""
     config = DllmGenerationConfig(
-        remasking="low_confidence_factor",
+        remasking="confidence_factor",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_factor=2.0,
-        valid_strategies={"low_confidence", "low_confidence_factor"},
+        valid_strategies={"confidence_topk", "confidence_factor"},
     )
     assert config.is_factor_remasking is True
 

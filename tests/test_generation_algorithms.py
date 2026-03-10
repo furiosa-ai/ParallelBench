@@ -1,13 +1,8 @@
 """Tests for generation algorithm pure functions."""
 
-import pytest
 import torch
 
 from parallelbench.models.local.generate import get_num_transfer_tokens
-from parallelbench.models.local.generate_rcr import (
-    gamma_func,
-    get_num_transfer_tokens_maskgit,
-)
 
 
 # -- get_num_transfer_tokens --
@@ -70,57 +65,3 @@ def test_get_num_transfer_tokens_steps_equal_mask_count():
     mask_index = torch.tensor([[True] * 5])
     result = get_num_transfer_tokens(mask_index, steps=5)
     assert (result == 1).all()
-
-
-# -- gamma_func --
-
-
-def test_gamma_func_linear():
-    assert gamma_func(0.5, "linear") == pytest.approx(0.5)
-
-
-def test_gamma_func_cosine_at_zero():
-    assert gamma_func(0.0, "cosine") == pytest.approx(1.0)
-
-
-def test_gamma_func_pow2():
-    # 1 - 0.5^2 = 0.75
-    assert gamma_func(0.5, "pow2") == pytest.approx(0.75)
-
-
-def test_gamma_func_log():
-    result = gamma_func(0.5, "log", total_num=512)
-    assert 0.0 < result <= 1.0
-
-
-def test_gamma_func_unknown_mode_raises():
-    with pytest.raises(NotImplementedError):
-        gamma_func(0.5, "unknown_mode")
-
-
-def test_gamma_func_result_clipped():
-    # Result should always be in [1e-6, 1.0]
-    for mode in ["linear", "cosine", "pow2"]:
-        for r in [0.0, 0.25, 0.5, 0.75, 1.0]:
-            result = gamma_func(r, mode)
-            assert 1e-6 <= result <= 1.0, (
-                f"gamma_func({r}, {mode}) = {result} out of range"
-            )
-
-
-# -- get_num_transfer_tokens_maskgit --
-
-
-def test_get_num_transfer_tokens_maskgit_basic():
-    mask_index = torch.tensor([[True] * 10])
-    result = get_num_transfer_tokens_maskgit(mask_index, steps=5, mode="linear")
-    assert result.shape == (1, 5)
-    assert result.dtype == torch.int64
-    assert result.sum().item() == 10
-
-
-def test_get_num_transfer_tokens_maskgit_sum_equals_total_masks():
-    mask_index = torch.tensor([[True, True, False, True, True, True]])
-    total_masks = mask_index.sum().item()
-    result = get_num_transfer_tokens_maskgit(mask_index, steps=3, mode="cosine")
-    assert result.sum().item() == total_masks

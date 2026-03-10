@@ -136,7 +136,7 @@ class TestLLaDAWrapperIntegration:
                     "steps": 32,
                     "max_tokens": 32,
                     "block_length": 32,
-                    "remasking": "low_confidence",
+                    "remasking": "confidence_topk",
                 },
             )
         ]
@@ -185,38 +185,6 @@ class TestLLaDAWrapperIntegration:
         assert gen_config["block_length"] == 64
         assert gen_config["remasking"] == "random"
         assert gen_config["temperature"] == 0.5
-
-    @patch("parallelbench.lm_eval_wrappers.llada_wrapper.LladaModel")
-    def test_llada_specific_params(self, MockLladaModel):
-        mock_model = MagicMock()
-        mock_model.generate.return_value = _make_dllm_output("result")
-        MockLladaModel.return_value = mock_model
-
-        from parallelbench.lm_eval_wrappers.llada_wrapper import LLaDAWrapper
-
-        wrapper = LLaDAWrapper(
-            model_path="GSAI-ML/LLaDA-1.5",
-            remdm_steps=4,
-            remdm_number=2,
-        )
-
-        instances = [
-            _make_mock_instance(
-                gen_kwargs={
-                    "until": ["\n\n"],
-                    "do_sample": False,
-                    "steps": 32,
-                    "max_tokens": 32,
-                    "block_length": 32,
-                    "remasking": "remdm",
-                }
-            )
-        ]
-        wrapper.generate_until(instances)
-
-        gen_config = mock_model.generate.call_args.kwargs["gen_config"]
-        assert gen_config["remdm_steps"] == 4
-        assert gen_config["remdm_number"] == 2
 
 
 class TestDreamWrapperIntegration:

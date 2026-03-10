@@ -73,7 +73,7 @@ def block_diffusion_generate(
     temperature=1.0,
     top_k=0,
     top_p=1.0,
-    remasking="low_confidence_threshold",
+    remasking="confidence_threshold",
     threshold=0.85,
     stopping_criteria_idx=None,
     output_history=False,
@@ -193,14 +193,14 @@ def block_diffusion_generate(
                     else:
                         raise ValueError("No mask tokens found in the current block.")
 
-            elif remasking == "low_confidence":
+            elif remasking == "confidence_topk":
                 confidence = torch.where(mask_index, x0_p, -torch.inf)
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)
                 for j in range(confidence.shape[0]):
                     _, idx = torch.topk(confidence[j], num_transfer_tokens[step])
                     transfer_index[j, idx] = True
 
-            elif remasking == "low_confidence_threshold":
+            elif remasking == "confidence_threshold":
                 confidence = torch.where(mask_index, x0_p, -torch.inf)
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)
                 for j in range(confidence.shape[0]):
@@ -210,7 +210,7 @@ def block_diffusion_generate(
                         # number of high confidence tokens is larger or equal to step schedule
                         transfer_index[j] = high_conf_mask
                     else:
-                        # insufficient high confidence tokens, just do low_confidence_static
+                        # insufficient high confidence tokens, just do confidence_topk
                         _, idx = torch.topk(confidence[j], num_transfer_tokens[step])
                         transfer_index[j, idx] = True
             else:

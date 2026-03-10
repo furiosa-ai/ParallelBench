@@ -3,7 +3,14 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 
-DEFAULT_VALID_STRATEGIES = {"random", "low_confidence", "topk_margin", "entropy"}
+DEFAULT_VALID_STRATEGIES = {
+    "random",
+    "confidence_topk",
+    "topk_margin",
+    "entropy_topk",
+    "confidence_threshold",
+    "confidence_factor",
+}
 
 
 @dataclass

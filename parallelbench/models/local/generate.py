@@ -77,7 +77,7 @@ def generate_with_no_cache(
     gen_length=128,
     block_length=128,
     temperature=0.0,
-    remasking="low_confidence",
+    remasking="confidence_topk",
     mask_id=126336,
     threshold=None,
     factor=None,
@@ -95,7 +95,7 @@ def generate_with_no_cache(
         block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive remasking.
         temperature: Categorical distribution sampling temperature.
         cfg_scale: Unsupervised classifier-free guidance scale.
-        remasking: Remasking strategy. 'low_confidence' or 'random'.
+        remasking: Remasking strategy. 'confidence_topk' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
@@ -192,7 +192,7 @@ def generate_with_prefix_cache(
     gen_length=128,
     block_length=128,
     temperature=0.0,
-    remasking="low_confidence",
+    remasking="confidence_topk",
     mask_id=126336,
     threshold=None,
     factor=None,
@@ -209,7 +209,7 @@ def generate_with_prefix_cache(
         block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive remasking.
         temperature: Categorical distribution sampling temperature.
         cfg_scale: Unsupervised classifier-free guidance scale.
-        remasking: Remasking strategy. 'low_confidence' or 'random'.
+        remasking: Remasking strategy. 'confidence_topk' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
@@ -336,7 +336,7 @@ def generate_with_dual_cache(
     gen_length=128,
     block_length=128,
     temperature=0.0,
-    remasking="low_confidence",
+    remasking="confidence_topk",
     mask_id=126336,
     threshold=None,
     factor=None,
@@ -352,7 +352,7 @@ def generate_with_dual_cache(
         block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive remasking.
         temperature: Categorical distribution sampling temperature.
         cfg_scale: Unsupervised classifier-free guidance scale.
-        remasking: Remasking strategy. 'low_confidence' or 'random'.
+        remasking: Remasking strategy. 'confidence_topk' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
@@ -497,7 +497,7 @@ def get_transfer_index(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if remasking.startswith("low_confidence"):
+    if remasking.startswith("confidence"):
         # get probabilities of selected ids (confidence)
         # x0_p = torch.squeeze(
         #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
@@ -586,7 +586,7 @@ def get_transfer_index_dynamic(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if remasking.startswith("low_confidence"):
+    if remasking.startswith("confidence"):
         # get probabilities of selected ids (confidence)
         # x0_p = torch.squeeze(
         #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l

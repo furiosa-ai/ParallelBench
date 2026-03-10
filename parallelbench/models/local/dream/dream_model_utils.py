@@ -219,14 +219,11 @@ def sample_block(
         tok_idx = None
         attention_mask = "full"
 
-    if alg == "low_confidence_threshold":
+    if alg == "confidence_threshold":
         assert threshold is not None, (
-            "threshold must be provided for low_confidence_threshold algorithm"
+            "threshold must be provided for confidence_threshold algorithm"
         )
-        alg = "low_confidence"
-    else:
-        pass
-        # assert threshold is None, "threshold should not be provided for non-low_confidence_threshold algorithms"
+        alg = "confidence_topk"
 
     # Process each block
     for num_block in range(num_blocks):
@@ -275,7 +272,7 @@ def sample_block(
             else:
                 mask_logits = logits[mask_index]
 
-                if alg == "low_confidence":
+                if alg == "confidence_topk":
                     confidence, x0 = sample_tokens(
                         mask_logits, temperature=temperature, top_p=top_p, top_k=top_k
                     )
@@ -287,7 +284,7 @@ def sample_block(
                         top_k=top_k,
                         margin_confidence=True,
                     )
-                elif alg == "entropy":
+                elif alg == "entropy_topk":
                     confidence, x0 = sample_tokens(
                         mask_logits,
                         temperature,
