@@ -115,14 +115,19 @@ def extract_task_name(results: dict) -> str:
     """Extract task name from results dict.
 
     lm-eval stores results keyed by task name. For single-task runs,
-    there is exactly one key. Falls back to 'unknown_task' if empty.
+    there is exactly one key. For multi-task runs, uses the common prefix
+    (e.g., "parallel_bench") to avoid overly long filenames.
+    Falls back to 'unknown_task' if empty.
     """
     task_names = list(results.get("results", {}).keys())
     if len(task_names) == 1:
         return task_names[0]
-    # Multi-task runs: join names
     if task_names:
-        return "_".join(sorted(task_names))
+        # Find common prefix to produce a short group name
+        prefix = os.path.commonprefix(sorted(task_names)).rstrip("_")
+        if prefix:
+            return prefix
+        return f"{len(task_names)}_tasks"
     return "unknown_task"
 
 
