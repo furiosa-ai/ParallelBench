@@ -1,13 +1,13 @@
-"""Custom EvaluationTracker that organizes results by gen_kwargs subdirectory.
+"""Custom EvaluationTracker that organizes results by structured subdirectories.
 
 lm-eval's default output structure:
     {output_path}/{model_sanitized}/results_{timestamp}.json
 
 ParallelBench output structure:
-    {output_path}/{model_sanitized}/{gen_kwargs_dir}/results_{timestamp}.json
+    {output_path}/{model_sanitized}/{remasking}/{task}/{gen_kwargs_dir}/results_{timestamp}.json
 
-This allows sweep experiments with different gen_kwargs to be cleanly separated
-while sharing the same model directory.
+This allows browsing results by (model, remasking) pair and comparing
+across tasks and hyperparameter sweeps.
 """
 
 from __future__ import annotations
@@ -26,15 +26,17 @@ logger = logging.getLogger(__name__)
 
 
 def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
-    """Build a directory name from gen_kwargs dict.
+    """Build a directory name from gen_kwargs dict (excluding remasking).
 
-    Produces a compact, filesystem-safe string like 'bl32_s32_low_confidence'.
+    Produces a compact, filesystem-safe string like 'bl32_s32'.
     Keys are abbreviated and ordered for readability:
-        block_length -> bl, steps -> s, remasking -> (value only),
+        block_length -> bl, steps -> s, max_tokens -> mt,
         alg_threshold -> at, alg_factor -> af, temperature -> t
     Unknown keys are appended as key=value pairs sorted alphabetically.
 
-    Returns 'default' when gen_kwargs is empty or None.
+    Remasking is excluded because it gets its own directory level.
+
+    Returns 'default' when gen_kwargs is empty or None (after removing remasking).
     """
     if not gen_kwargs:
         return "default"
@@ -43,7 +45,6 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
         "block_length": "bl",
         "steps": "s",
         "max_tokens": "mt",
-        "remasking": "",
         "alg_threshold": "at",
         "alg_factor": "af",
         "temperature": "t",
@@ -54,7 +55,6 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
     ordered_keys = [
         "block_length",
         "steps",
-        "remasking",
         "max_tokens",
         "temperature",
         "alg_temp",
@@ -76,18 +76,14 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
         if isinstance(value, float) and value == int(value):
             value = int(value)
 
-        if abbr == "":
-            # remasking: use value directly
-            parts.append(str(value))
-        else:
-            parts.append(f"{abbr}{value}")
+        parts.append(f"{abbr}{value}")
 
     # Append any unknown keys sorted alphabetically
     for key in sorted(gen_kwargs.keys()):
         if key in used_keys:
             continue
-        # Skip lm-eval internal keys
-        if key in ("until", "do_sample"):
+        # Skip lm-eval internal keys and remasking (separate directory level)
+        if key in ("until", "do_sample", "remasking"):
             continue
         value = gen_kwargs[key]
         if isinstance(value, float) and value == int(value):
@@ -95,6 +91,31 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
         parts.append(f"{key}{value}")
 
     return "_".join(parts) if parts else "default"
+
+
+def extract_remasking(gen_kwargs: dict | None) -> str:
+    """Extract remasking strategy from gen_kwargs.
+
+    Returns 'default' when gen_kwargs is empty or remasking is not specified.
+    """
+    if not gen_kwargs:
+        return "default"
+    return str(gen_kwargs.get("remasking", "default"))
+
+
+def extract_task_name(results: dict) -> str:
+    """Extract task name from results dict.
+
+    lm-eval stores results keyed by task name. For single-task runs,
+    there is exactly one key. Falls back to 'unknown_task' if empty.
+    """
+    task_names = list(results.get("results", {}).keys())
+    if len(task_names) == 1:
+        return task_names[0]
+    # Multi-task runs: join names
+    if task_names:
+        return "_".join(sorted(task_names))
+    return "unknown_task"
 
 
 class ParallelBenchEvaluationTracker(EvaluationTracker):
@@ -109,10 +130,15 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
         # Will be set by save_results_aggregated for reuse in save_results_samples
         self._gen_kwargs_output_dir: Path | None = None
 
-    def _resolve_output_dir(self, gen_kwargs: dict | None) -> Path:
-        """Build the output directory path including gen_kwargs subdirectory."""
+    def _resolve_output_dir(
+        self, gen_kwargs: dict | None, results: dict | None = None
+    ) -> Path:
+        """Build the output directory: model/remasking/task/gen_kwargs."""
         path = Path(self.output_path if self.output_path else Path.cwd())
         path = path / self.general_config_tracker.model_name_sanitized
+        path = path / extract_remasking(gen_kwargs)
+        if results is not None:
+            path = path / extract_task_name(results)
         path = path / build_gen_kwargs_dirname(gen_kwargs)
         path.mkdir(parents=True, exist_ok=True)
         return path
@@ -147,7 +173,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                 )
 
                 gen_kwargs = results.get("config", {}).get("gen_kwargs")
-                path = self._resolve_output_dir(gen_kwargs)
+                path = self._resolve_output_dir(gen_kwargs, results)
                 self._gen_kwargs_output_dir = path
 
                 self.date_id = datetime.now().isoformat().replace(":", "-")
@@ -155,13 +181,14 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                 file_path.open("w", encoding="utf-8").write(dumped)
 
                 logger.info(
-                    "Results saved to %s (gen_kwargs_dir: %s)",
+                    "Results saved to %s",
                     file_path,
-                    build_gen_kwargs_dirname(gen_kwargs),
                 )
 
                 # Handle Hub pushing
                 if self.api and self.push_results_to_hub:
+                    remasking_dir = extract_remasking(gen_kwargs)
+                    task_dir = extract_task_name(results)
                     gen_kwargs_dir = build_gen_kwargs_dirname(gen_kwargs)
                     repo_id = (
                         self.results_repo
@@ -179,6 +206,8 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                         path_or_fileobj=str(file_path),
                         path_in_repo=os.path.join(
                             self.general_config_tracker.model_name,
+                            remasking_dir,
+                            task_dir,
                             gen_kwargs_dir,
                             f"results_{self.date_id}.json",
                         ),

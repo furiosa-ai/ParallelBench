@@ -17,7 +17,7 @@ set -euo pipefail
 EXTRA_ARGS="${*}"
 INCLUDE_PATH="parallelbench/tasks"
 OUTPUT_DIR="results"
-LIMIT=8
+LIMIT=2
 BATCH_SIZE=1
 
 MODEL="parallelbench_llada"
@@ -63,7 +63,7 @@ for entry in "${RUNS[@]}"; do
     echo "  gen_kwargs: $gen_kwargs"
     echo "============================================"
 
-    accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
+    uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
         --model "$MODEL" \
         --model_args "$MODEL_ARGS" \
         --gen_kwargs "$gen_kwargs" \
