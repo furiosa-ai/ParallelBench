@@ -444,12 +444,10 @@ def sentence_to_words_score(prediction, ground_truth) -> dict[str, float]:
 
     inclusion_score = all(word in prediction for word in words)
     grammar_result = grammar_check(prediction)
-    score = inclusion_score and grammar_result
-
     return {
         "inclusion_score": float(inclusion_score),
         "grammar_score": float(grammar_result),
-        "score": float(score),
+        "score": float(grammar_result),
     }
 
 
@@ -581,7 +579,7 @@ class SummaryScore(Metric):
             "rouge2_score": rouge["rouge2"],
             "rougeL_score": rouge["rougeL"],
             "grammar_score": grammar,
-            "score": rouge["rougeL"] * grammar,
+            "score": grammar,
         }
 
         metrics = {k: float(v) for k, v in metrics.items()}
@@ -627,7 +625,7 @@ class ParaphraseScore(Metric):
             "inv_bleu_score": inv_bleu,
             "bertscore_score": bertscore,
             "grammar_score": grammar,
-            "score": inv_bleu * bertscore * grammar,
+            "score": grammar,
         }
 
         metrics = {k: float(v) for k, v in metrics.items()}
