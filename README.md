@@ -89,7 +89,8 @@ These parameters control the degree of parallelism when running evaluations with
 
 | Parameter | Type | Default | Description |
 | --------- | ---- | ------- | ----------- |
-| `steps` | int | 128 | Total denoising steps. For top-k methods, `tokens_per_step = max_tokens / steps` |
+| `k` | int | — | Tokens per step for top-k strategies. Auto-derives `steps = max_tokens / k` and `block_length = max_tokens` |
+| `steps` | int | 128 | Total denoising steps. For top-k methods, `k = max_tokens / steps` |
 | `block_length` | int | max_tokens | Semi-AR block size. Tokens within a block are decoded in parallel; blocks are decoded left-to-right |
 | `max_tokens` | int | 128 | Maximum output length |
 | `remasking` | str | — | Unmasking strategy (see table below) |
@@ -346,28 +347,28 @@ pb eval --model <wrapper> \
 
 ### Single Task Example
 
-Run LLaDA-1.5 on `waiting_line/copy` with **32 tokens per step** (fully parallel):
+Run LLaDA-1.5 on `waiting_line/copy` with **k=32** (fully parallel):
 
 ```bash
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
-  --gen_kwargs steps=1,block_length=32,remasking=random \
+  --gen_kwargs k=32,remasking=random \
   --tasks parallel_bench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
-# steps=1, block_length=32 → tokens_per_step = 32 (fully parallel)
+# k=32 → steps=1, block_length=32 (fully parallel)
 ```
 
-Compare with **one-by-one decoding** (1 token per step):
+Compare with **one-by-one decoding** (k=1):
 
 ```bash
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
-  --gen_kwargs steps=32,block_length=32,remasking=random \
+  --gen_kwargs k=1,remasking=random \
   --tasks parallel_bench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
-# steps=32, block_length=32 → tokens_per_step = 1 (one-by-one)
+# k=1 → steps=32, block_length=32 (one-by-one)
 ```
 
 ### Adaptive Unmasking Example

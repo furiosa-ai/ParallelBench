@@ -84,7 +84,7 @@ def test_get_strategy_type(name, expected_type):
 
 
 def test_get_representative_param_for_topk_strategy():
-    assert get_representative_param("random") == "tokens_per_step"
+    assert get_representative_param("random") == "k"
 
 
 def test_get_representative_param_for_threshold_strategy():
@@ -173,10 +173,10 @@ def test_derive_factor_ignores_alg_factor_value():
 
 
 def test_register_strategy_adds_new_strategy_that_is_queryable():
-    new_info = StrategyInfo("topk", "tokens_per_step", derive_topk)
+    new_info = StrategyInfo("topk", "k", derive_topk)
     register_strategy("test_custom_strategy", new_info)
     assert get_strategy_type("test_custom_strategy") == "topk"
-    assert get_representative_param("test_custom_strategy") == "tokens_per_step"
+    assert get_representative_param("test_custom_strategy") == "k"
     # Cleanup
     del UNMASKING_REGISTRY["test_custom_strategy"]
 

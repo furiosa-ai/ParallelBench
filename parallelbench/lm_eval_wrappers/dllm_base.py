@@ -89,8 +89,8 @@ class DLLMBase(LM):
         merged with --gen_kwargs CLI). Subclasses can override to change defaults
         or add model-specific parameters.
 
-        If "tokens_per_step" is present in gen_kwargs and neither "steps" nor
-        "block_length" are explicitly provided, derives steps and block_length
+        If "k" (tokens per step) is present in gen_kwargs and neither "steps"
+        nor "block_length" are explicitly provided, derives steps and block_length
         from the unmasking registry's derive_fn for the given remasking strategy.
         Explicit "steps"/"block_length" values always take priority.
         """
@@ -100,14 +100,10 @@ class DLLMBase(LM):
         steps_explicit = "steps" in gen_kwargs
         block_length_explicit = "block_length" in gen_kwargs
 
-        if (
-            "tokens_per_step" in gen_kwargs
-            and not steps_explicit
-            and not block_length_explicit
-        ):
+        if "k" in gen_kwargs and not steps_explicit and not block_length_explicit:
             info = get_strategy_info(remasking)
-            tokens_per_step = float(gen_kwargs["tokens_per_step"])
-            derived = info.derive_fn(tokens_per_step, max_tokens)
+            k = float(gen_kwargs["k"])
+            derived = info.derive_fn(k, max_tokens)
             steps = derived["steps"]
             block_length = derived["block_length"]
         else:
@@ -135,14 +131,14 @@ class DLLMBase(LM):
         store = MetadataStore.instance()
 
         BRIDGED_KEYS = (
-            "tokens_per_step",
+            "k",
             "alg_threshold",
             "alg_factor",
             "steps",
             "block_length",
             "remasking",
         )
-        COERCE_FLOAT_KEYS = ("tokens_per_step", "alg_threshold", "alg_factor")
+        COERCE_FLOAT_KEYS = ("k", "alg_threshold", "alg_factor")
 
         for request in requests:
             context, gen_kwargs = request.args
@@ -171,9 +167,16 @@ class DLLMBase(LM):
                 output_history=self._output_history,
             )
 
+            tokens_per_step = (
+                gen_config["max_tokens"] / dllm_output.nfe
+                if dllm_output.nfe > 0
+                else None
+            )
+
             store.append(
                 GenerationMetadata(
                     nfe=dllm_output.nfe,
+                    tokens_per_step=tokens_per_step,
                     history=dllm_output.history,
                     decoding_order=dllm_output.decoding_order,
                     decoding_order_corrs=dllm_output.decoding_order_corrs,

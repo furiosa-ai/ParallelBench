@@ -16,24 +16,24 @@ StrategyInfo = namedtuple(
 )
 
 
-def derive_topk(tokens_per_step: float, max_tokens: int) -> dict:
+def derive_topk(k: float, max_tokens: int) -> dict:
     """
     Derive generation kwargs for top-k unmasking strategies.
 
     Args:
-        tokens_per_step: Number of tokens unmasked per step. Must divide max_tokens evenly.
+        k: Number of tokens unmasked per step. Must divide max_tokens evenly.
         max_tokens: Maximum number of tokens to generate.
 
     Returns:
         dict with keys "steps" and "block_length".
 
     Raises:
-        ValueError: If max_tokens / tokens_per_step is not an integer.
+        ValueError: If max_tokens / k is not an integer.
     """
-    quotient = max_tokens / tokens_per_step
+    quotient = max_tokens / k
     if quotient != int(quotient):
         raise ValueError(
-            f"max_tokens ({max_tokens}) must be exactly divisible by tokens_per_step ({tokens_per_step})"
+            f"max_tokens ({max_tokens}) must be exactly divisible by k ({k})"
         )
     return {"steps": int(quotient), "block_length": max_tokens}
 
@@ -67,12 +67,12 @@ def derive_factor(alg_factor: float, max_tokens: int) -> dict:
 
 
 UNMASKING_REGISTRY: dict[str, StrategyInfo] = {
-    "random": StrategyInfo("topk", "tokens_per_step", derive_topk),
-    "origin": StrategyInfo("topk", "tokens_per_step", derive_topk),
-    "low_confidence": StrategyInfo("topk", "tokens_per_step", derive_topk),
-    "confidence_topk": StrategyInfo("topk", "tokens_per_step", derive_topk),
-    "topk_margin": StrategyInfo("topk", "tokens_per_step", derive_topk),
-    "entropy_topk": StrategyInfo("topk", "tokens_per_step", derive_topk),
+    "random": StrategyInfo("topk", "k", derive_topk),
+    "origin": StrategyInfo("topk", "k", derive_topk),
+    "low_confidence": StrategyInfo("topk", "k", derive_topk),
+    "confidence_topk": StrategyInfo("topk", "k", derive_topk),
+    "topk_margin": StrategyInfo("topk", "k", derive_topk),
+    "entropy_topk": StrategyInfo("topk", "k", derive_topk),
     "confidence_threshold": StrategyInfo(
         "threshold", "alg_threshold", derive_threshold
     ),

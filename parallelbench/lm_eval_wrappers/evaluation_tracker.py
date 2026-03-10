@@ -7,7 +7,7 @@ ParallelBench output structure:
     {output_path}/{model_sanitized}/{remasking}/{repr_param_value}/{run_id}/results_{task_name}.json
 
 The repr_param_value encodes the representative parameter for the remasking strategy:
-    - topk strategies: "tps{tokens_per_step}" (e.g., tps4)
+    - topk strategies: "k{k}" (e.g., k4)
     - threshold strategies: "t{alg_threshold}" (e.g., t0.3)
     - factor strategies: "f{alg_factor}" (e.g., f2.0)
 
@@ -136,7 +136,7 @@ def _resolve_repr_param_value(gen_kwargs: dict | None) -> str:
 
     Uses the unmasking registry to determine the strategy type and
     format the representative parameter accordingly:
-      - topk: "tps{int(max_tokens / steps)}" (e.g., tps4)
+      - topk: "k{int(max_tokens / steps)}" (e.g., k4)
       - threshold: "t{alg_threshold}" (e.g., t0.3)
       - factor: "f{alg_factor}" (e.g., f2.0)
 
@@ -160,8 +160,8 @@ def _resolve_repr_param_value(gen_kwargs: dict | None) -> str:
         max_tokens = gen_kwargs.get("max_tokens")
         steps = gen_kwargs.get("steps")
         if max_tokens is not None and steps is not None and steps != 0:
-            tps_value = int(max_tokens / steps)
-            return f"tps{tps_value}"
+            k_value = int(max_tokens / steps)
+            return f"k{k_value}"
         return build_gen_kwargs_dirname(gen_kwargs)
 
     if strategy_type == "threshold":

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Quick start: Run LLaDA-1.5 on all 17 ParallelBench tasks and analyze results.
 #
-# Uses tokens_per_step to auto-derive steps and block_length per task.
+# Uses k (tokens per step) to auto-derive steps and block_length per task.
 # Each task has its own max_tokens (32 for waiting_line, 64 for others),
-# and the system computes steps = max_tokens / tokens_per_step automatically.
+# and the system computes steps = max_tokens / k automatically.
 #
 # Usage:
 #   bash scripts/quick_start.sh                    # single GPU
@@ -17,7 +17,7 @@ OUTPUT_DIR="results"
 uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
     --model parallelbench_llada \
     --model_args model_path=GSAI-ML/LLaDA-1.5 \
-    --gen_kwargs tokens_per_step=1,remasking=random \
+    --gen_kwargs k=1,remasking=random \
     --tasks parallel_bench \
     --include_path parallelbench/tasks \
     --limit 2 \
