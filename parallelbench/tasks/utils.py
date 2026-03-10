@@ -74,6 +74,7 @@ def get_metric_keys_for_task(metric_name: str) -> list[str]:
 # dLLM metadata metric keys appended to every task result
 METADATA_METRIC_KEYS = [
     "nfe",
+    "tokens_per_step",
     "input_length",
     "output_length",
     "dec_order_kendall",

@@ -21,11 +21,13 @@ from rich.table import Table
 from parallelbench.analysis.pb_score import DEFAULT_THRESHOLDS, compute_pb_scores
 
 console = Console()
+console_err = Console(stderr=True)
 
 METRIC_KEYS = [
     "score",
     "score_strict",
     "nfe",
+    "tokens_per_step",
     "input_length",
     "output_length",
     "dec_order_kendall",
@@ -58,7 +60,6 @@ CSV_COLUMNS = [
     "task",
     *GENERATION_KWARGS_KEYS,
     *METRIC_KEYS,
-    "tokens_per_step",
     "n_samples",
     "results_file",
 ]
@@ -97,13 +98,14 @@ def _extract_rows_from_results(results_file: Path) -> list[dict]:
                 value = ""
             row[metric] = value
 
-        # Compute tokens per step
-        try:
-            nfe = float(row["nfe"])
-            max_tokens = int(row["max_tokens"])
-            row["tokens_per_step"] = f"{max_tokens / nfe:.1f}" if nfe > 0 else ""
-        except (ValueError, TypeError):
-            row["tokens_per_step"] = ""
+        # Fallback: compute tokens_per_step from gen_kwargs if not in metrics
+        if not row.get("tokens_per_step"):
+            try:
+                nfe = float(row["nfe"])
+                max_tokens = int(row["max_tokens"])
+                row["tokens_per_step"] = max_tokens / nfe if nfe > 0 else ""
+            except (ValueError, TypeError):
+                row["tokens_per_step"] = ""
 
         task_n_samples = n_samples.get(task_name, {})
         row["n_samples"] = task_n_samples.get("effective", "")
@@ -114,13 +116,16 @@ def _extract_rows_from_results(results_file: Path) -> list[dict]:
 
 
 def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list[dict]:
-    """Scan results directory and collect all rows."""
+    """Scan results directory and collect all rows.
+
+    Matches both legacy timestamp filenames (results_2026-03-10T05-48-12.json)
+    and new task-name filenames (results_parallel_bench_waiting_line_copy.json).
+    """
     results_files = sorted(results_dir.rglob("results_*.json"))
 
     if not results_files:
-        console.print(
+        console_err.print(
             f"[bold red]No results found[/bold red] in {results_dir}",
-            file=sys.stderr,
         )
         return []
 
@@ -132,7 +137,6 @@ def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list
         except (json.JSONDecodeError, KeyError) as e:
             console.print(
                 f"[yellow]Warning:[/yellow] skipping {results_file}: {e}",
-                file=sys.stderr,
             )
 
     if sort_keys:
@@ -171,6 +175,11 @@ def _format_value(key: str, value) -> str:
     if key == "nfe":
         try:
             return f"{float(value):.0f}"
+        except (ValueError, TypeError):
+            return str(value)
+    if key == "tokens_per_step":
+        try:
+            return f"{float(value):.1f}"
         except (ValueError, TypeError):
             return str(value)
     return str(value)
@@ -298,10 +307,37 @@ def main():
         default=None,
         help="Export results to CSV file",
     )
+    parser.add_argument(
+        "--latest",
+        action="store_true",
+        default=True,
+        help="Use .latest symlink to find the most recent run (default: True)",
+    )
+    parser.add_argument(
+        "--no-latest",
+        action="store_false",
+        dest="latest",
+        help="Scan all runs instead of just the latest",
+    )
     args = parser.parse_args()
 
+    results_dir = args.results_dir
     sort_keys = [k.strip() for k in args.sort.split(",")] if args.sort else None
-    rows = _collect_rows(args.results_dir, sort_keys=sort_keys)
+
+    # If .latest symlinks exist, collect results only from latest runs
+    if args.latest:
+        latest_links = list(results_dir.rglob(".latest"))
+        if latest_links:
+            console_err.print(
+                f"[dim]Using {len(latest_links)} latest run(s)[/dim]",
+            )
+            rows = []
+            for link in latest_links:
+                rows.extend(_collect_rows(link.resolve(), sort_keys=sort_keys))
+        else:
+            rows = _collect_rows(results_dir, sort_keys=sort_keys)
+    else:
+        rows = _collect_rows(results_dir, sort_keys=sort_keys)
 
     if not rows:
         sys.exit(1)
