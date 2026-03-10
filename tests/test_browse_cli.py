@@ -1,16 +1,26 @@
 """Tests for pb browse CLI subcommand."""
 
 import sys
+from io import StringIO
 from unittest import mock
 
 import pytest
+from rich.console import Console
 
 from parallelbench.cli.browse import (
     _load_all_task_configs,
     _get_available_task_names,
-    _format_value,
     main,
 )
+
+
+def _capture_rich_output(func, *args, **kwargs):
+    """Run a function while capturing Rich console output."""
+    string_io = StringIO()
+    test_console = Console(file=string_io, force_terminal=False, highlight=False)
+    with mock.patch("parallelbench.cli.browse.console", test_console):
+        func(*args, **kwargs)
+    return string_io.getvalue()
 
 
 class TestLoadAllTaskConfigs:
@@ -57,40 +67,20 @@ class TestGetAvailableTaskNames:
         assert "text_writing/paraphrasing" in names
 
 
-class TestFormatValue:
-    """Test value formatting for display."""
-
-    def test_format_string(self):
-        result = _format_value("hello")
-        assert "hello" in result
-
-    def test_format_list(self):
-        result = _format_value(["a", "b"])
-        assert '"a"' in result
-        assert '"b"' in result
-
-    def test_format_dict(self):
-        result = _format_value({"key": "value"})
-        assert "key" in result
-        assert "value" in result
-
-
 class TestBrowseMain:
     """Test CLI entry point."""
 
-    def test_no_args_lists_tasks(self, capsys):
+    def test_no_args_lists_tasks(self):
         with mock.patch.object(sys, "argv", ["prog"]):
-            main()
-        output = capsys.readouterr().out
+            output = _capture_rich_output(main)
         assert "Waiting Line" in output
         assert "Text Writing" in output
         assert "Puzzles" in output
         assert "copy" in output
 
-    def test_invalid_task_shows_error(self, capsys):
+    def test_invalid_task_shows_error(self):
         with mock.patch.object(sys, "argv", ["prog", "nonexistent/task"]):
-            main()
-        output = capsys.readouterr().out
+            output = _capture_rich_output(main)
         assert "Error" in output
         assert "Unknown task" in output
         assert "waiting_line/copy" in output  # Shows available tasks

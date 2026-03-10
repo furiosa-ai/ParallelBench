@@ -23,6 +23,7 @@ dependencies = [
     "lm-eval>=0.4.8",
     "language-tool-python>=3.2.2",
     "bert-score>=0.3.13",
+    "rich>=13.0.0",
 ]
 
 

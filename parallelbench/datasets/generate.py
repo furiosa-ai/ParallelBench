@@ -18,12 +18,23 @@ import yaml
 
 import pandas as pd
 from datasets import Dataset, DatasetDict
+from rich.console import Console
+from rich.progress import (
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    BarColumn,
+    MofNCompleteColumn,
+)
+from rich.table import Table
 
 from parallelbench.datasets.task import (
     create_parallel_bench_task,
     task_name_to_config_name,
 )
 from parallelbench.datasets.task_utils import load_task_configs
+
+console = Console()
 
 
 def _serialize_column(value):
@@ -94,66 +105,91 @@ def generate(
     split = "test"
     tasks = _load_all_tasks()
     if not tasks:
-        print("No task configs found")
+        console.print("[bold red]Error:[/bold red] No task configs found")
         return {}
 
-    print(f"Found {len(tasks)} tasks")
+    console.print(f"\n[bold]Found {len(tasks)} tasks[/bold]\n")
 
     all_rows = {}
     failed = []
-    for task_name in sorted(tasks.keys()):
-        task_config = copy.deepcopy(tasks[task_name])
+    sorted_tasks = sorted(tasks.keys())
 
-        try:
-            rows = create_parallel_bench_task(
-                split=split,
-                task=task_config,
-                output_file=None,
-                no_save=True,
-            )
-        except Exception as e:
-            print(f"  [WARN] {task_name} failed: {e}")
-            failed.append(task_name)
-            continue
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        console=console,
+    ) as progress:
+        overall = progress.add_task("Generating tasks", total=len(sorted_tasks))
 
-        all_rows[task_name] = rows
-        print(f"  Generated {task_name} ({len(rows)} samples)")
+        for task_name in sorted_tasks:
+            task_config = copy.deepcopy(tasks[task_name])
+            progress.update(overall, description=f"[cyan]{task_name}[/cyan]")
 
-        if dry_run:
-            continue
+            try:
+                rows = create_parallel_bench_task(
+                    split=split,
+                    task=task_config,
+                    output_file=None,
+                    no_save=True,
+                )
+            except Exception as e:
+                console.print(f"  [bold yellow]WARN[/bold yellow] {task_name}: {e}")
+                failed.append(task_name)
+                progress.advance(overall)
+                continue
 
-        if output_dir:
-            out_path = Path(output_dir) / split / f"{task_name}.jsonl"
-            out_path.parent.mkdir(parents=True, exist_ok=True)
-            pd.DataFrame(rows).to_json(out_path, orient="records", lines=True)
-            print(f"    Saved to {out_path}")
+            all_rows[task_name] = rows
 
-            # Save task_config.yaml alongside JSONL for load_task() compatibility
-            out_task_config_file = out_path.parent / "task_config.yaml"
-            if out_task_config_file.exists():
-                with open(out_task_config_file, "r") as f:
-                    out_task_config = yaml.safe_load(f) or {}
-            else:
-                out_task_config = {}
-            out_task_config[task_name] = task_config
-            with open(out_task_config_file, "w") as f:
-                yaml.dump(out_task_config, f)
+            if dry_run:
+                progress.advance(overall)
+                continue
 
-        if push:
-            config_name = task_name_to_config_name(task_name)
-            dataset = _build_hub_dataset(task_name, task_config, rows)
-            dataset_dict = DatasetDict({split: dataset})
-            dataset_dict.push_to_hub(
-                repo_id,
-                config_name=config_name,
-                private=private,
-            )
-            print(f"    Pushed to {repo_id} (config={config_name})")
+            if output_dir:
+                out_path = Path(output_dir) / split / f"{task_name}.jsonl"
+                out_path.parent.mkdir(parents=True, exist_ok=True)
+                pd.DataFrame(rows).to_json(out_path, orient="records", lines=True)
 
+                # Save task_config.yaml alongside JSONL for load_task() compatibility
+                out_task_config_file = out_path.parent / "task_config.yaml"
+                if out_task_config_file.exists():
+                    with open(out_task_config_file, "r") as f:
+                        out_task_config = yaml.safe_load(f) or {}
+                else:
+                    out_task_config = {}
+                out_task_config[task_name] = task_config
+                with open(out_task_config_file, "w") as f:
+                    yaml.dump(out_task_config, f)
+
+            if push:
+                config_name = task_name_to_config_name(task_name)
+                dataset = _build_hub_dataset(task_name, task_config, rows)
+                dataset_dict = DatasetDict({split: dataset})
+                dataset_dict.push_to_hub(
+                    repo_id,
+                    config_name=config_name,
+                    private=private,
+                )
+
+            progress.advance(overall)
+
+    # Summary
+    console.print()
     if failed:
-        print(f"Done! Generated {len(all_rows)} tasks, {len(failed)} failed: {failed}")
+        summary_table = Table(show_header=True, header_style="bold", box=None)
+        summary_table.add_column("Status", style="bold")
+        summary_table.add_column("Count", justify="right")
+        summary_table.add_row("[green]Generated[/green]", str(len(all_rows)))
+        summary_table.add_row("[red]Failed[/red]", str(len(failed)))
+        console.print(summary_table)
+        console.print(f"\n[bold yellow]Failed tasks:[/bold yellow] {', '.join(failed)}")
     else:
-        print(f"Done! Generated {len(all_rows)} tasks.")
+        console.print(
+            f"[bold green]Done![/bold green] Generated {len(all_rows)} tasks."
+        )
+
+    console.print()
     return all_rows
 
 

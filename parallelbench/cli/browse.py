@@ -14,7 +14,12 @@ import textwrap
 from pathlib import Path
 
 import yaml
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 
+console = Console()
 
 DEFAULT_HUB_REPO = "furiosa-ai/ParallelBench"
 
@@ -23,6 +28,13 @@ CATEGORY_DISPLAY_NAMES = {
     "waiting_line_n15": "Waiting Line (n=15, for API/AR models)",
     "text_writing": "Text Writing",
     "puzzles": "Puzzles",
+}
+
+CATEGORY_STYLES = {
+    "waiting_line": "cyan",
+    "waiting_line_n15": "cyan",
+    "text_writing": "green",
+    "puzzles": "magenta",
 }
 
 TASK_DESCRIPTIONS = {
@@ -44,14 +56,6 @@ TASK_DESCRIPTIONS = {
     "puzzles/latin_square_n4": "Solve a 4x4 Latin square puzzle",
     "puzzles/sudoku_n4": "Solve a 4x4 Sudoku puzzle",
 }
-
-
-def _format_value(value, indent=4):
-    """Format a value for display, handling dicts, lists, and strings."""
-    prefix = " " * indent
-    if isinstance(value, (dict, list)):
-        return textwrap.indent(json.dumps(value, indent=2, ensure_ascii=False), prefix)
-    return textwrap.indent(str(value), prefix)
 
 
 def _load_all_task_configs():
@@ -100,51 +104,96 @@ def _print_task_list():
     total_tasks = 0
     total_samples = 0
 
+    table = Table(
+        show_header=True,
+        header_style="bold",
+        box=None,
+        padding=(0, 2),
+        collapse_padding=True,
+    )
+    table.add_column("Task", style="bold")
+    table.add_column("Samples", justify="right", style="yellow")
+    table.add_column("Description", style="dim")
+
     for category, tasks in categories.items():
         display_name = CATEGORY_DISPLAY_NAMES.get(category, category)
-        print(f"\n  {display_name}")
-        print(f"  {'─' * 60}")
+        style = CATEGORY_STYLES.get(category, "white")
+
+        # Category header row
+        table.add_row()
+        table.add_row(
+            Text(f"  {display_name}", style=f"bold {style} underline"),
+            "",
+            "",
+        )
+
         for task_name in tasks:
             count = all_configs[task_name].get("num_samples", "?")
             short_name = task_name.split("/")[1]
             description = TASK_DESCRIPTIONS.get(task_name, "")
-            print(f"    {short_name:<25} {count:>4} samples   {description}")
+            table.add_row(f"    {short_name}", str(count), description)
             total_tasks += 1
             if isinstance(count, int):
                 total_samples += count
 
-    print(f"\n  Total: {total_tasks} tasks, {total_samples} samples")
-    print(f"  Hub:   {DEFAULT_HUB_REPO}\n")
+    console.print()
+    console.print(table)
+    console.print()
+    console.print(
+        f"  [bold]{total_tasks}[/bold] tasks, "
+        f"[bold]{total_samples}[/bold] samples  "
+        f"[dim]Hub: {DEFAULT_HUB_REPO}[/dim]"
+    )
+    console.print()
 
 
 def _print_sample(sample, index):
-    """Print a single sample with formatted output."""
-    print(f"\n  ── Sample {index} ──\n")
-
-    # Prompt
+    """Print a single sample with Rich Panel formatting."""
     messages = sample["input"]["messages"]
     prompt = messages[-1]["content"]
-    print("  [Prompt]")
-    print(textwrap.indent(prompt, "    "))
+
+    # Build content sections
+    sections = []
+
+    # Prompt
+    sections.append(Text("Prompt", style="bold cyan"))
+    sections.append(Text(prompt))
 
     # ICL examples (if any)
     if len(messages) > 1:
         num_icl = (len(messages) - 1) // 2
-        print(f"\n  [In-Context Examples] ({num_icl})")
+        sections.append(Text(f"\nIn-Context Examples ({num_icl})", style="bold cyan"))
 
     # Label
-    print("\n  [Label]")
-    print(_format_value(sample["label"]))
+    sections.append(Text("\nLabel", style="bold cyan"))
+    if isinstance(sample["label"], (dict, list)):
+        label_str = json.dumps(sample["label"], indent=2, ensure_ascii=False)
+    else:
+        label_str = str(sample["label"])
+    sections.append(Text(label_str))
 
     # Metadata
-    print("\n  [Metadata]")
-    print(_format_value(sample["metadata"]))
+    sections.append(Text("\nMetadata", style="bold cyan"))
+    if isinstance(sample["metadata"], (dict, list)):
+        metadata_str = json.dumps(sample["metadata"], indent=2, ensure_ascii=False)
+    else:
+        metadata_str = str(sample["metadata"])
+    sections.append(Text(metadata_str, style="dim"))
+
+    # Combine into a single renderable
+    content = Text("\n").join(sections)
+
+    panel = Panel(
+        content,
+        title=f"[bold]Sample {index}[/bold]",
+        border_style="blue",
+        padding=(1, 2),
+    )
+    console.print(panel)
 
 
 def _stream_samples_from_hub(task_name, num_samples):
     """Stream samples from HuggingFace Hub without downloading the full dataset."""
-    print(f"  Loading from {DEFAULT_HUB_REPO}...", flush=True)
-
     from datasets import load_dataset
 
     from parallelbench.datasets.task import _try_json_loads, task_name_to_config_name
@@ -183,43 +232,48 @@ def _print_task_samples(task_name, index=None, num_samples=3, generate=False):
     """Print samples from a specific task."""
     available = _get_available_task_names()
     if task_name not in available:
-        print(f"\n  Error: Unknown task '{task_name}'")
-        print("\n  Available tasks:")
+        console.print(
+            f"\n[bold red]Error:[/bold red] Unknown task [yellow]'{task_name}'[/yellow]"
+        )
+        console.print("\nAvailable tasks:")
         for name in available:
-            print(f"    - {name}")
+            console.print(f"  [green]{name}[/green]")
+        console.print()
         return
 
     description = TASK_DESCRIPTIONS.get(task_name, "")
-    print(f"\n  Task:    {task_name}")
+    console.print()
+    console.print(f"  [bold]Task:[/bold]   {task_name}")
     if description:
-        print(f"  About:   {description}")
+        console.print(f"  [bold]About:[/bold]  {description}")
 
     required = (index + 1) if index is not None else num_samples
 
     if generate:
-        print("  Loading... ", end="", flush=True)
-        from parallelbench.datasets import ParallelBench
+        with console.status("[bold green]Generating samples locally..."):
+            from parallelbench.datasets import ParallelBench
 
-        dataset = ParallelBench(task_name, flex_config={"num_samples": required})
-        samples = [dataset[i] for i in range(len(dataset))]
-        print("done")
-        print("  Source:  generated")
+            dataset = ParallelBench(task_name, flex_config={"num_samples": required})
+            samples = [dataset[i] for i in range(len(dataset))]
+        console.print("  [bold]Source:[/bold] generated")
     else:
-        samples = _stream_samples_from_hub(task_name, required)
-        print(f"  Source:  {DEFAULT_HUB_REPO}")
+        with console.status(f"[bold green]Loading from {DEFAULT_HUB_REPO}..."):
+            samples = _stream_samples_from_hub(task_name, required)
+        console.print(f"  [bold]Source:[/bold] {DEFAULT_HUB_REPO}")
+
+    console.print()
 
     if index is not None:
         if index >= len(samples):
-            print(
-                f"\n  Error: Index {index} out of range (only {len(samples)} samples loaded)"
+            console.print(
+                f"[bold red]Error:[/bold red] Index {index} out of range "
+                f"(only {len(samples)} samples loaded)"
             )
             return
         _print_sample(samples[index], index)
     else:
         for i, sample in enumerate(samples):
             _print_sample(sample, i)
-
-    print()
 
 
 def main():
