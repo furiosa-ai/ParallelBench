@@ -73,6 +73,45 @@ Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy for
 17 tasks across three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily, but expose clear quality drops in dLLMs under parallel decoding.
 
 
+## 📐 Key Concepts
+
+ParallelBench measures how **quality degrades as parallelism increases** in dLLMs. The central metric is **tokens per step** — the number of tokens generated in parallel at each denoising step.
+
+| Tokens per step | Meaning |
+| :-: | --- |
+| **1** | One-by-one decoding (equivalent to AR) — slow but highest quality |
+| **k** | k tokens decoded in parallel per step — faster but quality may degrade |
+| **max_tokens** | Fully parallel (one-step generation) — fastest but lowest quality |
+
+### Generation Parameters
+
+These parameters control the degree of parallelism when running evaluations with `pb eval`:
+
+| Parameter | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| `steps` | int | 128 | Total denoising steps. For top-k methods, `tokens_per_step = max_tokens / steps` |
+| `block_length` | int | max_tokens | Semi-AR block size. Tokens within a block are decoded in parallel; blocks are decoded left-to-right |
+| `max_tokens` | int | 128 | Maximum output length |
+| `remasking` | str | — | Unmasking strategy (see table below) |
+| `alg_threshold` | float | — | Confidence threshold for adaptive methods (required for `confidence_threshold`) |
+| `alg_factor` | float | — | Scaling factor for factor-based methods (required for `confidence_factor`) |
+
+**Constraints**: `max_tokens % block_length == 0` and `steps % (max_tokens / block_length) == 0`
+
+### Unmasking Strategies
+
+| Strategy | Type | CLI value | Description |
+| -------- | ---- | --------- | ----------- |
+| Random | Top-k (static) | `random` | Randomly selects which masked tokens to unmask |
+| Confidence | Top-k (static) | `confidence_topk` | Unmasks tokens with highest model confidence |
+| Margin | Top-k (static) | `topk_margin` | Unmasks tokens with largest margin between top-2 predictions |
+| Entropy | Top-k (static) | `entropy_topk` | Unmasks tokens with lowest prediction entropy |
+| Confidence Threshold | Adaptive | `confidence_threshold` | Unmasks all tokens above a confidence threshold (`alg_threshold`) |
+| Confidence Factor | Adaptive | `confidence_factor` | Scales unmask count by a factor (`alg_factor`) |
+
+**Top-k (static)** methods unmask a fixed number of tokens per step → tokens per step is constant.
+**Adaptive** methods unmask a variable number of tokens per step → tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
+
 ## ⚙️ Setup
 
 These steps will guide you through setting up the necessary environment and dependencies.
@@ -102,6 +141,8 @@ apt-get install openjdk-17-jdk -y
 ```
 
 ## ⚡ Quickstart
+
+> **No GPU?** You can explore all benchmark tasks without a GPU using `pb browse`. Jump to the [CLI examples](#cli-exploration) below.
 
 Here's a simple example of how to load a model and run it on a **ParallelBench** task.
 
@@ -150,7 +191,9 @@ metrics = dataset.compute_metrics([response], [sample["label"]])
 print(f"Metrics: {metrics}")
 ```
 
-You can also explore tasks directly from the command line:
+### CLI Exploration
+
+You can also explore tasks directly from the command line (no GPU required):
 
 ```bash
 # List all available tasks
@@ -192,22 +235,18 @@ pb browse waiting_line/copy --index 3
 
 For additional models and unmasking methods, please refer to the [Roadmap](https://github.com/furiosa-ai/ParallelBench/#%EF%B8%8F-roadmap) section.
 
-- LLaDA Family ([LLaDA 1.x](https://github.com/ML-GSAI/LLaDA))
-- Dream Family ([Dream](https://github.com/DreamLM/Dream), [DiffuCoder](https://github.com/apple/ml-diffucoder))
-- SDAR Family ([SDAR](https://github.com/JetAstra/SDAR), [TraDo](https://github.com/Gen-Verse/dLLM-RL))
+| CLI wrapper (`--model`) | Model family | Example `model_path` |
+| --- | --- | --- |
+| `parallelbench_llada` | LLaDA | `GSAI-ML/LLaDA-1.5` |
+| `parallelbench_dream` | Dream, DiffuCoder | `Dream-org/Dream-v0-Instruct-7B` |
+| `parallelbench_sedd` | SEDD | `louaaron/sedd-medium` |
+| `parallelbench_trado` | SDAR, TraDo | `JetAstra/SDAR-1.5-8B` |
+| `parallelbench_ar` | AR baselines (vLLM) | `meta-llama/Llama-3.1-8B-Instruct` |
+| `parallelbench_api` | API models | Haiku, Mercury (requires `.env` keys) |
 
 ### Unmasking Methods
 
-- Top-k methods:
-    - Random
-    - Confidence
-    - Entropy
-    - Margin
-- Advanced methods:
-    - Threshold-based
-    - Factor-based
-    - [RCR](https://github.com/Gen-Verse/dLLM-RL)
-    - [ReMDM](https://github.com/kuleshov-group/remdm)
+See the [Unmasking Strategies](#unmasking-strategies) table in Key Concepts for the full list of CLI values and descriptions.
 
 
 ## 🛠️ Create Your Own Tasks
@@ -279,7 +318,12 @@ Before running the evaluations, copy the example environment file and fill in yo
 cp .env.example .env
 ```
 
-Then edit `.env` with your actual keys. The keys will be loaded automatically via `python-dotenv`.
+| Key | Required for | Notes |
+| ----- | ----------- | ------- |
+| `ANTHROPIC_API_KEY` | `parallelbench_api` (Haiku) | Only needed for API-based evaluation |
+| `INCEPTION_API_KEY` | `parallelbench_api` (Mercury) | Only needed for API-based evaluation |
+| `WANDB_ENTITY` | Logging to W&B | Optional |
+| `WANDB_PROJECT` | Logging to W&B | Optional |
 
 For logging results, log in to Weights & Biases:
 
@@ -291,27 +335,62 @@ Evaluations are launched using the `pb eval` CLI (built on [lm-eval-harness](htt
 
 ```bash
 pb eval --model <wrapper> \
-  --model_args model_path=<model>,steps=128,max_tokens=128,block_length=128,remasking=<strategy> \
+  --model_args model_path=<model> \
+  --gen_kwargs steps=<S>,block_length=<B>,remasking=<strategy> \
   --tasks <task_names> \
   --include_path parallelbench/tasks \
   --batch_size 1
 ```
 
+> **Note**: `--include_path parallelbench/tasks` is always required to load ParallelBench task definitions.
+
 ### Single Task Example
+
+Run LLaDA-1.5 on `waiting_line/copy` with **32 tokens per step** (fully parallel):
 
 ```bash
 pb eval --model parallelbench_llada \
-  --model_args model_path=GSAI-ML/LLaDA-1.5,steps=32,max_tokens=32,block_length=1,remasking=random \
+  --model_args model_path=GSAI-ML/LLaDA-1.5 \
+  --gen_kwargs steps=1,block_length=32,remasking=random \
   --tasks parallel_bench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
+# steps=1, block_length=32 → tokens_per_step = 32 (fully parallel)
+```
+
+Compare with **one-by-one decoding** (1 token per step):
+
+```bash
+pb eval --model parallelbench_llada \
+  --model_args model_path=GSAI-ML/LLaDA-1.5 \
+  --gen_kwargs steps=32,block_length=32,remasking=random \
+  --tasks parallel_bench_waiting_line_copy \
+  --include_path parallelbench/tasks \
+  --batch_size 1
+# steps=32, block_length=32 → tokens_per_step = 1 (one-by-one)
+```
+
+### Adaptive Unmasking Example
+
+Use threshold-based unmasking where tokens per step varies adaptively:
+
+```bash
+pb eval --model parallelbench_llada \
+  --model_args model_path=GSAI-ML/LLaDA-1.5 \
+  --gen_kwargs steps=32,block_length=32,remasking=confidence_threshold,alg_threshold=0.8 \
+  --tasks parallel_bench_waiting_line_copy \
+  --include_path parallelbench/tasks \
+  --batch_size 1
+# alg_threshold=0.8 → only unmask tokens with confidence > 0.8
+# Actual tokens per step and NFE are measured after generation
 ```
 
 ### Full Benchmark
 
 ```bash
 pb eval --model parallelbench_llada \
-  --model_args model_path=GSAI-ML/LLaDA-1.5,steps=128,max_tokens=128,block_length=128,remasking=low_confidence \
+  --model_args model_path=GSAI-ML/LLaDA-1.5 \
+  --gen_kwargs steps=128,block_length=128,remasking=confidence_topk \
   --tasks parallel_bench \
   --include_path parallelbench/tasks
 ```
@@ -320,23 +399,43 @@ pb eval --model parallelbench_llada \
 
 ```bash
 accelerate launch -m parallelbench.cli.eval --model parallelbench_llada \
-  --model_args model_path=GSAI-ML/LLaDA-1.5,steps=128,max_tokens=128,block_length=128 \
+  --model_args model_path=GSAI-ML/LLaDA-1.5 \
+  --gen_kwargs steps=128,block_length=128,remasking=confidence_topk \
   --tasks parallel_bench \
   --include_path parallelbench/tasks
 ```
 
-### Run All Models
+### Quick Start Script
 
-To run all supported models at once, use the provided script:
+To run LLaDA-1.5 on all 17 tasks with a small sample (`--limit 2`):
 
 ```bash
-bash scripts/run_all.sh [output_dir]
+bash scripts/quick_start.sh                    # single GPU
+bash scripts/quick_start.sh --num_processes 2  # multi GPU
 ```
-
 
 ### Results
 
-All evaluation metrics and generated outputs are logged to **Weights & Biases (wandb)**. Please ensure you have configured your API key and project settings.
+Evaluation results are saved locally to `results/` as JSON files and optionally logged to **Weights & Biases (wandb)**.
+
+Use `pb analyze` to view results as a summary table with **PBx scores** — the maximum tokens-per-step achieving at least x% average score across all tasks:
+
+```bash
+# Summary table with PBx scores
+pb analyze results/
+
+# Group by remasking strategy for comparison
+pb analyze results/ --compare remasking
+
+# Export to CSV
+pb analyze results/ --export summary.csv
+```
+
+Example PBx output:
+```text
+PB90: 2.0  |  PB80: 8.0  |  PB70: 16.0  |  PB60: 32.0
+```
+This means TPS=8 still yields >= 80% average score (PB80), while TPS=32 only maintains >= 60% (PB60).
 
 
 ## 🙏 Acknowledgements

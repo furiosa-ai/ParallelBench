@@ -4,6 +4,7 @@ Usage:
     pb eval [lm-eval options]     Run lm-eval evaluation
     pb data [options]             Generate benchmark data
     pb browse [task] [options]    Browse benchmark tasks and samples
+    pb analyze [results_dir]      Analyze evaluation results
 """
 
 import sys
@@ -22,6 +23,7 @@ COMMANDS = {
     ),
     "data": ("Generate benchmark data", "pb data --output_dir ./output"),
     "browse": ("Browse benchmark tasks and samples", "pb browse waiting_line/copy"),
+    "analyze": ("Analyze evaluation results", "pb analyze results/"),
 }
 
 
@@ -73,6 +75,10 @@ def main():
         from parallelbench.cli.browse import main as browse_main
 
         browse_main()
+    elif command == "analyze":
+        from parallelbench.cli.analyze import main as analyze_main
+
+        analyze_main()
     else:
         console.print(
             f"\n[bold red]Error:[/bold red] Unknown command [yellow]'{command}'[/yellow]"
