@@ -15,26 +15,25 @@ import json
 from pathlib import Path
 
 import yaml
-
-import pandas as pd
-from datasets import Dataset, DatasetDict
 from rich.console import Console
 from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
     Progress,
     SpinnerColumn,
     TextColumn,
-    BarColumn,
-    MofNCompleteColumn,
 )
 from rich.table import Table
 
-from parallelbench.datasets.task import (
-    create_parallel_bench_task,
-    task_name_to_config_name,
-)
-from parallelbench.datasets.task_utils import load_task_configs
-
 console = Console()
+
+_TASK_CONFIG_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "datasets"
+    / "data"
+    / "task_configs"
+    / "test"
+)
 
 
 def _serialize_column(value):
@@ -50,19 +49,22 @@ def _load_all_tasks() -> dict[str, dict]:
     Discovers YAML files under data/task_configs/test/ and returns
     a flat dict mapping task_name -> task_config.
     """
-    config_dir = Path(__file__).resolve().parent / "data" / "task_configs" / "test"
-    if not config_dir.exists():
+    from parallelbench.datasets.task_utils import load_task_configs
+
+    if not _TASK_CONFIG_DIR.exists():
         return {}
 
     tasks = {}
-    for yaml_file in sorted(config_dir.glob("*.yaml")):
+    for yaml_file in sorted(_TASK_CONFIG_DIR.glob("*.yaml")):
         loaded = load_task_configs(str(yaml_file))
         tasks.update(loaded)
     return tasks
 
 
-def _build_hub_dataset(task_name: str, task_config: dict, rows: list[dict]) -> Dataset:
+def _build_hub_dataset(task_name: str, task_config: dict, rows: list[dict]):
     """Convert generated rows into a Hub-ready Dataset with serialized columns."""
+    from datasets import Dataset
+
     prompt = task_config.get("prompt", "")
     metric = task_config.get("metric", "")
 
@@ -102,6 +104,14 @@ def generate(
     Returns:
         Dict mapping task_name -> list of generated rows.
     """
+    import pandas as pd
+    from datasets import DatasetDict
+
+    from parallelbench.datasets.task import (
+        create_parallel_bench_task,
+        task_name_to_config_name,
+    )
+
     split = "test"
     tasks = _load_all_tasks()
     if not tasks:

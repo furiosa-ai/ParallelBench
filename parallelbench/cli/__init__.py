@@ -66,7 +66,7 @@ def main():
 
         eval_main()
     elif command == "data":
-        from parallelbench.datasets.generate import main as data_main
+        from parallelbench.cli.data import main as data_main
 
         data_main()
     elif command == "browse":
