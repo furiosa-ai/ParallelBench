@@ -4,9 +4,14 @@ lm-eval's default output structure:
     {output_path}/{model_sanitized}/results_{timestamp}.json
 
 ParallelBench output structure:
-    {output_path}/{model_sanitized}/{remasking}/{task}/{gen_kwargs_dir}/results_{timestamp}.json
+    {output_path}/{model_sanitized}/{remasking}/{repr_param_value}/{run_id}/results_{task_name}.json
 
-This allows browsing results by (model, remasking) pair and comparing
+The repr_param_value encodes the representative parameter for the remasking strategy:
+    - topk strategies: "tps{tokens_per_step}" (e.g., tps4)
+    - threshold strategies: "t{alg_threshold}" (e.g., t0.3)
+    - factor strategies: "f{alg_factor}" (e.g., f2.0)
+
+This allows browsing results by (model, remasking, repr_param) tuple and comparing
 across tasks and hyperparameter sweeps.
 """
 
@@ -16,7 +21,6 @@ import json
 import logging
 import os
 from dataclasses import asdict
-from datetime import datetime
 from pathlib import Path
 
 from lm_eval.loggers.evaluation_tracker import EvaluationTracker, sanitize_list
@@ -37,6 +41,10 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
     Remasking is excluded because it gets its own directory level.
 
     Returns 'default' when gen_kwargs is empty or None (after removing remasking).
+
+    .. deprecated::
+        Use _resolve_repr_param_value() with the unmasking registry instead.
+        Kept as fallback for backward compatibility.
     """
     if not gen_kwargs:
         return "default"
@@ -118,12 +126,67 @@ def extract_task_name(results: dict) -> str:
     return "unknown_task"
 
 
+def _resolve_repr_param_value(gen_kwargs: dict | None) -> str:
+    """Compute the representative parameter value directory segment.
+
+    Uses the unmasking registry to determine the strategy type and
+    format the representative parameter accordingly:
+      - topk: "tps{int(max_tokens / steps)}" (e.g., tps4)
+      - threshold: "t{alg_threshold}" (e.g., t0.3)
+      - factor: "f{alg_factor}" (e.g., f2.0)
+
+    Falls back to build_gen_kwargs_dirname() if the registry lookup fails.
+    """
+    if not gen_kwargs:
+        return build_gen_kwargs_dirname(gen_kwargs)
+
+    remasking = gen_kwargs.get("remasking")
+    if not remasking:
+        return build_gen_kwargs_dirname(gen_kwargs)
+
+    try:
+        from parallelbench.models.unmasking_registry import get_strategy_type
+
+        strategy_type = get_strategy_type(remasking)
+    except (KeyError, ImportError):
+        return build_gen_kwargs_dirname(gen_kwargs)
+
+    if strategy_type == "topk":
+        max_tokens = gen_kwargs.get("max_tokens")
+        steps = gen_kwargs.get("steps")
+        if max_tokens is not None and steps is not None and steps != 0:
+            tps_value = int(max_tokens / steps)
+            return f"tps{tps_value}"
+        return build_gen_kwargs_dirname(gen_kwargs)
+
+    if strategy_type == "threshold":
+        alg_threshold = gen_kwargs.get("alg_threshold")
+        if alg_threshold is not None:
+            return f"t{alg_threshold}"
+        return build_gen_kwargs_dirname(gen_kwargs)
+
+    if strategy_type == "factor":
+        alg_factor = gen_kwargs.get("alg_factor")
+        if alg_factor is not None:
+            return f"f{alg_factor}"
+        return build_gen_kwargs_dirname(gen_kwargs)
+
+    return build_gen_kwargs_dirname(gen_kwargs)
+
+
 class ParallelBenchEvaluationTracker(EvaluationTracker):
-    """EvaluationTracker subclass that adds gen_kwargs subdirectory to output path.
+    """EvaluationTracker subclass that adds structured subdirectory to output path.
 
     Overrides save_results_aggregated and save_results_samples to insert
-    a gen_kwargs-derived subdirectory between the model directory and result files.
+    a repr_param_value/run_id subdirectory between the model/remasking directories
+    and result files.
+
+    Class attributes:
+        run_id: Set by parallelbench/cli/eval.py before instantiation.
+                Either user-provided via --run_id or an auto-generated 8-char hex UUID.
     """
+
+    run_id: str | None = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -133,13 +196,13 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
     def _resolve_output_dir(
         self, gen_kwargs: dict | None, results: dict | None = None
     ) -> Path:
-        """Build the output directory: model/remasking/task/gen_kwargs."""
+        """Build the output directory: model/remasking/repr_param_value/run_id."""
         path = Path(self.output_path if self.output_path else Path.cwd())
         path = path / self.general_config_tracker.model_name_sanitized
         path = path / extract_remasking(gen_kwargs)
-        if results is not None:
-            path = path / extract_task_name(results)
-        path = path / build_gen_kwargs_dirname(gen_kwargs)
+        path = path / _resolve_repr_param_value(gen_kwargs)
+        run_id = self.__class__.run_id or "unknown"
+        path = path / run_id
         path.mkdir(parents=True, exist_ok=True)
         return path
 
@@ -148,7 +211,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
         results: dict,
         samples: dict | None = None,
     ) -> None:
-        """Save aggregated results with gen_kwargs subdirectory."""
+        """Save aggregated results with structured subdirectory."""
         self.general_config_tracker.log_end_time()
 
         if self.output_path:
@@ -176,8 +239,8 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                 path = self._resolve_output_dir(gen_kwargs, results)
                 self._gen_kwargs_output_dir = path
 
-                self.date_id = datetime.now().isoformat().replace(":", "-")
-                file_path = path / f"results_{self.date_id}.json"
+                task_name = extract_task_name(results)
+                file_path = path / f"results_{task_name}.json"
                 file_path.open("w", encoding="utf-8").write(dumped)
 
                 logger.info(
@@ -188,8 +251,8 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                 # Handle Hub pushing
                 if self.api and self.push_results_to_hub:
                     remasking_dir = extract_remasking(gen_kwargs)
-                    task_dir = extract_task_name(results)
-                    gen_kwargs_dir = build_gen_kwargs_dirname(gen_kwargs)
+                    repr_param_dir = _resolve_repr_param_value(gen_kwargs)
+                    run_id = self.__class__.run_id or "unknown"
                     repo_id = (
                         self.results_repo
                         if self.public_repo
@@ -207,9 +270,9 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                         path_in_repo=os.path.join(
                             self.general_config_tracker.model_name,
                             remasking_dir,
-                            task_dir,
-                            gen_kwargs_dir,
-                            f"results_{self.date_id}.json",
+                            repr_param_dir,
+                            run_id,
+                            f"results_{task_name}.json",
                         ),
                         repo_type="dataset",
                         commit_message=f"Adding results for {self.general_config_tracker.model_name}",
@@ -223,7 +286,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
         task_name: str,
         samples: dict,
     ) -> None:
-        """Save per-sample results with gen_kwargs subdirectory.
+        """Save per-sample results with structured subdirectory.
 
         Reuses the output directory determined by save_results_aggregated
         (which is always called first by lm-eval).
@@ -240,7 +303,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                     path = path / self.general_config_tracker.model_name_sanitized
                     path.mkdir(parents=True, exist_ok=True)
 
-                file_path = path / f"samples_{task_name}_{self.date_id}.jsonl"
+                file_path = path / f"samples_{task_name}.jsonl"
 
                 for sample in samples:
                     arguments = {}

@@ -2,9 +2,13 @@ from abc import ABC
 from dataclasses import dataclass, field
 from typing import Optional
 
+from parallelbench.models.unmasking_registry import get_strategy_type
+
 
 DEFAULT_VALID_STRATEGIES = {
     "random",
+    "origin",
+    "low_confidence",
     "confidence_topk",
     "topk_margin",
     "entropy_topk",
@@ -77,11 +81,9 @@ class DllmGenerationConfig(BaseGenerationConfig):
         if self.remasking not in self.valid_strategies:
             raise ValueError(f"Unsupported remasking strategy: {self.remasking}")
 
-        self.is_threshold_remasking = self.remasking.endswith("_threshold")
-        self.is_factor_remasking = self.remasking.endswith("_factor")
-        self.is_default_remasking = not (
-            self.is_threshold_remasking or self.is_factor_remasking
-        )
+        self.is_threshold_remasking = get_strategy_type(self.remasking) == "threshold"
+        self.is_factor_remasking = get_strategy_type(self.remasking) == "factor"
+        self.is_default_remasking = get_strategy_type(self.remasking) == "topk"
 
         # Validate default remasking
         if self.is_default_remasking:

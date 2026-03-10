@@ -9,6 +9,17 @@ from parallelbench.models.registry import ModelRegistry
 from parallelbench.models.local.transformers_model import TransformersModel
 from parallelbench.models.local.vllm_model import vllmModel
 
+# Unmasking registry
+from parallelbench.models.unmasking_registry import (
+    UNMASKING_REGISTRY,
+    StrategyInfo,
+    get_all_strategies,
+    get_representative_param,
+    get_strategy_info,
+    get_strategy_type,
+    register_strategy,
+)
+
 
 __all__ = [
     "BaseModel",
@@ -23,6 +34,13 @@ __all__ = [
     "MercuryModel",
     "TransformersModel",
     "vllmModel",
+    "UNMASKING_REGISTRY",
+    "StrategyInfo",
+    "get_all_strategies",
+    "get_representative_param",
+    "get_strategy_info",
+    "get_strategy_type",
+    "register_strategy",
 ]
 
 

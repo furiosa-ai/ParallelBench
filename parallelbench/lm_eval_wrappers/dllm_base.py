@@ -21,6 +21,7 @@ from parallelbench.lm_eval_wrappers.metadata_store import (
     GenerationMetadata,
     MetadataStore,
 )
+from parallelbench.models.unmasking_registry import get_strategy_info
 
 
 class DLLMBase(LM):
@@ -87,12 +88,37 @@ class DLLMBase(LM):
         Reads generation parameters from gen_kwargs (task YAML generation_kwargs
         merged with --gen_kwargs CLI). Subclasses can override to change defaults
         or add model-specific parameters.
+
+        If "tokens_per_step" is present in gen_kwargs and neither "steps" nor
+        "block_length" are explicitly provided, derives steps and block_length
+        from the unmasking registry's derive_fn for the given remasking strategy.
+        Explicit "steps"/"block_length" values always take priority.
         """
+        max_tokens = int(gen_kwargs.get("max_tokens", 128))
+        remasking = gen_kwargs.get("remasking", "random")
+
+        steps_explicit = "steps" in gen_kwargs
+        block_length_explicit = "block_length" in gen_kwargs
+
+        if (
+            "tokens_per_step" in gen_kwargs
+            and not steps_explicit
+            and not block_length_explicit
+        ):
+            info = get_strategy_info(remasking)
+            tokens_per_step = float(gen_kwargs["tokens_per_step"])
+            derived = info.derive_fn(tokens_per_step, max_tokens)
+            steps = derived["steps"]
+            block_length = derived["block_length"]
+        else:
+            steps = int(gen_kwargs.get("steps", 128))
+            block_length = int(gen_kwargs.get("block_length", 128))
+
         config = {
-            "steps": int(gen_kwargs.get("steps", 128)),
-            "max_tokens": int(gen_kwargs.get("max_tokens", 128)),
-            "block_length": int(gen_kwargs.get("block_length", 128)),
-            "remasking": gen_kwargs.get("remasking", "random"),
+            "steps": steps,
+            "max_tokens": max_tokens,
+            "block_length": block_length,
+            "remasking": remasking,
             "temperature": float(gen_kwargs.get("temperature", 0.0)),
             "alg_temp": float(gen_kwargs.get("alg_temp", 0.0)),
         }
@@ -108,8 +134,26 @@ class DLLMBase(LM):
         results: list[str] = []
         store = MetadataStore.instance()
 
+        BRIDGED_KEYS = (
+            "tokens_per_step",
+            "alg_threshold",
+            "alg_factor",
+            "steps",
+            "block_length",
+            "remasking",
+        )
+        COERCE_FLOAT_KEYS = ("tokens_per_step", "alg_threshold", "alg_factor")
+
         for request in requests:
             context, gen_kwargs = request.args
+
+            # Bridge generation params from model_args (CLI) into gen_kwargs (task YAML)
+            for key in BRIDGED_KEYS:
+                if key in self._extra_kwargs and key not in gen_kwargs:
+                    value = self._extra_kwargs[key]
+                    if key in COERCE_FLOAT_KEYS:
+                        value = float(value)
+                    gen_kwargs[key] = value
 
             messages = self._context_to_messages(context)
             gen_config = self._build_generation_config(gen_kwargs)

@@ -114,7 +114,11 @@ def _extract_rows_from_results(results_file: Path) -> list[dict]:
 
 
 def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list[dict]:
-    """Scan results directory and collect all rows."""
+    """Scan results directory and collect all rows.
+
+    Matches both legacy timestamp filenames (results_2026-03-10T05-48-12.json)
+    and new task-name filenames (results_parallel_bench_waiting_line_copy.json).
+    """
     results_files = sorted(results_dir.rglob("results_*.json"))
 
     if not results_files:

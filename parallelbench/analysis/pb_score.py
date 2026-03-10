@@ -20,15 +20,9 @@ Example:
 
 from __future__ import annotations
 
+from parallelbench.models.unmasking_registry import get_strategy_type
+
 DEFAULT_THRESHOLDS = [90, 80, 70, 60]
-
-
-def _is_threshold_remasking(remasking: str) -> bool:
-    return remasking.endswith("_threshold")
-
-
-def _is_factor_remasking(remasking: str) -> bool:
-    return remasking.endswith("_factor")
 
 
 def _make_config_key(row: dict) -> tuple | None:
@@ -47,11 +41,16 @@ def _make_config_key(row: dict) -> tuple | None:
     if nfe <= 0 or max_tokens <= 0:
         return None
 
-    if _is_threshold_remasking(remasking):
+    try:
+        strategy_type = get_strategy_type(remasking)
+    except KeyError:
+        return None
+
+    if strategy_type == "threshold":
         threshold = row.get("alg_threshold", "")
         config_key = (remasking, f"threshold={threshold}")
         tps = max_tokens / nfe
-    elif _is_factor_remasking(remasking):
+    elif strategy_type == "factor":
         factor = row.get("alg_factor", "")
         config_key = (remasking, f"factor={factor}")
         tps = max_tokens / nfe
