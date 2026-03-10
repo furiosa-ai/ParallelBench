@@ -207,8 +207,19 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
         path = path / extract_remasking(gen_kwargs)
         path = path / _resolve_repr_param_value(gen_kwargs)
         run_id = self.__class__.run_id or "unknown"
+        parent = path
         path = path / run_id
         path.mkdir(parents=True, exist_ok=True)
+
+        # Create/update .latest symlink pointing to the current run_id
+        latest = parent / ".latest"
+        try:
+            if latest.is_symlink() or latest.exists():
+                latest.unlink()
+            latest.symlink_to(run_id)
+        except OSError:
+            pass  # Symlinks may not be supported on all filesystems
+
         return path
 
     def save_results_aggregated(

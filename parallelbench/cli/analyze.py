@@ -21,6 +21,7 @@ from rich.table import Table
 from parallelbench.analysis.pb_score import DEFAULT_THRESHOLDS, compute_pb_scores
 
 console = Console()
+console_err = Console(stderr=True)
 
 METRIC_KEYS = [
     "score",
@@ -122,9 +123,8 @@ def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list
     results_files = sorted(results_dir.rglob("results_*.json"))
 
     if not results_files:
-        console.print(
+        console_err.print(
             f"[bold red]No results found[/bold red] in {results_dir}",
-            file=sys.stderr,
         )
         return []
 
@@ -136,7 +136,6 @@ def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list
         except (json.JSONDecodeError, KeyError) as e:
             console.print(
                 f"[yellow]Warning:[/yellow] skipping {results_file}: {e}",
-                file=sys.stderr,
             )
 
     if sort_keys:
@@ -302,10 +301,37 @@ def main():
         default=None,
         help="Export results to CSV file",
     )
+    parser.add_argument(
+        "--latest",
+        action="store_true",
+        default=True,
+        help="Use .latest symlink to find the most recent run (default: True)",
+    )
+    parser.add_argument(
+        "--no-latest",
+        action="store_false",
+        dest="latest",
+        help="Scan all runs instead of just the latest",
+    )
     args = parser.parse_args()
 
+    results_dir = args.results_dir
     sort_keys = [k.strip() for k in args.sort.split(",")] if args.sort else None
-    rows = _collect_rows(args.results_dir, sort_keys=sort_keys)
+
+    # If .latest symlinks exist, collect results only from latest runs
+    if args.latest:
+        latest_links = list(results_dir.rglob(".latest"))
+        if latest_links:
+            console_err.print(
+                f"[dim]Using {len(latest_links)} latest run(s)[/dim]",
+            )
+            rows = []
+            for link in latest_links:
+                rows.extend(_collect_rows(link.resolve(), sort_keys=sort_keys))
+        else:
+            rows = _collect_rows(results_dir, sort_keys=sort_keys)
+    else:
+        rows = _collect_rows(results_dir, sort_keys=sort_keys)
 
     if not rows:
         sys.exit(1)
