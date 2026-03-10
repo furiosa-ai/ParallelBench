@@ -3,6 +3,7 @@
 Usage:
     pb eval [lm-eval options]     Run lm-eval evaluation
     pb data [options]             Generate benchmark data
+    pb browse [task] [options]    Browse benchmark tasks and samples
 """
 
 import sys
@@ -15,6 +16,7 @@ def main():
         print("Commands:")
         print("  eval    Run lm-eval evaluation")
         print("  data    Generate benchmark data")
+        print("  browse  Browse benchmark tasks and samples")
         print()
         print("Run 'pb <command> --help' for more information.")
         sys.exit(1)
@@ -30,9 +32,13 @@ def main():
         from parallelbench.datasets.generate import main as data_main
 
         data_main()
+    elif command == "browse":
+        from parallelbench.cli.browse import main as browse_main
+
+        browse_main()
     else:
         print(f"Unknown command: '{command}'")
-        print("Available commands: eval, data")
+        print("Available commands: eval, data, browse")
         sys.exit(1)
 
 

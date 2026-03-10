@@ -103,7 +103,7 @@ apt-get install openjdk-17-jdk -y
 
 ## ⚡ Quickstart
 
-Here's a simple example of how to load a model and run it on a **ParallelBench** task. For a more in-depth example, see the [`demo.py`](demo.py) script.
+Here's a simple example of how to load a model and run it on a **ParallelBench** task.
 
 ```python
 import torch
@@ -148,6 +148,19 @@ print(f"Model Output:    {response}")
 # To get the final score, run compute_metrics
 metrics = dataset.compute_metrics([response], [sample["label"]])
 print(f"Metrics: {metrics}")
+```
+
+You can also explore tasks directly from the command line:
+
+```bash
+# List all available tasks
+pb browse
+
+# View samples from a specific task (streamed from HuggingFace Hub)
+pb browse waiting_line/copy
+
+# View a specific sample by index
+pb browse waiting_line/copy --index 3
 ```
 
 ## 🎯 Evaluation Coverage
