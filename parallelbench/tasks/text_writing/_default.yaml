@@ -1,5 +1,12 @@
 group: parallel_bench_text_writing
 group_alias: "ParallelBench - Text Writing"
+aggregate_metric_list:
+  - metric: score
+    aggregation: mean
+    weight_by_size: true
+  - metric: nfe
+    aggregation: mean
+    weight_by_size: true
 task:
   - parallel_bench_text_writing_paraphrasing
   - parallel_bench_text_writing_summarization
