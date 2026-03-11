@@ -1,7 +1,6 @@
 LLADA_MASK_TOKEN_ID = 126336
 LLADA_VALID_STRATEGIES = {
     "random",
-    "low_confidence",
     "confidence_topk",
     "confidence_threshold",
     "confidence_factor",

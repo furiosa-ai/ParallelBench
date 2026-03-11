@@ -69,7 +69,6 @@ def derive_factor(alg_factor: float, max_tokens: int) -> dict:
 UNMASKING_REGISTRY: dict[str, StrategyInfo] = {
     "random": StrategyInfo("topk", "k", derive_topk),
     "origin": StrategyInfo("topk", "k", derive_topk),
-    "low_confidence": StrategyInfo("topk", "k", derive_topk),
     "confidence_topk": StrategyInfo("topk", "k", derive_topk),
     "topk_margin": StrategyInfo("topk", "k", derive_topk),
     "entropy_topk": StrategyInfo("topk", "k", derive_topk),

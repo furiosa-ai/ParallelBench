@@ -29,12 +29,11 @@ from parallelbench.models.local.trado.constants import TRADO_VALID_STRATEGIES
 # ============================================================
 
 
-def test_all_eight_strategies_are_registered():
-    """All 8 expected strategy names are present in the registry."""
+def test_all_seven_strategies_are_registered():
+    """All 7 expected strategy names are present in the registry."""
     expected = {
         "random",
         "origin",
-        "low_confidence",
         "confidence_topk",
         "topk_margin",
         "entropy_topk",
@@ -66,7 +65,6 @@ def test_registry_is_superset_of_per_model_valid_strategies():
     [
         ("random", "topk"),
         ("origin", "topk"),
-        ("low_confidence", "topk"),
         ("confidence_topk", "topk"),
         ("topk_margin", "topk"),
         ("entropy_topk", "topk"),

@@ -8,7 +8,6 @@ from parallelbench.models.unmasking_registry import get_strategy_type
 DEFAULT_VALID_STRATEGIES = {
     "random",
     "origin",
-    "low_confidence",
     "confidence_topk",
     "topk_margin",
     "entropy_topk",
@@ -118,6 +117,19 @@ class DllmGenerationConfig(BaseGenerationConfig):
                     f"alg_threshold must be None for {self.remasking} algorithm"
                 )
 
+    # Mapping from internal strategy names to fast-dllm backend names.
+    _BACKEND_REMASKING_MAP: dict = None  # type: ignore[assignment]
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+    def _backend_remasking(self) -> str:
+        """Map internal remasking name to the backend (fast-dllm) name."""
+        backend_map = {
+            "confidence_topk": "low_confidence",
+        }
+        return backend_map.get(self.remasking, self.remasking)
+
     def to_generation_kwargs(self) -> dict:
         return dict(
             steps=self.steps,
@@ -125,7 +137,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
             block_length=self.block_length,
             temperature=self.temperature,
             alg_temp=self.alg_temp,
-            remasking=self.remasking,
+            remasking=self._backend_remasking(),
             threshold=self.alg_threshold,
             factor=self.alg_factor,
         )
