@@ -349,3 +349,162 @@ def get_transfer_index_dynamic(
         transfer_index[j, select_index] = True
 
     return x0, transfer_index
+
+
+@torch.no_grad()
+def generate_batch(
+    model,
+    prompts,
+    steps=128,
+    gen_length=128,
+    block_length=128,
+    temperature=0.0,
+    unmasking="confidence_topk",
+    mask_id=126336,
+    pad_id=0,
+    threshold=None,
+    factor=None,
+    output_history=False,
+    alg_temp=0.0,
+    eb_sampler_gamma=None,
+) -> tuple[torch.Tensor, int, Optional[list[list]]]:
+    """Batched generation for masked diffusion language models.
+
+    NOTE: This is NOT an official LLaDA implementation. LLaDA does not officially
+    support batched generation (see https://github.com/ML-GSAI/LLaDA/issues/78).
+    This implementation uses a [prompt | mask | pad] layout with right-padding and
+    attention masking to enable correct batched inference without model modification.
+
+    Layout per sample: [prompt | mask_tokens | pad_tokens]
+    Pad tokens are placed AFTER mask tokens and excluded via attention_mask,
+    so RoPE position encoding remains correct without model modification.
+
+    Args:
+        model: Mask predictor.
+        prompts: List of 1D tensors, each of shape (L_i,) with variable lengths.
+        steps: Sampling steps per block.
+        gen_length: Generated answer length (same for all samples).
+        block_length: Block length for semi-autoregressive unmasking.
+        temperature: Categorical distribution sampling temperature.
+        unmasking: Unmasking strategy.
+        mask_id: The token id of [MASK].
+        pad_id: The token id used for right-padding.
+        threshold: Confidence threshold for threshold-based unmasking.
+        factor: Dynamic unmasking factor.
+        output_history: Whether to output generation history per sample.
+        alg_temp: Algorithm temperature.
+        eb_sampler_gamma: Entropy-based sampler gamma.
+
+    Returns:
+        x: Tensor of shape (B, max_prompt_len + gen_length) with generated tokens.
+        nfe: Number of forward evaluations (shared across the batch).
+        history: List of per-sample history lists, or None.
+    """
+    batch_size = len(prompts)
+    device = (
+        model.device if hasattr(model, "device") else next(model.parameters()).device
+    )
+
+    prompt_lengths = torch.tensor(
+        [p.squeeze(0).shape[0] if p.dim() == 2 else p.shape[0] for p in prompts],
+        dtype=torch.long,
+        device=device,
+    )
+    max_prompt_len = prompt_lengths.max().item()
+    max_total_len = max_prompt_len + gen_length
+
+    # Build x: [prompt | masks | pads]
+    x = torch.full((batch_size, max_total_len), pad_id, dtype=torch.long, device=device)
+    attention_mask = torch.zeros(
+        (batch_size, max_total_len), dtype=torch.float, device=device
+    )
+
+    for i in range(batch_size):
+        pl = prompt_lengths[i].item()
+        p = prompts[i].to(device)
+        if p.dim() == 2:
+            p = p.squeeze(0)
+        x[i, :pl] = p
+        x[i, pl : pl + gen_length] = mask_id
+        attention_mask[i, : pl + gen_length] = 1.0
+
+    assert gen_length % block_length == 0
+    num_blocks = gen_length // block_length
+
+    if steps is not None:
+        assert steps % num_blocks == 0
+        steps = steps // num_blocks
+    else:
+        assert (
+            threshold is not None or factor is not None or eb_sampler_gamma is not None
+        ), "If steps is None, threshold, factor, or eb_sampler_gamma must be provided."
+
+    nfe = 0
+    # Precompute position indices for vectorized per-sample boundary ops
+    positions = torch.arange(max_total_len, device=device).unsqueeze(0)  # (1, L)
+    history = [[] for _ in range(batch_size)] if output_history else None
+
+    for num_block in range(num_blocks):
+        block_starts = (prompt_lengths + num_block * block_length).unsqueeze(
+            1
+        )  # (B, 1)
+        block_ends = (prompt_lengths + (num_block + 1) * block_length).unsqueeze(
+            1
+        )  # (B, 1)
+        in_block = (positions >= block_starts) & (positions < block_ends)  # (B, L)
+
+        block_mask_index = (x == mask_id) & in_block
+        num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps)
+
+        i_step = 0
+        while True:
+            nfe += 1
+            # Include all masks up to current block end (previous blocks already filled)
+            mask_index = (x == mask_id) & (positions < block_ends)
+
+            logits = model(x, attention_mask=attention_mask).logits
+
+            if factor is None:
+                x0, transfer_index = get_transfer_index(
+                    logits,
+                    temperature,
+                    unmasking,
+                    mask_index,
+                    x,
+                    (
+                        num_transfer_tokens[:, i_step]
+                        if threshold is None and eb_sampler_gamma is None
+                        else None
+                    ),
+                    threshold,
+                    alg_temp=alg_temp,
+                    eb_sampler_gamma=eb_sampler_gamma,
+                )
+            else:
+                x0, transfer_index = get_transfer_index_dynamic(
+                    logits,
+                    temperature,
+                    unmasking,
+                    mask_index,
+                    x,
+                    None,
+                    factor,
+                    alg_temp=alg_temp,
+                )
+            x[transfer_index] = x0[transfer_index]
+
+            if history is not None:
+                for si in range(batch_size):
+                    pl = prompt_lengths[si].item()
+                    history[si].append(
+                        x[si, pl : pl + gen_length].cpu().clone().unsqueeze(0)
+                    )
+
+            i_step += 1
+
+            # Break when all masks in current block are filled for ALL samples
+            remaining = (x == mask_id) & in_block
+            if not remaining.any():
+                break
+
+    return x, nfe, history
