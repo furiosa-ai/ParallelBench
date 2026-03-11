@@ -1,4 +1,4 @@
-group: parallelbench
+group: parallelbench_all
 group_alias: ParallelBench
 aggregate_metric_list:
   - metric: score

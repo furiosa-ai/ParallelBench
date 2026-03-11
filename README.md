@@ -392,7 +392,7 @@ pb eval --model parallelbench_llada \
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs steps=128,block_length=128,unmasking=confidence_topk \
-  --tasks parallelbench \
+  --tasks parallelbench_all \
   --include_path parallelbench/tasks
 ```
 
@@ -402,7 +402,7 @@ pb eval --model parallelbench_llada \
 accelerate launch -m parallelbench.cli.eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs steps=128,block_length=128,unmasking=confidence_topk \
-  --tasks parallelbench \
+  --tasks parallelbench_all \
   --include_path parallelbench/tasks
 ```
 

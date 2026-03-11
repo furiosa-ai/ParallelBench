@@ -23,7 +23,7 @@ for K in 1 2 4 8 16 32; do
         --model parallelbench_llada \
         --model_args model_path=GSAI-ML/LLaDA-1.5 \
         --gen_kwargs k=${K},unmasking=confidence_topk \
-        --tasks parallelbench \
+        --tasks parallelbench_all \
         --include_path parallelbench/tasks \
         --limit 32 \
         --batch_size 1 \
