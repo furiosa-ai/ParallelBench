@@ -1,4 +1,4 @@
-class: !function ../parallel_bench_task.ParallelBenchTask
+class: !function ../parallelbench_task.ParallelBenchTask
 dataset_path: furiosa-ai/ParallelBench
 output_type: generate_until
 generation_kwargs:

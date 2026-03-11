@@ -108,7 +108,7 @@ def generate(
     from datasets import DatasetDict
 
     from parallelbench.datasets.task import (
-        create_parallel_bench_task,
+        create_parallelbench_task,
         task_name_to_config_name,
     )
 
@@ -138,7 +138,7 @@ def generate(
             progress.update(overall, description=f"[cyan]{task_name}[/cyan]")
 
             try:
-                rows = create_parallel_bench_task(
+                rows = create_parallelbench_task(
                     split=split,
                     task=task_config,
                     output_file=None,

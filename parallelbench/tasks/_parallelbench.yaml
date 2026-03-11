@@ -1,4 +1,4 @@
-group: parallel_bench
+group: parallelbench
 group_alias: ParallelBench
 aggregate_metric_list:
   - metric: score
@@ -11,6 +11,6 @@ aggregate_metric_list:
     aggregation: mean
     weight_by_size: true
 task:
-  - parallel_bench_waiting_line
-  - parallel_bench_text_writing
-  - parallel_bench_puzzles
+  - parallelbench_waiting_line
+  - parallelbench_text_writing
+  - parallelbench_puzzles

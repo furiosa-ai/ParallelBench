@@ -5,7 +5,7 @@ import random
 import pytest
 
 from parallelbench.datasets.task_generators import TASK_GENERATORS
-from parallelbench.datasets.task import generate_parallel_bench_task_random
+from parallelbench.datasets.task import generate_parallelbench_task_random
 from parallelbench.datasets.task_utils import _shuffle
 
 
@@ -49,10 +49,10 @@ class TestSortGenerator:
         }
 
         rng1 = random.Random(42)
-        result1 = list(generate_parallel_bench_task_random(rng1, config))
+        result1 = list(generate_parallelbench_task_random(rng1, config))
 
         rng2 = random.Random(42)
-        result2 = list(generate_parallel_bench_task_random(rng2, config))
+        result2 = list(generate_parallelbench_task_random(rng2, config))
 
         assert result1 == result2
 
@@ -65,7 +65,7 @@ class TestSortGenerator:
             "max_length": 3,
         }
         rng = random.Random(0)
-        samples = list(generate_parallel_bench_task_random(rng, config))
+        samples = list(generate_parallelbench_task_random(rng, config))
         assert len(samples) == 1
 
         sample = samples[0]
@@ -80,7 +80,7 @@ class TestUnknownTaskType:
         config = {"type": "nonexistent", "num_samples": 1}
         rng = random.Random(0)
         with pytest.raises(ValueError, match="Unknown task type"):
-            list(generate_parallel_bench_task_random(rng, config))
+            list(generate_parallelbench_task_random(rng, config))
 
 
 class TestShuffleEdgeCases:

@@ -1,7 +1,7 @@
 """ParallelBench task implementation for lm-eval-harness.
 
 Each ParallelBench task (e.g. waiting_line/copy, puzzles/sudoku_n4) is defined
-by a YAML file that sets metadata.parallel_bench_task to the task identifier.
+by a YAML file that sets metadata.parallelbench_task to the task identifier.
 This class loads data from the existing ParallelBench dataset, formats prompts,
 and computes metrics using the existing metric functions.
 """
@@ -27,7 +27,7 @@ class ParallelBenchTask(ConfigurableTask):
 
     YAML config must include:
         metadata:
-          parallel_bench_task: "waiting_line/copy"  # dataset task identifier
+          parallelbench_task: "waiting_line/copy"  # dataset task identifier
 
     Hub에서 데이터를 로드하려면 dataset_path를 설정합니다:
         dataset_path: "furiosa-ai/ParallelBench"
@@ -45,12 +45,12 @@ class ParallelBenchTask(ConfigurableTask):
             config = {k: v for k, v in config.items() if k != "class"}
 
         # Initialize ParallelBench before super().__init__ because the parent
-        # calls fewshot_docs() -> test_docs() during init, which needs _parallel_bench.
+        # calls fewshot_docs() -> test_docs() during init, which needs _parallelbench.
         metadata = (config or {}).get("metadata", {})
-        task_name = metadata.get("parallel_bench_task")
+        task_name = metadata.get("parallelbench_task")
         if task_name is None:
             raise ValueError(
-                "ParallelBenchTask requires metadata.parallel_bench_task in YAML config"
+                "ParallelBenchTask requires metadata.parallelbench_task in YAML config"
             )
 
         flex_config = metadata.get("flex_config")
@@ -59,12 +59,12 @@ class ParallelBenchTask(ConfigurableTask):
         # adding dataset_path to a flex-enabled YAML switches to paper-reproduce mode.
         if from_hub:
             flex_config = None
-        self._parallel_bench = ParallelBench(
+        self._parallelbench = ParallelBench(
             task=task_name, split="test", from_hub=from_hub, flex_config=flex_config
         )
-        self._metric_name = self._parallel_bench.metric_name
+        self._metric_name = self._parallelbench.metric_name
 
-        metric_func = self._parallel_bench.metric_func
+        metric_func = self._parallelbench.metric_func
         if isinstance(metric_func, type) and issubclass(metric_func, Metric):
             metric_func = metric_func()
         self._metric_func = metric_func
@@ -77,8 +77,8 @@ class ParallelBenchTask(ConfigurableTask):
     def download(self, dataset_kwargs=None) -> None:
         """Build a HuggingFace DatasetDict from local ParallelBench data."""
         docs = []
-        for idx in range(len(self._parallel_bench)):
-            sample = self._parallel_bench[idx]
+        for idx in range(len(self._parallelbench)):
+            sample = self._parallelbench[idx]
             docs.append(
                 {
                     "messages": sample["input"]["messages"],

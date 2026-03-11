@@ -2,13 +2,13 @@ from pathlib import Path
 
 from parallelbench.datasets.task import (
     PARALLEL_BENCH_MASK_TOKEN as PARALLEL_BENCH_MASK_TOKEN,
-    create_parallel_bench_task as create_parallel_bench_task,
+    create_parallelbench_task as create_parallelbench_task,
     load_task,
     load_task_flex,
     task_name_to_config_name as task_name_to_config_name,
     config_name_to_task_name as config_name_to_task_name,
 )
-from parallelbench.datasets.metrics import Metric, parallel_bench_metric_func_map
+from parallelbench.datasets.metrics import Metric, parallelbench_metric_func_map
 from parallelbench.datasets.task_utils import load_task_configs
 
 
@@ -44,7 +44,7 @@ class ParallelBench:
 
         self.prompt = task_config["prompt"]
         self.metric_name = task_config["metric"]
-        metric_func = parallel_bench_metric_func_map[task_config["metric"]]
+        metric_func = parallelbench_metric_func_map[task_config["metric"]]
         if isinstance(metric_func, type) and issubclass(metric_func, Metric):
             self.metric_func = metric_func()
         else:

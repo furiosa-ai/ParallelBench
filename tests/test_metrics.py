@@ -19,7 +19,7 @@ from parallelbench.datasets.metrics import (
     startwith_score,
     regex_match_score,
     Metric,
-    parallel_bench_metric_func_map,
+    parallelbench_metric_func_map,
 )
 
 
@@ -224,7 +224,7 @@ class TestAllMetricsReturnDict:
             "regex_match_score": ("abc", {"pattern": "abc"}),
         }
 
-        func = parallel_bench_metric_func_map[metric_name]
+        func = parallelbench_metric_func_map[metric_name]
         if isinstance(func, type) and issubclass(func, Metric):
             func = func()
 
@@ -258,5 +258,5 @@ class TestTextToRegexTimeout:
 
 class TestMetricFuncMap:
     def test_all_entries_callable(self):
-        for name, func in parallel_bench_metric_func_map.items():
+        for name, func in parallelbench_metric_func_map.items():
             assert callable(func) or (isinstance(func, type)), f"{name} is not callable"

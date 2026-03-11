@@ -1,7 +1,7 @@
 include: _base.yml
-task: parallel_bench_puzzles_latin_square_n4
+task: parallelbench_puzzles_latin_square_n4
 metadata:
-  parallel_bench_task: "puzzles/latin_square_n4"
+  parallelbench_task: "puzzles/latin_square_n4"
   flex_config:
     size: 4
     num_samples: 100

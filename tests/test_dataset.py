@@ -20,7 +20,7 @@ class TestGetTaskNames:
         for name in get_task_names():
             assert not name.startswith("_")
 
-    def test_parallel_bench_tasks_populated(self):
+    def test_parallelbench_tasks_populated(self):
         assert len(PARALLEL_BENCH_TASKS) > 0
 
 

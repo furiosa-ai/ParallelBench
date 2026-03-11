@@ -1,4 +1,4 @@
 include: _base.yml
-task: parallel_bench_text_writing_paraphrasing
+task: parallelbench_text_writing_paraphrasing
 metadata:
-  parallel_bench_task: "text_writing/paraphrasing"
+  parallelbench_task: "text_writing/paraphrasing"

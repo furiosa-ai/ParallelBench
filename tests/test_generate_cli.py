@@ -63,7 +63,7 @@ class TestGenerateFunction:
         """Verify push triggers push_to_hub with correct args."""
         with (
             mock.patch(
-                "parallelbench.datasets.task.create_parallel_bench_task"
+                "parallelbench.datasets.task.create_parallelbench_task"
             ) as mock_create,
             mock.patch("datasets.DatasetDict") as mock_dd,
         ):

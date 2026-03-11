@@ -116,14 +116,14 @@ def extract_task_name(results: dict) -> str:
 
     lm-eval stores results keyed by task name. For single-task runs,
     there is exactly one key. For multi-task runs, uses the common prefix
-    (e.g., "parallel_bench") to avoid overly long filenames.
+    (e.g., "parallelbench") to avoid overly long filenames.
     Falls back to 'unknown_task' if empty.
     """
     task_names = list(results.get("results", {}).keys())
     if len(task_names) == 1:
         return task_names[0]
     if task_names:
-        # Find common prefix to produce a short group name
+        # Find common prefix to produce a short group name (e.g., "parallelbench")
         prefix = os.path.commonprefix(sorted(task_names)).rstrip("_")
         if prefix:
             return prefix

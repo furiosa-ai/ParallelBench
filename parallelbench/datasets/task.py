@@ -2,7 +2,7 @@
 
 This module provides:
 - load_task(): Load pre-generated task data from JSONL files
-- create_parallel_bench_task(): Generate and save task data
+- create_parallelbench_task(): Generate and save task data
 - CLI entry point for batch task creation
 """
 
@@ -148,7 +148,7 @@ def load_task_flex(split, task_name, flex_config):
     task_config["seed"] = seed
     rng = random.Random(seed)
 
-    # Load words from file if needed — create_parallel_bench_task does this at lines 258-260
+    # Load words from file if needed — create_parallelbench_task does this at lines 258-260
     if "words" in task_config and isinstance(task_config["words"], str):
         task_config["words"] = load_words_from_file(task_config["words"])
 
@@ -157,7 +157,7 @@ def load_task_flex(split, task_name, flex_config):
     # Handle ICL examples if configured
     if task_config.get("icl_example_count", 0) > 0:
         icl_datasets = [
-            create_parallel_bench_task_random(
+            create_parallelbench_task_random(
                 rng=rng, task={**task_config, "icl_example_count": 0}
             )
             for _ in range(task_config["icl_example_count"])
@@ -190,7 +190,7 @@ def _flex_seed(task_name, flex_config):
     return seed % (2**16 - 1)
 
 
-def generate_parallel_bench_task_random(rng, task_config, infinite=False):
+def generate_parallelbench_task_random(rng, task_config, infinite=False):
     task_config = {**task_config}
 
     if infinite:
@@ -203,11 +203,11 @@ def generate_parallel_bench_task_random(rng, task_config, infinite=False):
     yield from generator(rng, task_config)
 
 
-def create_parallel_bench_task_random(rng, task):
-    return list(generate_parallel_bench_task_random(rng, task))
+def create_parallelbench_task_random(rng, task):
+    return list(generate_parallelbench_task_random(rng, task))
 
 
-def create_parallel_bench_task_random_samples_per_length(rng, task):
+def create_parallelbench_task_random_samples_per_length(rng, task):
     samples_per_length = task["samples_per_length"]
     num_samples = task["num_samples"]
     if num_samples % samples_per_length != 0:
@@ -245,7 +245,7 @@ def create_parallel_bench_task_random_samples_per_length(rng, task):
 
     finished = False
     for i, sample in enumerate(
-        tqdm(generate_parallel_bench_task_random(rng, task, infinite=True)), start=1
+        tqdm(generate_parallelbench_task_random(rng, task, infinite=True)), start=1
     ):
         length = (
             sample["metadata"]["length"]
@@ -316,13 +316,13 @@ def _create_task(rng, task):
         f"Creating task {task['name']} with seed {task['seed']}..."
     )
     if task.get("samples_per_length", 0) > 0:
-        data = create_parallel_bench_task_random_samples_per_length(rng, task)
+        data = create_parallelbench_task_random_samples_per_length(rng, task)
     else:
-        data = create_parallel_bench_task_random(rng, task)
+        data = create_parallelbench_task_random(rng, task)
     return data
 
 
-def create_parallel_bench_task(split, task, output_file, rng=None, no_save=False):
+def create_parallelbench_task(split, task, output_file, rng=None, no_save=False):
     if not output_file:
         output_file = _get_task_file(split, task_name=task["name"])
 
@@ -344,7 +344,7 @@ def create_parallel_bench_task(split, task, output_file, rng=None, no_save=False
 
     if task.get("icl_example_count", 0) > 0:
         icl_datasets = [
-            create_parallel_bench_task_random(
+            create_parallelbench_task_random(
                 rng=rng, task={**task, "icl_example_count": 0}
             )
             for _ in range(task["icl_example_count"])
@@ -396,7 +396,7 @@ def main(task, **kwargs):
             )
 
     for split, t in loaded_tasks:
-        create_parallel_bench_task(split=split, task=t, **kwargs)
+        create_parallelbench_task(split=split, task=t, **kwargs)
 
 
 def parse_args():

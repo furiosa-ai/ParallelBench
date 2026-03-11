@@ -1,7 +1,7 @@
 include: _base.yml
-task: parallel_bench_puzzles_sudoku_n4
+task: parallelbench_puzzles_sudoku_n4
 metadata:
-  parallel_bench_task: "puzzles/sudoku_n4"
+  parallelbench_task: "puzzles/sudoku_n4"
   flex_config:
     size: 4
     num_holes: 8

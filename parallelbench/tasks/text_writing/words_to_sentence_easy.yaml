@@ -1,7 +1,7 @@
 include: _base.yml
-task: parallel_bench_text_writing_words_to_sentence_easy
+task: parallelbench_text_writing_words_to_sentence_easy
 metadata:
-  parallel_bench_task: "text_writing/words_to_sentence_easy"
+  parallelbench_task: "text_writing/words_to_sentence_easy"
   flex_config:
     min_length: 3
     max_length: 5

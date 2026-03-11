@@ -1,7 +1,7 @@
 include: _base.yml
-task: parallel_bench_waiting_line_reverse
+task: parallelbench_waiting_line_reverse
 metadata:
-  parallel_bench_task: "waiting_line/reverse"
+  parallelbench_task: "waiting_line/reverse"
   flex_config:
     min_length: 3
     max_length: 6

@@ -4,7 +4,7 @@ import shutil
 
 import pytest
 
-from parallelbench.datasets.task import create_parallel_bench_task
+from parallelbench.datasets.task import create_parallelbench_task
 from parallelbench.datasets.task_utils import _get_task_file, load_task_configs
 
 
@@ -28,7 +28,7 @@ def generate_test_data():
             "samples_per_length": 0,
             "icl_example_count": 0,
         }
-        create_parallel_bench_task(split="test", task=task_config, output_file=None)
+        create_parallelbench_task(split="test", task=task_config, output_file=None)
         generated_dirs.add(_get_task_file("test", task_name).parent)
 
     yield

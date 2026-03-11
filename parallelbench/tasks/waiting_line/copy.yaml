@@ -1,7 +1,7 @@
 include: _base.yml
-task: parallel_bench_waiting_line_copy
+task: parallelbench_waiting_line_copy
 metadata:
-  parallel_bench_task: "waiting_line/copy"
+  parallelbench_task: "waiting_line/copy"
   flex_config:
     min_length: 3
     max_length: 6

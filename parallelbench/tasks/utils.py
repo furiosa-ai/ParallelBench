@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Callable
 
-from parallelbench.datasets.metrics import Metric, parallel_bench_metric_func_map
+from parallelbench.datasets.metrics import Metric, parallelbench_metric_func_map
 
 
 def compute_sample_metrics(
@@ -22,7 +22,7 @@ def compute_sample_metrics(
     All values are raw (not scaled to percentage — aggregation handles that).
     """
     if metric_func is None:
-        metric_func = parallel_bench_metric_func_map[metric_name]
+        metric_func = parallelbench_metric_func_map[metric_name]
         if isinstance(metric_func, type) and issubclass(metric_func, Metric):
             metric_func = metric_func()
 

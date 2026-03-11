@@ -119,7 +119,7 @@ def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list
     """Scan results directory and collect all rows.
 
     Matches both legacy timestamp filenames (results_2026-03-10T05-48-12.json)
-    and new task-name filenames (results_parallel_bench_waiting_line_copy.json).
+    and new task-name filenames (results_parallelbench_waiting_line_copy.json).
     """
     results_files = sorted(results_dir.rglob("results_*.json"))
 
@@ -221,8 +221,8 @@ def _print_results_table(rows: list[dict], title: str | None = None) -> None:
         display_row = dict(row)
         # Shorten task name for display
         task = display_row.get("task", "")
-        if task.startswith("parallel_bench_"):
-            display_row["task"] = task[len("parallel_bench_") :]
+        if task.startswith("parallelbench_"):
+            display_row["task"] = task[len("parallelbench_") :]
         table.add_row(
             *[_format_value(col, display_row.get(col, "")) for col in DISPLAY_COLUMNS]
         )

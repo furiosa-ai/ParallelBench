@@ -1,7 +1,7 @@
 include: _base.yml
-task: parallel_bench_waiting_line_remove_random
+task: parallelbench_waiting_line_remove_random
 metadata:
-  parallel_bench_task: "waiting_line/remove_random"
+  parallelbench_task: "waiting_line/remove_random"
   flex_config:
     min_length: 3
     max_length: 6

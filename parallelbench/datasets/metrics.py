@@ -683,7 +683,7 @@ def sudoku_score(prediction, ground_truth) -> dict[str, float]:
     }
 
 
-parallel_bench_metric_func_map = {
+parallelbench_metric_func_map = {
     "list_match_score": list_match_score,
     "list_shuffle_score": list_shuffle_score,
     "list_random_insert_score": list_random_insert_score,

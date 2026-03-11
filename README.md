@@ -261,7 +261,7 @@ pb data --split test --output_dir ./output
 To generate and push directly to HuggingFace Hub:
 
 ```bash
-pb data --split test --push --repo_id org/parallel_bench
+pb data --split test --push --repo_id org/parallelbench
 ```
 
 This command uses the configurations specified in `parallelbench/datasets/data/task_configs/`.
@@ -353,7 +353,7 @@ Run LLaDA-1.5 on `waiting_line/copy` with **k=32** (fully parallel):
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs k=32,remasking=random \
-  --tasks parallel_bench_waiting_line_copy \
+  --tasks parallelbench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
 # k=32 → steps=1, block_length=32 (fully parallel)
@@ -365,7 +365,7 @@ Compare with **one-by-one decoding** (k=1):
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs k=1,remasking=random \
-  --tasks parallel_bench_waiting_line_copy \
+  --tasks parallelbench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
 # k=1 → steps=32, block_length=32 (one-by-one)
@@ -379,7 +379,7 @@ Use threshold-based unmasking where tokens per step varies adaptively:
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs steps=32,block_length=32,remasking=confidence_threshold,alg_threshold=0.8 \
-  --tasks parallel_bench_waiting_line_copy \
+  --tasks parallelbench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
 # alg_threshold=0.8 → only unmask tokens with confidence > 0.8
@@ -392,7 +392,7 @@ pb eval --model parallelbench_llada \
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs steps=128,block_length=128,remasking=confidence_topk \
-  --tasks parallel_bench \
+  --tasks parallelbench \
   --include_path parallelbench/tasks
 ```
 
@@ -402,7 +402,7 @@ pb eval --model parallelbench_llada \
 accelerate launch -m parallelbench.cli.eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs steps=128,block_length=128,remasking=confidence_topk \
-  --tasks parallel_bench \
+  --tasks parallelbench \
   --include_path parallelbench/tasks
 ```
 

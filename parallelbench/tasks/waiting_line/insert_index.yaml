@@ -1,7 +1,7 @@
 include: _base.yml
-task: parallel_bench_waiting_line_insert_index
+task: parallelbench_waiting_line_insert_index
 metadata:
-  parallel_bench_task: "waiting_line/insert_index"
+  parallelbench_task: "waiting_line/insert_index"
   flex_config:
     min_length: 3
     max_length: 6
