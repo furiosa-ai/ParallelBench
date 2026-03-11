@@ -125,9 +125,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
 
     def _backend_unmasking(self) -> str:
         """Map internal unmasking name to the backend (fast-dllm) name."""
-        backend_map = {
-            "confidence_topk": "low_confidence",
-        }
+        backend_map: dict[str, str] = {}
         return backend_map.get(self.unmasking, self.unmasking)
 
     def to_generation_kwargs(self) -> dict:
