@@ -20,7 +20,6 @@ DEFAULT_VALID_STRATEGIES = {
 class BaseGenerationConfig(ABC):
     """Common generation config shared by all model types."""
 
-    accel_framework: Optional[str] = None
     max_tokens: int = 128
     temperature: float = 0.0
 
@@ -35,8 +34,6 @@ class DllmGenerationConfig(BaseGenerationConfig):
     alg_temp: float = 0.0
     alg_threshold: Optional[float] = None
     alg_factor: Optional[float] = None
-    use_fast_dllm_cache: bool = False
-    use_fast_dllm_dual_cache: bool = False
     valid_strategies: set = field(default_factory=lambda: set(DEFAULT_VALID_STRATEGIES))
 
     def __post_init__(self):
@@ -63,18 +60,6 @@ class DllmGenerationConfig(BaseGenerationConfig):
 
         if self.max_tokens % self.block_length != 0:
             raise ValueError("max_tokens must be divisible by block_length")
-
-        # Validate fast_dllm cache usage
-        if self.accel_framework != "fast_dllm":
-            if self.use_fast_dllm_cache:
-                raise ValueError(
-                    "use_fast_dllm_cache can only be True when accel_framework is 'fast_dllm'"
-                )
-
-            if self.use_fast_dllm_dual_cache:
-                raise ValueError(
-                    "use_fast_dllm_dual_cache can only be True when accel_framework is 'fast_dllm'"
-                )
 
     def _validate_unmasking(self):
         if self.unmasking not in self.valid_strategies:
@@ -117,14 +102,8 @@ class DllmGenerationConfig(BaseGenerationConfig):
                     f"alg_threshold must be None for {self.unmasking} algorithm"
                 )
 
-    # Mapping from internal strategy names to fast-dllm backend names.
-    _BACKEND_UNMASKING_MAP: dict = None  # type: ignore[assignment]
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-
     def _backend_unmasking(self) -> str:
-        """Map internal unmasking name to the backend (fast-dllm) name."""
+        """Map internal unmasking name to the backend name."""
         backend_map: dict[str, str] = {}
         return backend_map.get(self.unmasking, self.unmasking)
 

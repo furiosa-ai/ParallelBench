@@ -55,7 +55,7 @@ def load_model(model_name: str, **kwargs) -> "BaseModel":
 
     Args:
         model_name (str): Name or path of the model.
-        **kwargs: Additional arguments. May include 'accel_framework'.
+        **kwargs: Additional arguments. May include 'accel_framework' for dispatch.
 
     Returns:
         BaseModel: An instance of the loaded model.
@@ -72,10 +72,7 @@ def load_model(model_name: str, **kwargs) -> "BaseModel":
         model_class = None
 
     if model_class:
-        # API models don't accept accel_framework
-        if issubclass(model_class, ApiModel):
-            return model_class(model_name, **kwargs)
-        return model_class(model_name, accel_framework=accel_framework, **kwargs)
+        return model_class(model_name, **kwargs)
     elif accel_framework == "vllm":
         return vllmModel(model_name, **kwargs)
     elif accel_framework == "transformers":

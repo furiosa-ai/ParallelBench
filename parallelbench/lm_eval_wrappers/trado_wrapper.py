@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from lm_eval.api.registry import register_model
 
 from parallelbench.models.base_model import BaseModel
@@ -25,24 +23,19 @@ class TradoWrapper(DLLMBase):
     def __init__(
         self,
         model_path: str,
-        accel_framework: Optional[str] = None,
-        top_p: Optional[float] = None,
-        top_k: Optional[float] = None,
+        top_p: float | None = None,
+        top_k: float | None = None,
         **kwargs,
     ) -> None:
         self._top_p = top_p
         self._top_k = top_k
         super().__init__(
             model_path=model_path,
-            accel_framework=accel_framework,
             **kwargs,
         )
 
     def _create_inner_model(self) -> BaseModel:
-        return TradoModel(
-            model_name=self.model_path,
-            accel_framework=self.accel_framework,
-        )
+        return TradoModel(model_name=self.model_path)
 
     def _build_generation_config(self, gen_kwargs: dict) -> dict:
         config = super()._build_generation_config(gen_kwargs)

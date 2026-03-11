@@ -10,7 +10,6 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "sedd",
-    "fast-dllm",
     "flash-attn",
     "torch==2.8.*",
     "transformers==4.*",
@@ -36,7 +35,6 @@ members = [
 
 [tool.uv.sources]
 sedd = { workspace = true, editable = true }
-fast-dllm = { workspace = true, editable = true }
 
 
 [tool.uv.extra-build-dependencies]

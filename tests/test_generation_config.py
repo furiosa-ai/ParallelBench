@@ -1,4 +1,4 @@
-"""Tests for GenerationConfig hierarchy and fast-dLLM cache validation."""
+"""Tests for GenerationConfig hierarchy."""
 
 import pytest
 
@@ -12,11 +12,10 @@ from parallelbench.models.generation_config import (
 
 
 def test_base_generation_config_has_common_fields():
-    """BaseGenerationConfig should only have common fields (max_tokens, temperature, accel_framework)."""
+    """BaseGenerationConfig should only have common fields (max_tokens, temperature)."""
     config = ARGenerationConfig()  # Use ARGenerationConfig as concrete subclass
     assert hasattr(config, "max_tokens")
     assert hasattr(config, "temperature")
-    assert hasattr(config, "accel_framework")
     # dLLM-specific fields should NOT be on BaseGenerationConfig
     assert not hasattr(config, "unmasking")
     assert not hasattr(config, "block_length")
@@ -140,65 +139,6 @@ def test_transformers_generation_config_no_crash():
     assert config.max_tokens == 128
     kwargs = config.to_generate_kwargs()
     assert "max_new_tokens" in kwargs
-
-
-# -- Fast-dLLM cache validation --
-
-
-def test_fast_dllm_cache_allowed_with_fast_dllm_framework():
-    config = DllmGenerationConfig(
-        unmasking="random",
-        accel_framework="fast_dllm",
-        use_fast_dllm_cache=True,
-    )
-    assert config.use_fast_dllm_cache is True
-
-
-def test_fast_dllm_dual_cache_allowed_with_fast_dllm_framework():
-    config = DllmGenerationConfig(
-        unmasking="random",
-        accel_framework="fast_dllm",
-        use_fast_dllm_dual_cache=True,
-    )
-    assert config.use_fast_dllm_dual_cache is True
-
-
-def test_fast_dllm_cache_without_fast_dllm_raises():
-    with pytest.raises(ValueError, match="use_fast_dllm_cache"):
-        DllmGenerationConfig(
-            unmasking="random",
-            accel_framework=None,
-            use_fast_dllm_cache=True,
-        )
-
-
-def test_fast_dllm_dual_cache_without_fast_dllm_raises():
-    with pytest.raises(ValueError, match="use_fast_dllm_dual_cache"):
-        DllmGenerationConfig(
-            unmasking="random",
-            accel_framework=None,
-            use_fast_dllm_dual_cache=True,
-        )
-
-
-def test_fast_dllm_cache_with_non_fast_dllm_framework_raises():
-    with pytest.raises(ValueError, match="use_fast_dllm_cache"):
-        DllmGenerationConfig(
-            unmasking="random",
-            accel_framework="vllm",
-            use_fast_dllm_cache=True,
-        )
-
-
-def test_fast_dllm_both_caches_with_fast_dllm_framework():
-    config = DllmGenerationConfig(
-        unmasking="random",
-        accel_framework="fast_dllm",
-        use_fast_dllm_cache=True,
-        use_fast_dllm_dual_cache=True,
-    )
-    assert config.use_fast_dllm_cache is True
-    assert config.use_fast_dllm_dual_cache is True
 
 
 def test_steps_not_divisible_by_num_blocks_raises():

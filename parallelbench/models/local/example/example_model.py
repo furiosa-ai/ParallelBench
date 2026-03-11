@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Union
 
 import torch
 
@@ -36,10 +36,8 @@ class ExampleModel(LocalModel):
     with a predicate that matches your desired model name(s).
     """
 
-    def __init__(
-        self, model_name: str, accel_framework: Optional[str] = None, **kwargs
-    ):
-        super().__init__(model_name, accel_framework=accel_framework, **kwargs)
+    def __init__(self, model_name: str, **kwargs):
+        super().__init__(model_name, **kwargs)
         # Initialize the model here (e.g., load weights, set up tokenizer, etc.)
 
     def generate(

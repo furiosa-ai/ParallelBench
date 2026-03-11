@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from lm_eval.api.registry import register_model
 
 from parallelbench.models.base_model import BaseModel
@@ -23,20 +21,15 @@ class SEDDWrapper(DLLMBase):
     def __init__(
         self,
         model_path: str,
-        accel_framework: Optional[str] = None,
         **kwargs,
     ) -> None:
         super().__init__(
             model_path=model_path,
-            accel_framework=accel_framework,
             **kwargs,
         )
 
     def _create_inner_model(self) -> BaseModel:
-        return SeddModel(
-            model_name=self.model_path,
-            accel_framework=self.accel_framework,
-        )
+        return SeddModel(model_name=self.model_path)
 
     def _build_generation_config(self, gen_kwargs: dict) -> dict:
         if "temperature" not in gen_kwargs:

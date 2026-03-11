@@ -45,16 +45,12 @@ class SeddGenerationConfig(DllmGenerationConfig):
 
 @ModelRegistry.register(lambda name: "sedd" in name.lower())
 class SeddModel(LocalModel):
-    def __init__(self, model_name, accel_framework=None):
-        assert accel_framework is None
-
+    def __init__(self, model_name):
         self.device = torch.device("cuda")
         self.model, self.graph, self.noise = load_model(model_name, self.device)
         self.model.eval()
 
         self.tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
-
-        self._validate_and_set_framework(accel_framework)
 
     def _generate(self, input_ids, gen_config, output_history=False):
         generate_kwargs = gen_config.to_generation_kwargs()
@@ -94,9 +90,7 @@ class SeddModel(LocalModel):
         input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
             self.device
         )
-        gen_config = SeddGenerationConfig(
-            accel_framework=self.accel_framework, **gen_config
-        )
+        gen_config = SeddGenerationConfig(**gen_config)
 
         input_output_ids, nfe, history = self._generate(
             input_ids, gen_config, output_history=output_history

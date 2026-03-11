@@ -60,51 +60,6 @@ def test_dllm_output_properties():
 # ============================================================
 
 
-def _create_local_model(accel_framework=None, model_name="test-model"):
-    """Create a LocalModel with mocked from_pretrained calls."""
-    mock_model = mock.MagicMock()
-    mock_tokenizer = mock.MagicMock()
-
-    with (
-        mock.patch(
-            "parallelbench.models.base_model.AutoModel.from_pretrained",
-            return_value=mock_model,
-        ),
-        mock.patch(
-            "parallelbench.models.base_model.AutoTokenizer.from_pretrained",
-            return_value=mock_tokenizer,
-        ),
-    ):
-
-        class ConcreteLocalModel(LocalModel):
-            def generate(
-                self,
-                messages,
-                gen_config=None,
-                output_prefix=None,
-                output_history=False,
-            ):
-                pass
-
-        instance = ConcreteLocalModel(model_name, accel_framework=accel_framework)
-    return instance, mock_model, mock_tokenizer
-
-
-def test_invalid_accel_framework_raises():
-    with pytest.raises(ValueError, match="Invalid accel_framework"):
-        _create_local_model(accel_framework="invalid")
-
-
-def test_non_fast_dllm_framework_sets_is_fast_dllm_false():
-    instance, _, _ = _create_local_model(accel_framework=None)
-    assert instance.is_fast_dllm is False
-
-
-def test_valid_accel_framework_fast_dllm():
-    instance, _, _ = _create_local_model(accel_framework="fast_dllm")
-    assert instance.is_fast_dllm is True
-
-
 def test_calls_from_pretrained_with_correct_args():
     mock_model = mock.MagicMock()
     mock_tokenizer = mock.MagicMock()

@@ -16,10 +16,7 @@ class LLaDAWrapper(DLLMBase):
     """lm-eval wrapper around LladaModel."""
 
     def _create_inner_model(self) -> BaseModel:
-        return LladaModel(
-            model_name=self.model_path,
-            accel_framework=self.accel_framework,
-        )
+        return LladaModel(model_name=self.model_path)
 
     def _build_generation_config(self, gen_kwargs: dict) -> dict:
         if "unmasking" not in gen_kwargs:

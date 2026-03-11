@@ -100,8 +100,6 @@ class TestGenerateHistoryNoneSafety:
         llada.tokenizer = mock.MagicMock()
         llada.model = mock.MagicMock()
         llada.mask_id = 50257
-        llada.accel_framework = "test"
-
         output_ids = torch.tensor([[1, 2, 3]])
         with mock.patch.object(llada, "_generate", return_value=(output_ids, 10, None)):
             with mock.patch(
@@ -135,7 +133,6 @@ class TestGenerateHistoryNoneSafety:
         llada.tokenizer = mock.MagicMock()
         llada.model = mock.MagicMock()
         llada.mask_id = 50257
-        llada.accel_framework = "test"
 
         output_ids = torch.tensor([[1, 2, 3]])
         mock_history = [torch.tensor([[1, 2, 3]])]

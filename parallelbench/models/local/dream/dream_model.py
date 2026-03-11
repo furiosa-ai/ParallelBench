@@ -68,10 +68,8 @@ class DreamGenerationConfig(DllmGenerationConfig):
     )
 )
 class DreamModel(LocalModel):
-    def __init__(self, model_name, accel_framework=None, eps=0):
-        super().__init__(
-            model_name, model_class=AutoModel, accel_framework=accel_framework
-        )
+    def __init__(self, model_name, eps=0):
+        super().__init__(model_name, model_class=AutoModel)
 
         self.eps = eps
         self.mask_id = DREAM_MASK_TOKEN_ID
@@ -85,11 +83,6 @@ class DreamModel(LocalModel):
         self.model.forward = types.MethodType(self.model.__class__.forward, self.model)
 
         gen_kwargs = gen_config.to_generation_kwargs()
-
-        if self.accel_framework == "fast_dllm":
-            raise NotImplementedError(
-                "Fast-dLLM Dream model patching is not implemented yet."
-            )
 
         if (
             gen_kwargs.get("block_length") is not None
@@ -150,9 +143,7 @@ class DreamModel(LocalModel):
         input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
             self.model.device
         )
-        gen_config = DreamGenerationConfig(
-            accel_framework=self.accel_framework, **gen_config
-        )
+        gen_config = DreamGenerationConfig(**gen_config)
 
         model_output, nfe = self._generate(
             input_ids, gen_config, output_history=output_history

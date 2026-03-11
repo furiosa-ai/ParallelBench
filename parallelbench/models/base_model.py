@@ -5,8 +5,6 @@ from typing import Optional, Union, List, Dict
 from transformers import AutoModel, AutoTokenizer
 import torch
 
-VALID_ACCEL_FRAMEWORKS = {None, "vllm", "transformers", "fast_dllm"}
-
 
 class BaseModel(ABC):
     """Abstract base class for all models (API and local)."""
@@ -46,19 +44,7 @@ class LocalModel(BaseModel):
     model loading independently and bypass __init__; they also use trust_remote_code=True.
     """
 
-    def _validate_and_set_framework(self, accel_framework):
-        """Validate accel_framework and set related attributes."""
-        if accel_framework not in VALID_ACCEL_FRAMEWORKS:
-            raise ValueError(
-                f"Invalid accel_framework: {accel_framework}. "
-                f"Valid options are: {VALID_ACCEL_FRAMEWORKS}"
-            )
-        self.accel_framework = accel_framework
-        self.is_fast_dllm = self.accel_framework == "fast_dllm"
-
-    def __init__(self, model_name, model_class=AutoModel, accel_framework=None):
-        self._validate_and_set_framework(accel_framework)
-
+    def __init__(self, model_name, model_class=AutoModel):
         local_rank = os.environ.get("LOCAL_RANK")
         device_map = f"cuda:{local_rank}" if local_rank is not None else "cuda"
         self.model = model_class.from_pretrained(

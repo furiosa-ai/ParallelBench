@@ -4,11 +4,9 @@ from unittest import mock
 
 import pytest
 
-from parallelbench.models.base_model import ApiModel
-
 
 @mock.patch("parallelbench.models.ModelRegistry.get_model_class")
-def test_load_model_registry_local_model_passes_accel_framework(mock_get):
+def test_load_model_registry_model_does_not_pass_accel_framework(mock_get):
     from parallelbench.models import load_model
 
     # Create a real class so issubclass() works
@@ -19,32 +17,10 @@ def test_load_model_registry_local_model_passes_accel_framework(mock_get):
 
     mock_get.return_value = FakeLocalModel
 
-    result = load_model("my-model", accel_framework="fast_dllm", extra_arg=42)
+    result = load_model("my-model", accel_framework="vllm", extra_arg=42)
     assert result.args == ("my-model",)
-    assert result.kwargs == {"accel_framework": "fast_dllm", "extra_arg": 42}
-
-
-@mock.patch("parallelbench.models.ModelRegistry.get_model_class")
-def test_load_model_registry_api_model_omits_accel_framework(mock_get):
-    from parallelbench.models import load_model
-
-    # Create a real class that is a subclass of ApiModel
-    class FakeApiModel(ApiModel):
-        def __init__(self, *args, **kwargs):
-            self._args = args
-            self._kwargs = kwargs
-
-        def generate(
-            self, messages, gen_config=None, output_prefix=None, output_history=False
-        ):
-            pass
-
-    mock_get.return_value = FakeApiModel
-
-    result = load_model("api-model", accel_framework="vllm", api_key="xyz")
-    # accel_framework should NOT be passed to ApiModel
-    assert result._args == ("api-model",)
-    assert result._kwargs == {"api_key": "xyz"}
+    # accel_framework should be popped, not passed to model constructor
+    assert result.kwargs == {"extra_arg": 42}
 
 
 @mock.patch(

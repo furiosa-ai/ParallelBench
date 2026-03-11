@@ -57,7 +57,7 @@ class TradoGenerationConfig(DllmGenerationConfig):
     )
 )
 class TradoModel(LocalModel):
-    def __init__(self, model_name, accel_framework=None):
+    def __init__(self, model_name):
         # Use AutoModelForCausalLM to load the model
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
@@ -73,13 +73,9 @@ class TradoModel(LocalModel):
         self.tokenizer.mask_token_id = TRADO_MASK_TOKEN_ID
 
         self.mask_id = TRADO_MASK_TOKEN_ID
-        self._validate_and_set_framework(accel_framework)
 
     def _generate(self, input_ids, gen_config, output_history=False, output0_ids=None):
         gen_kwargs = gen_config.to_generation_kwargs()
-
-        if self.accel_framework == "fast_dllm":
-            raise NotImplementedError("fast_dllm is not yet supported for TraDo model.")
 
         generate_fn = block_diffusion_generate
 
@@ -111,9 +107,7 @@ class TradoModel(LocalModel):
         else:
             prompt = messages
 
-        gen_config = TradoGenerationConfig(
-            accel_framework=self.accel_framework, **gen_config
-        )
+        gen_config = TradoGenerationConfig(**gen_config)
 
         input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
             self.model.device

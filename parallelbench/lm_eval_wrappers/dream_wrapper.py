@@ -26,7 +26,6 @@ class DreamWrapper(DLLMBase):
     def __init__(
         self,
         model_path: str,
-        accel_framework: Optional[str] = None,
         eps: float = 0,
         top_p: Optional[float] = None,
         top_k: Optional[float] = None,
@@ -37,14 +36,12 @@ class DreamWrapper(DLLMBase):
         self._top_k = top_k
         super().__init__(
             model_path=model_path,
-            accel_framework=accel_framework,
             **kwargs,
         )
 
     def _create_inner_model(self) -> BaseModel:
         return DreamModel(
             model_name=self.model_path,
-            accel_framework=self.accel_framework,
             eps=self._eps,
         )
 

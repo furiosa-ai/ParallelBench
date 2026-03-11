@@ -3,7 +3,6 @@ from typing import Optional, Union
 import types
 
 import torch
-from fast_dllm.llada.model.modeling_llada import LLaDAModelLM as FastLLaDAModelLM
 from transformers import AutoModel, PreTrainedModel
 
 from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
@@ -38,18 +37,13 @@ class LladaGenerationConfig(DllmGenerationConfig):
     )
 )
 class LladaModel(LocalModel):
-    def __init__(self, model_name: str, accel_framework: Optional[str] = None):
+    def __init__(self, model_name: str):
         """Initialize the LladaModel.
 
         Args:
             model_name (str): The name of the model to load.
-            accel_framework (Optional[str]): The acceleration framework to use. Defaults to None.
         """
-        model_class = FastLLaDAModelLM if accel_framework == "fast_dllm" else AutoModel
-
-        super().__init__(
-            model_name, model_class=model_class, accel_framework=accel_framework
-        )
+        super().__init__(model_name, model_class=AutoModel)
 
         self.patch_model_forward(self.model, LLADA_MASK_TOKEN_ID)
         self.tokenizer.mask_token_id = LLADA_MASK_TOKEN_ID
@@ -133,9 +127,7 @@ class LladaModel(LocalModel):
         input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
             self.model.device
         )
-        gen_config = LladaGenerationConfig(
-            accel_framework=self.accel_framework, **gen_config
-        )
+        gen_config = LladaGenerationConfig(**gen_config)
 
         if output_prefix is not None:
             output_prefix = output_prefix.replace(

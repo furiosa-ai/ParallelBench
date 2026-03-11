@@ -9,7 +9,6 @@ capture via MetadataStore.
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Optional
 
 import torch
 from accelerate import Accelerator
@@ -32,7 +31,6 @@ class DLLMBase(LM):
 
     Constructor model_args (passed via --model_args):
         model_path: str          - HuggingFace model name/path
-        accel_framework: str     - None, "fast_dllm", etc.
         output_history: bool     - Whether to track generation history
         infill: bool             - Whether to use infill mode
 
@@ -50,7 +48,6 @@ class DLLMBase(LM):
     def __init__(
         self,
         model_path: str,
-        accel_framework: Optional[str] = None,
         output_history: bool = True,
         infill: bool = False,
         batch_size: int = 1,
@@ -65,7 +62,6 @@ class DLLMBase(LM):
         self._device = torch.device(str(self.accelerator.device))
 
         self.model_path = model_path
-        self.accel_framework = accel_framework
         self._output_history = output_history
         self._infill = infill
         self._batch_size = batch_size
