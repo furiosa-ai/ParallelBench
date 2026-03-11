@@ -14,6 +14,7 @@ import torch
 from accelerate import Accelerator
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
+from lm_eval.models.utils import Collator
 
 from parallelbench.models.base_model import BaseModel, DLLMOutput
 from parallelbench.lm_eval_wrappers.metadata_store import (
@@ -64,7 +65,7 @@ class DLLMBase(LM):
         self.model_path = model_path
         self._output_history = output_history
         self._infill = infill
-        self._batch_size = batch_size
+        self._batch_size = int(batch_size)
         self._extra_kwargs = kwargs
 
         self._inner_model: BaseModel = self._create_inner_model()
@@ -123,38 +124,21 @@ class DLLMBase(LM):
     # ─── lm-eval LM interface ────────────────────────────────────────────
 
     def generate_until(self, requests: list[Instance]) -> list[str]:
+        if self._batch_size > 1:
+            return self._generate_until_batched(requests)
+        return self._generate_until_sequential(requests)
+
+    def _generate_until_sequential(self, requests: list[Instance]) -> list[str]:
+        """Process requests one at a time (batch_size=1 path)."""
         results: list[str] = []
         store = MetadataStore.instance()
 
-        BRIDGED_KEYS = (
-            "k",
-            "alg_threshold",
-            "alg_factor",
-            "steps",
-            "block_length",
-            "unmasking",
-        )
-        COERCE_FLOAT_KEYS = ("k", "alg_threshold", "alg_factor")
-
         for request in requests:
             context, gen_kwargs = request.args
-
-            # Bridge generation params from model_args (CLI) into gen_kwargs (task YAML)
-            for key in BRIDGED_KEYS:
-                if key in self._extra_kwargs and key not in gen_kwargs:
-                    value = self._extra_kwargs[key]
-                    if key in COERCE_FLOAT_KEYS:
-                        value = float(value)
-                    gen_kwargs[key] = value
-
+            gen_kwargs = self._bridge_generation_kwargs(gen_kwargs)
             messages = self._context_to_messages(context)
             gen_config = self._build_generation_config(gen_kwargs)
-
-            output_prefix = None
-            if self._infill and hasattr(request, "doc") and request.doc:
-                output_prefix_str = request.doc.get("output_prefix")
-                if output_prefix_str is not None:
-                    output_prefix = self._encode_output_prefix(output_prefix_str)
+            output_prefix = self._get_output_prefix(request)
 
             dllm_output: DLLMOutput = self._inner_model.generate(
                 messages=messages,
@@ -163,27 +147,75 @@ class DLLMBase(LM):
                 output_history=self._output_history,
             )
 
-            tokens_per_step = (
-                gen_config["max_tokens"] / dllm_output.nfe
-                if dllm_output.nfe > 0
-                else None
+            store.append(self._build_metadata(dllm_output, gen_config))
+            generated_text = self._apply_until_truncation(
+                dllm_output.output, gen_kwargs
             )
-
-            store.append(
-                GenerationMetadata(
-                    nfe=dllm_output.nfe,
-                    tokens_per_step=tokens_per_step,
-                    history=dllm_output.history,
-                    decoding_order=dllm_output.decoding_order,
-                    decoding_order_corrs=dllm_output.decoding_order_corrs,
-                    input_length=dllm_output.input_length,
-                    output_length=dllm_output.output_length,
-                )
-            )
-
-            generated_text = dllm_output.output
-            generated_text = self._apply_until_truncation(generated_text, gen_kwargs)
             results.append(generated_text)
+
+        return results
+
+    def _generate_until_batched(self, requests: list[Instance]) -> list[str]:
+        """Process requests in batches using Collator (batch_size>1 path).
+
+        Groups requests by gen_kwargs, sorts by descending context length,
+        and calls generate_batch() on the inner model. Results and metadata
+        are reordered back to the original request order.
+        """
+        # Bridge gen_kwargs for all requests before grouping
+        bridged_args = []
+        for request in requests:
+            context, gen_kwargs = request.args
+            gen_kwargs = self._bridge_generation_kwargs(gen_kwargs)
+            bridged_args.append((context, gen_kwargs))
+
+        def _collate(item):
+            context, _gen_kwargs = item
+            return -len(str(context)), str(context)
+
+        collator = Collator(
+            bridged_args,
+            sort_fn=_collate,
+            group_by="gen_kwargs",
+            group_fn=lambda x: x[1],
+        )
+
+        results: list[str] = []
+        metadata_list: list[GenerationMetadata] = []
+
+        for chunk in collator.get_batched(n=self._batch_size):
+            contexts, all_gen_kwargs = zip(*chunk)
+            gen_kwargs = all_gen_kwargs[0]
+            gen_config = self._build_generation_config(gen_kwargs)
+
+            messages_list = [self._context_to_messages(ctx) for ctx in contexts]
+            # NOTE: Infill output_prefix is not supported in batched mode.
+            # Collator reorders requests, so original request indices are not
+            # available here. Infill mode is not used by any current model.
+            output_prefix_list = None
+
+            dllm_outputs: list[DLLMOutput] = self._inner_model.generate_batch(
+                messages_list=messages_list,
+                gen_config=gen_config,
+                output_prefix_list=output_prefix_list,
+                output_history=self._output_history,
+            )
+
+            for dllm_output in dllm_outputs:
+                metadata_list.append(self._build_metadata(dllm_output, gen_config))
+                generated_text = self._apply_until_truncation(
+                    dllm_output.output, gen_kwargs
+                )
+                results.append(generated_text)
+
+        # Restore original request order
+        results = collator.get_original(results)
+        metadata_list = collator.get_original(metadata_list)
+
+        # Append metadata in original order
+        store = MetadataStore.instance()
+        for metadata in metadata_list:
+            store.append(metadata)
 
         return results
 
@@ -200,6 +232,53 @@ class DLLMBase(LM):
         )
 
     # ─── Helper methods ──────────────────────────────────────────────────
+
+    BRIDGED_KEYS = (
+        "k",
+        "alg_threshold",
+        "alg_factor",
+        "steps",
+        "block_length",
+        "unmasking",
+    )
+    COERCE_FLOAT_KEYS = ("k", "alg_threshold", "alg_factor")
+
+    def _bridge_generation_kwargs(self, gen_kwargs: dict) -> dict:
+        """Bridge generation params from model_args (CLI) into gen_kwargs (task YAML)."""
+        gen_kwargs = dict(gen_kwargs)
+        for key in self.BRIDGED_KEYS:
+            if key in self._extra_kwargs and key not in gen_kwargs:
+                value = self._extra_kwargs[key]
+                if key in self.COERCE_FLOAT_KEYS:
+                    value = float(value)
+                gen_kwargs[key] = value
+        return gen_kwargs
+
+    def _get_output_prefix(self, request: Instance) -> str | None:
+        """Extract output prefix from request for infill mode."""
+        if self._infill and hasattr(request, "doc") and request.doc:
+            output_prefix_str = request.doc.get("output_prefix")
+            if output_prefix_str is not None:
+                return self._encode_output_prefix(output_prefix_str)
+        return None
+
+    @staticmethod
+    def _build_metadata(
+        dllm_output: DLLMOutput, gen_config: dict
+    ) -> GenerationMetadata:
+        """Build GenerationMetadata from a DLLMOutput."""
+        tokens_per_step = (
+            gen_config["max_tokens"] / dllm_output.nfe if dllm_output.nfe > 0 else None
+        )
+        return GenerationMetadata(
+            nfe=dllm_output.nfe,
+            tokens_per_step=tokens_per_step,
+            history=dllm_output.history,
+            decoding_order=dllm_output.decoding_order,
+            decoding_order_corrs=dllm_output.decoding_order_corrs,
+            input_length=dllm_output.input_length,
+            output_length=dllm_output.output_length,
+        )
 
     def _context_to_messages(self, context: str | list) -> list[dict] | str:
         """Convert lm-eval context to the messages format expected by inner model.

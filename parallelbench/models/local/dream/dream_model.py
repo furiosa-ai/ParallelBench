@@ -115,7 +115,11 @@ class DreamModel(LocalModel):
             "apple/diffucoder-7b-cpgrpo",
         )
 
-    def _generate(self, input_ids, gen_config, output_history):
+    @property
+    def supports_batch(self) -> bool:
+        return True
+
+    def _generate(self, input_ids, gen_config, output_history, attention_mask=None):
         self.patch_model(gen_config)
 
         gen_kwargs = dict(
@@ -123,12 +127,84 @@ class DreamModel(LocalModel):
             output_history=output_history,
         )
 
+        if attention_mask is not None:
+            gen_kwargs["attention_mask"] = attention_mask
+
         if self.eps is not None:
             gen_kwargs["eps"] = self.eps
         elif self._is_diffucoder:
             gen_kwargs["eps"] = DIFFUCODER_EPS
 
         return self.model.diffusion_generate(input_ids, **gen_kwargs), self.model.nfe
+
+    def generate_batch(
+        self,
+        messages_list,
+        gen_config=None,
+        output_prefix_list=None,
+        output_history=False,
+    ):
+        prompts = []
+        for messages in messages_list:
+            if isinstance(messages, list):
+                prompt = self.tokenizer.apply_chat_template(
+                    messages, add_generation_prompt=True, tokenize=False
+                )
+            else:
+                prompt = messages
+            prompts.append(prompt)
+
+        self.tokenizer.padding_side = "left"
+        encoded = self.tokenizer(prompts, return_tensors="pt", padding=True).to(
+            self.model.device
+        )
+        input_ids = encoded.input_ids
+        attention_mask = encoded.attention_mask
+
+        gen_config_obj = DreamGenerationConfig(**gen_config)
+        model_output, nfe = self._generate(
+            input_ids,
+            gen_config_obj,
+            output_history=output_history,
+            attention_mask=attention_mask,
+        )
+
+        input_len = input_ids.shape[1]
+        results = []
+        for i in range(len(messages_list)):
+            sample_input_ids = input_ids[i : i + 1]
+            sample_output_ids = model_output.sequences[i : i + 1, input_len:]
+            output_text = self.tokenizer.decode(
+                sample_output_ids[0], skip_special_tokens=True
+            )
+
+            if output_history:
+                history = [h[i : i + 1, input_len:] for h in model_output.history]
+                decoding_order, decoding_order_corrs = (
+                    compute_decoding_order_correlation_from_history(
+                        self.tokenizer, history
+                    )
+                )
+                if output_history != "pt":
+                    history = decode_history(self.tokenizer, history)
+            else:
+                decoding_order, decoding_order_corrs = None, None
+                history = None
+
+            results.append(
+                DLLMOutput(
+                    output=output_text,
+                    input_ids=sample_input_ids,
+                    output_ids=sample_output_ids,
+                    pad_token_id=self.tokenizer.pad_token_id,
+                    nfe=nfe,
+                    history=history,
+                    decoding_order=decoding_order,
+                    decoding_order_corrs=decoding_order_corrs,
+                )
+            )
+
+        return results
 
     def generate(
         self, messages, output_prefix=None, gen_config=None, output_history=False

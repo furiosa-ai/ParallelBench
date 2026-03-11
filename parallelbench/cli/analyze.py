@@ -185,11 +185,21 @@ def _format_value(key: str, value) -> str:
     return str(value)
 
 
+def _get_display_columns(rows: list[dict]) -> list[str]:
+    """Return display columns, including model column when multiple models exist."""
+    models = {row.get("model", "unknown") for row in rows}
+    if len(models) > 1:
+        return ["model", *DISPLAY_COLUMNS]
+    return list(DISPLAY_COLUMNS)
+
+
 def _print_results_table(rows: list[dict], title: str | None = None) -> None:
     """Print a Rich-formatted results table."""
     if title is None:
         models = sorted({row.get("model", "unknown") for row in rows})
         title = f"Results ({', '.join(models)})"
+
+    display_columns = _get_display_columns(rows)
 
     table = Table(
         title=title,
@@ -200,13 +210,14 @@ def _print_results_table(rows: list[dict], title: str | None = None) -> None:
 
     numeric_columns = {"score", "nfe", "tokens_per_step"}
     col_config = {
+        "model": {"max_width": 30},
         "task": {"max_width": 30},
         "unmasking": {"max_width": 16},
         "tokens_per_step": {"min_width": 5},
         "nfe": {"min_width": 5},
         "score": {"min_width": 6},
     }
-    for col in DISPLAY_COLUMNS:
+    for col in display_columns:
         justify = "right" if col in numeric_columns else "left"
         cfg = col_config.get(col, {})
         table.add_column(
@@ -224,7 +235,7 @@ def _print_results_table(rows: list[dict], title: str | None = None) -> None:
         if task.startswith("parallelbench_"):
             display_row["task"] = task[len("parallelbench_") :]
         table.add_row(
-            *[_format_value(col, display_row.get(col, "")) for col in DISPLAY_COLUMNS]
+            *[_format_value(col, display_row.get(col, "")) for col in display_columns]
         )
 
     console.print()

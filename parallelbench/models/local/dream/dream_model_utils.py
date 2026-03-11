@@ -233,7 +233,7 @@ def sample_block(
         i = 0
         while True:
             mask_index = torch.full(
-                (1, x.shape[1]), False, dtype=torch.bool, device=x.device
+                (x.shape[0], x.shape[1]), False, dtype=torch.bool, device=x.device
             )
             mask_index[:, current_block_start:current_block_end] = (
                 x[:, current_block_start:current_block_end] == mask_token_id
@@ -351,20 +351,23 @@ def sample_block(
 
                     current_transfer_tokens = (
                         x[:, current_block_start:current_block_end] == mask_token_id
-                    ).sum()
+                    ).sum(1)
                     transfer_index = torch.zeros_like(
                         x_, device=x.device, dtype=torch.bool
                     )
 
-                    selected_confidence, select_index = torch.topk(
-                        full_confidence, current_transfer_tokens
-                    )
-
-                    select_index = select_index.to(x.device)
-                    transfer_index[0, select_index[0]] = True
-                    for k in range(1, current_transfer_tokens):
-                        if selected_confidence[0, k] < threshold:
-                            transfer_index[0, select_index[0, k]] = False
+                    for j in range(x.shape[0]):
+                        n_transfer = current_transfer_tokens[j].item()
+                        if n_transfer == 0:
+                            continue
+                        selected_confidence, select_index = torch.topk(
+                            full_confidence[j], n_transfer
+                        )
+                        select_index = select_index.to(x.device)
+                        transfer_index[j, select_index] = True
+                        for k in range(1, n_transfer):
+                            if selected_confidence[k] < threshold:
+                                transfer_index[j, select_index[k]] = False
 
                     x[transfer_index] = x_[transfer_index]
                 else:

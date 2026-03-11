@@ -123,3 +123,69 @@ def test_calls_model_eval():
         ConcreteLocalModel("my-model-path")
 
     mock_model.eval.assert_called_once()
+
+
+# ============================================================
+# Batch generation API
+# ============================================================
+
+
+def test_supports_batch_returns_false_by_default():
+    """BaseModel.supports_batch should return False by default."""
+
+    class ConcreteModel(BaseModel):
+        def generate(self, messages, **kwargs):
+            return DLLMOutput(output="test")
+
+    model = ConcreteModel()
+    assert model.supports_batch is False
+
+
+def test_generate_batch_raises_not_implemented_with_class_name():
+    """BaseModel.generate_batch() should raise NotImplementedError with the class name."""
+
+    class MyCustomModel(BaseModel):
+        def generate(self, messages, **kwargs):
+            return DLLMOutput(output="test")
+
+    model = MyCustomModel()
+    with pytest.raises(NotImplementedError, match="MyCustomModel"):
+        model.generate_batch(
+            messages_list=[[{"role": "user", "content": "hi"}]],
+            gen_config={"steps": 32},
+        )
+
+
+def test_subclass_with_batch_support():
+    """A subclass that implements generate_batch() and supports_batch=True should work."""
+
+    class BatchModel(BaseModel):
+        @property
+        def supports_batch(self) -> bool:
+            return True
+
+        def generate(self, messages, **kwargs):
+            return DLLMOutput(output="single")
+
+        def generate_batch(
+            self,
+            messages_list,
+            gen_config=None,
+            output_prefix_list=None,
+            output_history=False,
+        ):
+            return [DLLMOutput(output=f"batch_{i}") for i in range(len(messages_list))]
+
+    model = BatchModel()
+    assert model.supports_batch is True
+
+    results = model.generate_batch(
+        messages_list=[
+            [{"role": "user", "content": "a"}],
+            [{"role": "user", "content": "b"}],
+        ],
+        gen_config={"steps": 32},
+    )
+    assert len(results) == 2
+    assert results[0].output == "batch_0"
+    assert results[1].output == "batch_1"

@@ -9,6 +9,15 @@ import torch
 class BaseModel(ABC):
     """Abstract base class for all models (API and local)."""
 
+    @property
+    def supports_batch(self) -> bool:
+        """Whether this model supports batched generation via generate_batch().
+
+        Subclasses that implement generate_batch() should override this to return True.
+        When False and batch_size > 1 is used, generate_batch() raises NotImplementedError.
+        """
+        return False
+
     @abstractmethod
     def generate(
         self,
@@ -28,6 +37,28 @@ class BaseModel(ABC):
             DLLMOutput: Generated output with metadata
         """
         pass
+
+    def generate_batch(
+        self,
+        messages_list: List[Union[List[dict], str]],
+        gen_config: Dict = None,
+        output_prefix_list: Optional[List[Optional[str]]] = None,
+        output_history: bool = False,
+    ) -> List["DLLMOutput"]:
+        """Generate outputs for a batch of inputs in a single forward pass.
+
+        Args:
+            messages_list: List of per-sample messages (each element is what generate() receives)
+            gen_config: Generation configuration shared across the batch
+            output_prefix_list: List of per-sample output prefixes (None means no prefix)
+            output_history: If True, return intermediate decoding states
+        Returns:
+            List of DLLMOutput in the same order as messages_list
+        """
+        raise NotImplementedError(
+            f"{self.__class__.__name__} does not support batch generation. "
+            f"Use batch_size=1 or implement generate_batch() in {self.__class__.__name__}."
+        )
 
 
 class ApiModel(BaseModel):
