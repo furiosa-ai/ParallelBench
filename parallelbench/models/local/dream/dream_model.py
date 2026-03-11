@@ -19,8 +19,8 @@ from .dream_model_utils import sample_block
 
 @dataclass
 class DreamGenerationConfig(DllmGenerationConfig):
-    remasking: str = (
-        "origin"  # Set the default remasking strategy to "origin" for Dream models
+    unmasking: str = (
+        "origin"  # Set the default unmasking strategy to "origin" for Dream models
     )
     block_length: int = 128  # Set the default block length for Dream models
 
@@ -43,10 +43,10 @@ class DreamGenerationConfig(DllmGenerationConfig):
     def to_generation_kwargs(self):
         gen_kwargs = super().to_generation_kwargs()
         gen_length = gen_kwargs.pop("gen_length")
-        remasking = gen_kwargs.pop("remasking", None)
+        unmasking = gen_kwargs.pop("unmasking", None)
         return {
             **gen_kwargs,
-            "alg": remasking,
+            "alg": unmasking,
             "max_new_tokens": gen_length,
             "return_dict_in_generate": True,
             "attention_mask": None,

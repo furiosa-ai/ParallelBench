@@ -77,7 +77,7 @@ def generate_with_no_cache(
     gen_length=128,
     block_length=128,
     temperature=0.0,
-    remasking="confidence_topk",
+    unmasking="confidence_topk",
     mask_id=126336,
     threshold=None,
     factor=None,
@@ -92,10 +92,10 @@ def generate_with_no_cache(
         prompt: A tensor of shape (1, L).
         steps: Sampling steps, less than or equal to gen_length.
         gen_length: Generated answer length.
-        block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive remasking.
+        block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive unmasking.
         temperature: Categorical distribution sampling temperature.
         cfg_scale: Unsupervised classifier-free guidance scale.
-        remasking: Remasking strategy. 'confidence_topk' or 'random'.
+        unmasking: Unmasking strategy. 'confidence_topk' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
@@ -142,7 +142,7 @@ def generate_with_no_cache(
                 x0, transfer_index = get_transfer_index(
                     logits,
                     temperature,
-                    remasking,
+                    unmasking,
                     mask_index,
                     x,
                     (
@@ -158,7 +158,7 @@ def generate_with_no_cache(
                 x0, transfer_index = get_transfer_index_dynamic(
                     logits,
                     temperature,
-                    remasking,
+                    unmasking,
                     mask_index,
                     x,
                     None,
@@ -192,7 +192,7 @@ def generate_with_prefix_cache(
     gen_length=128,
     block_length=128,
     temperature=0.0,
-    remasking="confidence_topk",
+    unmasking="confidence_topk",
     mask_id=126336,
     threshold=None,
     factor=None,
@@ -206,10 +206,10 @@ def generate_with_prefix_cache(
         prompt: A tensor of shape (1, L).
         steps: Sampling steps, less than or equal to gen_length.
         gen_length: Generated answer length.
-        block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive remasking.
+        block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive unmasking.
         temperature: Categorical distribution sampling temperature.
         cfg_scale: Unsupervised classifier-free guidance scale.
-        remasking: Remasking strategy. 'confidence_topk' or 'random'.
+        unmasking: Unmasking strategy. 'confidence_topk' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
@@ -246,7 +246,7 @@ def generate_with_prefix_cache(
             x0, transfer_index = get_transfer_index(
                 output.logits,
                 temperature,
-                remasking,
+                unmasking,
                 mask_index,
                 x,
                 num_transfer_tokens[:, 0] if threshold is None else None,
@@ -257,7 +257,7 @@ def generate_with_prefix_cache(
             x0, transfer_index = get_transfer_index_dynamic(
                 output.logits,
                 temperature,
-                remasking,
+                unmasking,
                 mask_index,
                 x,
                 None,
@@ -300,7 +300,7 @@ def generate_with_prefix_cache(
                 x0, transfer_index = get_transfer_index(
                     logits,
                     temperature,
-                    remasking,
+                    unmasking,
                     mask_index,
                     x[:, current_block_start:],
                     num_transfer_tokens[:, i] if threshold is None else None,
@@ -311,7 +311,7 @@ def generate_with_prefix_cache(
                 x0, transfer_index = get_transfer_index_dynamic(
                     logits,
                     temperature,
-                    remasking,
+                    unmasking,
                     mask_index,
                     x[:, current_block_start:],
                     None,
@@ -336,7 +336,7 @@ def generate_with_dual_cache(
     gen_length=128,
     block_length=128,
     temperature=0.0,
-    remasking="confidence_topk",
+    unmasking="confidence_topk",
     mask_id=126336,
     threshold=None,
     factor=None,
@@ -349,10 +349,10 @@ def generate_with_dual_cache(
         prompt: A tensor of shape (1, L).
         steps: Sampling steps, less than or equal to gen_length.
         gen_length: Generated answer length.
-        block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive remasking.
+        block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive unmasking.
         temperature: Categorical distribution sampling temperature.
         cfg_scale: Unsupervised classifier-free guidance scale.
-        remasking: Remasking strategy. 'confidence_topk' or 'random'.
+        unmasking: Unmasking strategy. 'confidence_topk' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
@@ -388,7 +388,7 @@ def generate_with_dual_cache(
             x0, transfer_index = get_transfer_index(
                 output.logits,
                 temperature,
-                remasking,
+                unmasking,
                 mask_index,
                 x,
                 num_transfer_tokens[:, 0] if threshold is None else None,
@@ -399,7 +399,7 @@ def generate_with_dual_cache(
             x0, transfer_index = get_transfer_index_dynamic(
                 output.logits,
                 temperature,
-                remasking,
+                unmasking,
                 mask_index,
                 x,
                 None,
@@ -432,7 +432,7 @@ def generate_with_dual_cache(
                 x0, transfer_index = get_transfer_index(
                     logits,
                     temperature,
-                    remasking,
+                    unmasking,
                     mask_index,
                     x[:, current_block_start:current_block_end],
                     num_transfer_tokens[:, i] if threshold is None else None,
@@ -443,7 +443,7 @@ def generate_with_dual_cache(
                 x0, transfer_index = get_transfer_index_dynamic(
                     logits,
                     temperature,
-                    remasking,
+                    unmasking,
                     mask_index,
                     x[:, current_block_start:current_block_end],
                     None,
@@ -465,7 +465,7 @@ def generate_with_dual_cache(
 def get_transfer_index(
     logits,
     temperature,
-    remasking,
+    unmasking,
     mask_index,
     x,
     num_transfer_tokens,
@@ -497,12 +497,12 @@ def get_transfer_index(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if remasking.startswith("confidence"):
+    if unmasking.startswith("confidence"):
         # get probabilities of selected ids (confidence)
         # x0_p = torch.squeeze(
         #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
         pass
-    elif remasking.startswith("topk_margin"):
+    elif unmasking.startswith("topk_margin"):
         x0_p = None
         sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
         # Extract top1 and top2 probabilities
@@ -510,16 +510,16 @@ def get_transfer_index(
         top2_probs = sorted_probs[..., 1]
         # Calculate confidence as top1 - top2
         x0_p = top1_probs - top2_probs
-    elif remasking.startswith("entropy"):
+    elif unmasking.startswith("entropy"):
         x0_p = None
         epsilon = 1e-10
         log_probs = torch.log(p + epsilon)
         x0_p = torch.sum(p * log_probs, dim=-1)
-    elif remasking.startswith("random"):
+    elif unmasking.startswith("random"):
         x0_p = None
         x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
     else:
-        raise NotImplementedError(remasking)
+        raise NotImplementedError(unmasking)
 
     x0 = torch.where(mask_index, x0, x)
     confidence = torch.where(mask_index, x0_p, -np.inf)
@@ -555,7 +555,7 @@ def get_transfer_index(
 def get_transfer_index_dynamic(
     logits,
     temperature,
-    remasking,
+    unmasking,
     mask_index,
     x,
     num_transfer_tokens,
@@ -586,26 +586,26 @@ def get_transfer_index_dynamic(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if remasking.startswith("confidence"):
+    if unmasking.startswith("confidence"):
         # get probabilities of selected ids (confidence)
         # x0_p = torch.squeeze(
         #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
         pass
-    elif remasking.startswith("topk_margin"):
+    elif unmasking.startswith("topk_margin"):
         sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
         # Extract top1 and top2 probabilities
         top1_probs = sorted_probs[..., 0]
         top2_probs = sorted_probs[..., 1]
         # Calculate confidence as top1 - top2
         x0_p = top1_probs - top2_probs
-    elif remasking.startswith("entropy"):
+    elif unmasking.startswith("entropy"):
         epsilon = 1e-10
         log_probs = torch.log(p + epsilon)
         x0_p = torch.sum(p * log_probs, dim=-1)
-    elif remasking.startswith("random"):
+    elif unmasking.startswith("random"):
         x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
     else:
-        raise NotImplementedError(remasking)
+        raise NotImplementedError(unmasking)
 
     x0 = torch.where(mask_index, x0, x)
     confidence = torch.where(mask_index, x0_p, -np.inf)

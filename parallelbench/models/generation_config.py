@@ -29,7 +29,7 @@ class BaseGenerationConfig(ABC):
 class DllmGenerationConfig(BaseGenerationConfig):
     """Generation config for discrete diffusion language models (dLLMs)."""
 
-    remasking: Optional[str] = None
+    unmasking: Optional[str] = None
     steps: Optional[int] = 128
     block_length: Optional[int] = None
     alg_temp: float = 0.0
@@ -43,7 +43,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
         if self.block_length is None:
             self.block_length = self.max_tokens
         self._validate_dllm_gen_configs()
-        self._validate_remasking()
+        self._validate_unmasking()
 
     @property
     def num_blocks(self):
@@ -76,59 +76,59 @@ class DllmGenerationConfig(BaseGenerationConfig):
                     "use_fast_dllm_dual_cache can only be True when accel_framework is 'fast_dllm'"
                 )
 
-    def _validate_remasking(self):
-        if self.remasking not in self.valid_strategies:
-            raise ValueError(f"Unsupported remasking strategy: {self.remasking}")
+    def _validate_unmasking(self):
+        if self.unmasking not in self.valid_strategies:
+            raise ValueError(f"Unsupported unmasking strategy: {self.unmasking}")
 
-        self.is_threshold_remasking = get_strategy_type(self.remasking) == "threshold"
-        self.is_factor_remasking = get_strategy_type(self.remasking) == "factor"
-        self.is_default_remasking = get_strategy_type(self.remasking) == "topk"
+        self.is_threshold_unmasking = get_strategy_type(self.unmasking) == "threshold"
+        self.is_factor_unmasking = get_strategy_type(self.unmasking) == "factor"
+        self.is_default_unmasking = get_strategy_type(self.unmasking) == "topk"
 
-        # Validate default remasking
-        if self.is_default_remasking:
+        # Validate default unmasking
+        if self.is_default_unmasking:
             if self.alg_threshold is not None and self.alg_threshold != 0.0:
                 raise ValueError(
-                    "alg_threshold must be None or 0.0 for default remasking strategies"
+                    "alg_threshold must be None or 0.0 for default unmasking strategies"
                 )
             if self.alg_factor is not None and self.alg_factor != 1.0:
                 raise ValueError(
-                    "alg_factor must be None or 1.0 for default remasking strategies"
+                    "alg_factor must be None or 1.0 for default unmasking strategies"
                 )
 
-        # Validate threshold remasking
-        if self.is_threshold_remasking:
+        # Validate threshold unmasking
+        if self.is_threshold_unmasking:
             if self.alg_threshold is None:
                 raise ValueError(
-                    f"alg_threshold must be provided for {self.remasking} algorithm"
+                    f"alg_threshold must be provided for {self.unmasking} algorithm"
                 )
             if self.alg_factor is not None:
                 raise ValueError(
-                    f"alg_factor must be None for {self.remasking} algorithm"
+                    f"alg_factor must be None for {self.unmasking} algorithm"
                 )
 
-        # Validate factor remasking
-        if self.is_factor_remasking:
+        # Validate factor unmasking
+        if self.is_factor_unmasking:
             if self.alg_factor is None:
                 raise ValueError(
-                    f"alg_factor must be provided for {self.remasking} algorithm"
+                    f"alg_factor must be provided for {self.unmasking} algorithm"
                 )
             if self.alg_threshold is not None:
                 raise ValueError(
-                    f"alg_threshold must be None for {self.remasking} algorithm"
+                    f"alg_threshold must be None for {self.unmasking} algorithm"
                 )
 
     # Mapping from internal strategy names to fast-dllm backend names.
-    _BACKEND_REMASKING_MAP: dict = None  # type: ignore[assignment]
+    _BACKEND_UNMASKING_MAP: dict = None  # type: ignore[assignment]
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
 
-    def _backend_remasking(self) -> str:
-        """Map internal remasking name to the backend (fast-dllm) name."""
+    def _backend_unmasking(self) -> str:
+        """Map internal unmasking name to the backend (fast-dllm) name."""
         backend_map = {
             "confidence_topk": "low_confidence",
         }
-        return backend_map.get(self.remasking, self.remasking)
+        return backend_map.get(self.unmasking, self.unmasking)
 
     def to_generation_kwargs(self) -> dict:
         return dict(
@@ -137,7 +137,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
             block_length=self.block_length,
             temperature=self.temperature,
             alg_temp=self.alg_temp,
-            remasking=self._backend_remasking(),
+            unmasking=self._backend_unmasking(),
             threshold=self.alg_threshold,
             factor=self.alg_factor,
         )

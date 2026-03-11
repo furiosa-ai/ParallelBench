@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Quick start: Run LLaDA-1.5 with confidence topk strategy across k values.
 #
-# Sweeps k = 1, 2, 4, 8, 16, 32 with remasking=confidence_topk (confidence topk).
+# Sweeps k = 1, 2, 4, 8, 16, 32 with unmasking=confidence_topk (confidence topk).
 # Each run uses --limit 32 samples per task.
 #
 # Usage:
@@ -22,7 +22,7 @@ for K in 1 2 4 8 16 32; do
     uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
         --model parallelbench_llada \
         --model_args model_path=GSAI-ML/LLaDA-1.5 \
-        --gen_kwargs k=${K},remasking=confidence_topk \
+        --gen_kwargs k=${K},unmasking=confidence_topk \
         --tasks parallelbench \
         --include_path parallelbench/tasks \
         --limit 32 \

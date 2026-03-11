@@ -93,7 +93,7 @@ These parameters control the degree of parallelism when running evaluations with
 | `steps` | int | 128 | Total denoising steps. For top-k methods, `k = max_tokens / steps` |
 | `block_length` | int | max_tokens | Semi-AR block size. Tokens within a block are decoded in parallel; blocks are decoded left-to-right |
 | `max_tokens` | int | 128 | Maximum output length |
-| `remasking` | str | — | Unmasking strategy (see table below) |
+| `unmasking` | str | — | Unmasking strategy (see table below) |
 | `alg_threshold` | float | — | Confidence threshold for adaptive methods (required for `confidence_threshold`) |
 | `alg_factor` | float | — | Scaling factor for factor-based methods (required for `confidence_factor`) |
 
@@ -273,7 +273,7 @@ This command uses the configurations specified in `parallelbench/datasets/data/t
 You can integrate your own diffusion LLM by following the example in `parallelbench/models/local/example/`. This directory contains:
 
 - **`example_model.py`**: Template for implementing a custom model class that inherits from `LocalModel`
-- **`constants.py`**: Example constants such as mask token IDs and valid remasking strategies
+- **`constants.py`**: Example constants such as mask token IDs and valid unmasking strategies
 
 ### Implementation Steps
 
@@ -337,7 +337,7 @@ Evaluations are launched using the `pb eval` CLI (built on [lm-eval-harness](htt
 ```bash
 pb eval --model <wrapper> \
   --model_args model_path=<model> \
-  --gen_kwargs steps=<S>,block_length=<B>,remasking=<strategy> \
+  --gen_kwargs steps=<S>,block_length=<B>,unmasking=<strategy> \
   --tasks <task_names> \
   --include_path parallelbench/tasks \
   --batch_size 1
@@ -352,7 +352,7 @@ Run LLaDA-1.5 on `waiting_line/copy` with **k=32** (fully parallel):
 ```bash
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
-  --gen_kwargs k=32,remasking=random \
+  --gen_kwargs k=32,unmasking=random \
   --tasks parallelbench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
@@ -364,7 +364,7 @@ Compare with **one-by-one decoding** (k=1):
 ```bash
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
-  --gen_kwargs k=1,remasking=random \
+  --gen_kwargs k=1,unmasking=random \
   --tasks parallelbench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
@@ -378,7 +378,7 @@ Use threshold-based unmasking where tokens per step varies adaptively:
 ```bash
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
-  --gen_kwargs steps=32,block_length=32,remasking=confidence_threshold,alg_threshold=0.8 \
+  --gen_kwargs steps=32,block_length=32,unmasking=confidence_threshold,alg_threshold=0.8 \
   --tasks parallelbench_waiting_line_copy \
   --include_path parallelbench/tasks \
   --batch_size 1
@@ -391,7 +391,7 @@ pb eval --model parallelbench_llada \
 ```bash
 pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
-  --gen_kwargs steps=128,block_length=128,remasking=confidence_topk \
+  --gen_kwargs steps=128,block_length=128,unmasking=confidence_topk \
   --tasks parallelbench \
   --include_path parallelbench/tasks
 ```
@@ -401,7 +401,7 @@ pb eval --model parallelbench_llada \
 ```bash
 accelerate launch -m parallelbench.cli.eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
-  --gen_kwargs steps=128,block_length=128,remasking=confidence_topk \
+  --gen_kwargs steps=128,block_length=128,unmasking=confidence_topk \
   --tasks parallelbench \
   --include_path parallelbench/tasks
 ```
@@ -425,8 +425,8 @@ Use `pb analyze` to view results as a summary table with **PBx scores** — the 
 # Summary table with PBx scores
 pb analyze results/
 
-# Group by remasking strategy for comparison
-pb analyze results/ --compare remasking
+# Group by unmasking strategy for comparison
+pb analyze results/ --compare unmasking
 
 # Export to CSV
 pb analyze results/ --export summary.csv

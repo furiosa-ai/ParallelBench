@@ -18,7 +18,7 @@ def test_base_generation_config_has_common_fields():
     assert hasattr(config, "temperature")
     assert hasattr(config, "accel_framework")
     # dLLM-specific fields should NOT be on BaseGenerationConfig
-    assert not hasattr(config, "remasking")
+    assert not hasattr(config, "unmasking")
     assert not hasattr(config, "block_length")
     assert not hasattr(config, "steps")
 
@@ -36,49 +36,49 @@ def test_ar_generation_config_custom_values():
 
 
 def test_dllm_generation_config_valid():
-    """DllmGenerationConfig with valid remasking should work."""
+    """DllmGenerationConfig with valid unmasking should work."""
     config = DllmGenerationConfig(
-        remasking="random",
+        unmasking="random",
         block_length=128,
         max_tokens=128,
         steps=128,
     )
-    assert config.remasking == "random"
-    assert config.is_default_remasking is True
+    assert config.unmasking == "random"
+    assert config.is_default_unmasking is True
 
 
-def test_dllm_generation_config_threshold_remasking():
-    """Test threshold-based remasking strategies with custom valid_strategies."""
+def test_dllm_generation_config_threshold_unmasking():
+    """Test threshold-based unmasking strategies with custom valid_strategies."""
     config = DllmGenerationConfig(
-        remasking="confidence_threshold",
+        unmasking="confidence_threshold",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_threshold=0.5,
         valid_strategies={"confidence_topk", "confidence_threshold"},
     )
-    assert config.is_threshold_remasking is True
-    assert config.is_default_remasking is False
+    assert config.is_threshold_unmasking is True
+    assert config.is_default_unmasking is False
 
 
-def test_dllm_generation_config_factor_remasking():
-    """Test factor-based remasking strategies with custom valid_strategies."""
+def test_dllm_generation_config_factor_unmasking():
+    """Test factor-based unmasking strategies with custom valid_strategies."""
     config = DllmGenerationConfig(
-        remasking="confidence_factor",
+        unmasking="confidence_factor",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_factor=2.0,
         valid_strategies={"confidence_topk", "confidence_factor"},
     )
-    assert config.is_factor_remasking is True
+    assert config.is_factor_unmasking is True
 
 
-def test_dllm_generation_config_invalid_remasking():
-    """Invalid remasking strategy should raise ValueError."""
-    with pytest.raises(ValueError, match="Unsupported remasking strategy"):
+def test_dllm_generation_config_invalid_unmasking():
+    """Invalid unmasking strategy should raise ValueError."""
+    with pytest.raises(ValueError, match="Unsupported unmasking strategy"):
         DllmGenerationConfig(
-            remasking="invalid_strategy",
+            unmasking="invalid_strategy",
             block_length=128,
             max_tokens=128,
         )
@@ -88,7 +88,7 @@ def test_dllm_generation_config_steps_too_large():
     """steps > max_tokens should raise ValueError."""
     with pytest.raises(ValueError, match="steps cannot be greater than max_tokens"):
         DllmGenerationConfig(
-            remasking="random",
+            unmasking="random",
             block_length=128,
             max_tokens=128,
             steps=256,
@@ -97,7 +97,7 @@ def test_dllm_generation_config_steps_too_large():
 
 def test_dllm_generation_config_num_blocks():
     config = DllmGenerationConfig(
-        remasking="random",
+        unmasking="random",
         block_length=64,
         max_tokens=256,
         steps=64,
@@ -116,7 +116,7 @@ def test_dllm_generation_config_num_blocks_invalid_block_length():
 
 def test_dllm_to_generation_kwargs():
     config = DllmGenerationConfig(
-        remasking="random",
+        unmasking="random",
         block_length=128,
         max_tokens=128,
         steps=128,
@@ -124,7 +124,7 @@ def test_dllm_to_generation_kwargs():
     kwargs = config.to_generation_kwargs()
     assert kwargs["gen_length"] == 128
     assert kwargs["block_length"] == 128
-    assert kwargs["remasking"] == "random"
+    assert kwargs["unmasking"] == "random"
 
 
 # -- TransformersGenerationConfig inherits ARGenerationConfig --
@@ -147,7 +147,7 @@ def test_transformers_generation_config_no_crash():
 
 def test_fast_dllm_cache_allowed_with_fast_dllm_framework():
     config = DllmGenerationConfig(
-        remasking="random",
+        unmasking="random",
         accel_framework="fast_dllm",
         use_fast_dllm_cache=True,
     )
@@ -156,7 +156,7 @@ def test_fast_dllm_cache_allowed_with_fast_dllm_framework():
 
 def test_fast_dllm_dual_cache_allowed_with_fast_dllm_framework():
     config = DllmGenerationConfig(
-        remasking="random",
+        unmasking="random",
         accel_framework="fast_dllm",
         use_fast_dllm_dual_cache=True,
     )
@@ -166,7 +166,7 @@ def test_fast_dllm_dual_cache_allowed_with_fast_dllm_framework():
 def test_fast_dllm_cache_without_fast_dllm_raises():
     with pytest.raises(ValueError, match="use_fast_dllm_cache"):
         DllmGenerationConfig(
-            remasking="random",
+            unmasking="random",
             accel_framework=None,
             use_fast_dllm_cache=True,
         )
@@ -175,7 +175,7 @@ def test_fast_dllm_cache_without_fast_dllm_raises():
 def test_fast_dllm_dual_cache_without_fast_dllm_raises():
     with pytest.raises(ValueError, match="use_fast_dllm_dual_cache"):
         DllmGenerationConfig(
-            remasking="random",
+            unmasking="random",
             accel_framework=None,
             use_fast_dllm_dual_cache=True,
         )
@@ -184,7 +184,7 @@ def test_fast_dllm_dual_cache_without_fast_dllm_raises():
 def test_fast_dllm_cache_with_non_fast_dllm_framework_raises():
     with pytest.raises(ValueError, match="use_fast_dllm_cache"):
         DllmGenerationConfig(
-            remasking="random",
+            unmasking="random",
             accel_framework="vllm",
             use_fast_dllm_cache=True,
         )
@@ -192,7 +192,7 @@ def test_fast_dllm_cache_with_non_fast_dllm_framework_raises():
 
 def test_fast_dllm_both_caches_with_fast_dllm_framework():
     config = DllmGenerationConfig(
-        remasking="random",
+        unmasking="random",
         accel_framework="fast_dllm",
         use_fast_dllm_cache=True,
         use_fast_dllm_dual_cache=True,
@@ -204,7 +204,7 @@ def test_fast_dllm_both_caches_with_fast_dllm_framework():
 def test_steps_not_divisible_by_num_blocks_raises():
     with pytest.raises(ValueError, match="steps must be divisible by num_blocks"):
         DllmGenerationConfig(
-            remasking="random",
+            unmasking="random",
             steps=3,
             block_length=64,
             max_tokens=128,
@@ -216,7 +216,7 @@ def test_max_tokens_not_divisible_by_block_length_raises():
         ValueError, match="max_tokens must be divisible by block_length"
     ):
         DllmGenerationConfig(
-            remasking="random",
+            unmasking="random",
             steps=100,
             block_length=64,
             max_tokens=100,

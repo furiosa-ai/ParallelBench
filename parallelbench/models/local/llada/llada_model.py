@@ -23,7 +23,7 @@ from parallelbench.models.registry import ModelRegistry
 
 @dataclass
 class LladaGenerationConfig(DllmGenerationConfig):
-    remasking: str = "confidence_topk"  # Set the default remasking strategy
+    unmasking: str = "confidence_topk"  # Set the default unmasking strategy
     block_length: int = 128  # Set the default block length
 
     valid_strategies: set = field(default_factory=lambda: set(LLADA_VALID_STRATEGIES))

@@ -73,7 +73,7 @@ def block_diffusion_generate(
     temperature=1.0,
     top_k=0,
     top_p=1.0,
-    remasking="confidence_threshold",
+    unmasking="confidence_threshold",
     threshold=0.85,
     stopping_criteria_idx=None,
     output_history=False,
@@ -178,7 +178,7 @@ def block_diffusion_generate(
             )
 
             # Sampling strategy
-            if remasking == "sequential":
+            if unmasking == "sequential":
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)
                 for j in range(cur_x.shape[0]):
                     if mask_index[j].any():
@@ -193,14 +193,14 @@ def block_diffusion_generate(
                     else:
                         raise ValueError("No mask tokens found in the current block.")
 
-            elif remasking == "confidence_topk":
+            elif unmasking == "confidence_topk":
                 confidence = torch.where(mask_index, x0_p, -torch.inf)
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)
                 for j in range(confidence.shape[0]):
                     _, idx = torch.topk(confidence[j], num_transfer_tokens[step])
                     transfer_index[j, idx] = True
 
-            elif remasking == "confidence_threshold":
+            elif unmasking == "confidence_threshold":
                 confidence = torch.where(mask_index, x0_p, -torch.inf)
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)
                 for j in range(confidence.shape[0]):
@@ -214,7 +214,7 @@ def block_diffusion_generate(
                         _, idx = torch.topk(confidence[j], num_transfer_tokens[step])
                         transfer_index[j, idx] = True
             else:
-                raise ValueError(f"Unknown remasking strategy: {remasking}")
+                raise ValueError(f"Unknown unmasking strategy: {unmasking}")
 
             cur_x[transfer_index] = x0[transfer_index]
 

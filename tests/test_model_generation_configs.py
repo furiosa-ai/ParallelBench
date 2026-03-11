@@ -14,7 +14,7 @@ from parallelbench.models.local.trado.trado_model import TradoGenerationConfig
 
 def test_llada_defaults():
     config = LladaGenerationConfig()
-    assert config.remasking == "confidence_topk"
+    assert config.unmasking == "confidence_topk"
     assert config.block_length == 128
 
 
@@ -23,9 +23,9 @@ def test_llada_defaults():
 # ============================================================
 
 
-def test_dream_default_remasking():
+def test_dream_default_unmasking():
     config = DreamGenerationConfig()
-    assert config.remasking == "origin"
+    assert config.unmasking == "origin"
 
 
 def test_dream_temperature_zero_nullifies_top_p_top_k():
@@ -36,7 +36,7 @@ def test_dream_temperature_zero_nullifies_top_p_top_k():
 
 def test_dream_temperature_positive_preserves_top_p_top_k():
     config = DreamGenerationConfig(
-        remasking="random",
+        unmasking="random",
         temperature=0.8,
         top_p=0.9,
         top_k=50,
@@ -46,16 +46,16 @@ def test_dream_temperature_positive_preserves_top_p_top_k():
 
 
 def test_dream_to_generation_kwargs_uses_alg_and_max_new_tokens():
-    config = DreamGenerationConfig(remasking="random", max_tokens=256)
+    config = DreamGenerationConfig(unmasking="random", max_tokens=256)
     kwargs = config.to_generation_kwargs()
-    # Dream uses "alg" instead of "remasking"
+    # Dream uses "alg" instead of "unmasking"
     assert "alg" in kwargs
     assert kwargs["alg"] == "random"
     # Dream uses "max_new_tokens" instead of "gen_length"
     assert "max_new_tokens" in kwargs
     assert kwargs["max_new_tokens"] == 256
     assert "gen_length" not in kwargs
-    assert "remasking" not in kwargs
+    assert "unmasking" not in kwargs
 
 
 def test_dream_to_generation_kwargs_includes_return_dict():
@@ -70,9 +70,9 @@ def test_dream_to_generation_kwargs_includes_return_dict():
 # ============================================================
 
 
-def test_trado_default_remasking():
+def test_trado_default_unmasking():
     config = TradoGenerationConfig()
-    assert config.remasking == "confidence_threshold"
+    assert config.unmasking == "confidence_threshold"
 
 
 def test_trado_default_alg_threshold():
@@ -86,8 +86,8 @@ def test_trado_valid_strategies():
 
 
 def test_trado_invalid_strategy_random_raises():
-    with pytest.raises(ValueError, match="Unsupported remasking strategy"):
-        TradoGenerationConfig(remasking="random")
+    with pytest.raises(ValueError, match="Unsupported unmasking strategy"):
+        TradoGenerationConfig(unmasking="random")
 
 
 def test_trado_to_generation_kwargs_format():
@@ -100,4 +100,4 @@ def test_trado_to_generation_kwargs_format():
     assert "threshold" in kwargs
     assert kwargs["threshold"] == 0.85
     assert "gen_length" in kwargs
-    assert "remasking" in kwargs
+    assert "unmasking" in kwargs

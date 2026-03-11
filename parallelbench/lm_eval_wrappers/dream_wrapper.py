@@ -49,8 +49,8 @@ class DreamWrapper(DLLMBase):
         )
 
     def _build_generation_config(self, gen_kwargs: dict) -> dict:
-        if "remasking" not in gen_kwargs:
-            gen_kwargs = {**gen_kwargs, "remasking": "origin"}
+        if "unmasking" not in gen_kwargs:
+            gen_kwargs = {**gen_kwargs, "unmasking": "origin"}
         config = super()._build_generation_config(gen_kwargs)
         if self._top_p is not None:
             config["top_p"] = self._top_p

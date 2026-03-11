@@ -25,8 +25,8 @@ class SeddPredictorType(str, Enum):
 class SeddGenerationConfig(DllmGenerationConfig):
     predictor: SeddPredictorType = SeddPredictorType.ANALYTIC
 
-    def _validate_remasking(self):
-        pass  # SEDD does not use remasking strategies
+    def _validate_unmasking(self):
+        pass  # SEDD does not use unmasking strategies
 
     def __post_init__(self):
         super().__post_init__()

@@ -40,11 +40,11 @@ class DLLMBase(LM):
         steps: int               - Diffusion steps (default: 128)
         max_tokens: int          - Maximum generation length (default: 128)
         block_length: int        - Block length for semi-AR generation (default: 128)
-        remasking: str           - Remasking strategy (default: "random")
+        unmasking: str           - Unmasking strategy (default: "random")
         temperature: float       - Sampling temperature (default: 0.0)
         alg_temp: float          - Algorithm temperature (default: 0.0)
         alg_threshold: float     - Confidence threshold
-        alg_factor: float        - Dynamic remasking factor
+        alg_factor: float        - Dynamic unmasking factor
     """
 
     def __init__(
@@ -91,17 +91,17 @@ class DLLMBase(LM):
 
         If "k" (tokens per step) is present in gen_kwargs and neither "steps"
         nor "block_length" are explicitly provided, derives steps and block_length
-        from the unmasking registry's derive_fn for the given remasking strategy.
+        from the unmasking registry's derive_fn for the given unmasking strategy.
         Explicit "steps"/"block_length" values always take priority.
         """
         max_tokens = int(gen_kwargs.get("max_tokens", 128))
-        remasking = gen_kwargs.get("remasking", "random")
+        unmasking = gen_kwargs.get("unmasking", "random")
 
         steps_explicit = "steps" in gen_kwargs
         block_length_explicit = "block_length" in gen_kwargs
 
         if "k" in gen_kwargs and not steps_explicit and not block_length_explicit:
-            info = get_strategy_info(remasking)
+            info = get_strategy_info(unmasking)
             k = float(gen_kwargs["k"])
             derived = info.derive_fn(k, max_tokens)
             steps = derived["steps"]
@@ -114,7 +114,7 @@ class DLLMBase(LM):
             "steps": steps,
             "max_tokens": max_tokens,
             "block_length": block_length,
-            "remasking": remasking,
+            "unmasking": unmasking,
             "temperature": float(gen_kwargs.get("temperature", 0.0)),
             "alg_temp": float(gen_kwargs.get("alg_temp", 0.0)),
         }
@@ -136,7 +136,7 @@ class DLLMBase(LM):
             "alg_factor",
             "steps",
             "block_length",
-            "remasking",
+            "unmasking",
         )
         COERCE_FLOAT_KEYS = ("k", "alg_threshold", "alg_factor")
 

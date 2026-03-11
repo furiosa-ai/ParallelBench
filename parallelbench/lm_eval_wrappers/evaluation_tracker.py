@@ -4,14 +4,14 @@ lm-eval's default output structure:
     {output_path}/{model_sanitized}/results_{timestamp}.json
 
 ParallelBench output structure:
-    {output_path}/{model_sanitized}/{remasking}/{repr_param_value}/{run_id}/results_{task_name}.json
+    {output_path}/{model_sanitized}/{unmasking}/{repr_param_value}/{run_id}/results_{task_name}.json
 
-The repr_param_value encodes the representative parameter for the remasking strategy:
+The repr_param_value encodes the representative parameter for the unmasking strategy:
     - topk strategies: "k{k}" (e.g., k4)
     - threshold strategies: "t{alg_threshold}" (e.g., t0.3)
     - factor strategies: "f{alg_factor}" (e.g., f2.0)
 
-This allows browsing results by (model, remasking, repr_param) tuple and comparing
+This allows browsing results by (model, unmasking, repr_param) tuple and comparing
 across tasks and hyperparameter sweeps.
 """
 
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
-    """Build a directory name from gen_kwargs dict (excluding remasking).
+    """Build a directory name from gen_kwargs dict (excluding unmasking).
 
     Produces a compact, filesystem-safe string like 'bl32_s32'.
     Keys are abbreviated and ordered for readability:
@@ -38,9 +38,9 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
         alg_threshold -> at, alg_factor -> af, temperature -> t
     Unknown keys are appended as key=value pairs sorted alphabetically.
 
-    Remasking is excluded because it gets its own directory level.
+    Unmasking is excluded because it gets its own directory level.
 
-    Returns 'default' when gen_kwargs is empty or None (after removing remasking).
+    Returns 'default' when gen_kwargs is empty or None (after removing unmasking).
 
     .. deprecated::
         Use _resolve_repr_param_value() with the unmasking registry instead.
@@ -90,8 +90,8 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
     for key in sorted(gen_kwargs.keys()):
         if key in used_keys:
             continue
-        # Skip lm-eval internal keys and remasking (separate directory level)
-        if key in ("until", "do_sample", "remasking"):
+        # Skip lm-eval internal keys and unmasking (separate directory level)
+        if key in ("until", "do_sample", "unmasking"):
             continue
         value = gen_kwargs[key]
         if isinstance(value, float) and value == int(value):
@@ -101,14 +101,14 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
     return "_".join(parts) if parts else "default"
 
 
-def extract_remasking(gen_kwargs: dict | None) -> str:
-    """Extract remasking strategy from gen_kwargs.
+def extract_unmasking(gen_kwargs: dict | None) -> str:
+    """Extract unmasking strategy from gen_kwargs.
 
-    Returns 'default' when gen_kwargs is empty or remasking is not specified.
+    Returns 'default' when gen_kwargs is empty or unmasking is not specified.
     """
     if not gen_kwargs:
         return "default"
-    return str(gen_kwargs.get("remasking", "default"))
+    return str(gen_kwargs.get("unmasking", "default"))
 
 
 def extract_task_name(results: dict) -> str:
@@ -145,14 +145,14 @@ def _resolve_repr_param_value(gen_kwargs: dict | None) -> str:
     if not gen_kwargs:
         return build_gen_kwargs_dirname(gen_kwargs)
 
-    remasking = gen_kwargs.get("remasking")
-    if not remasking:
+    unmasking = gen_kwargs.get("unmasking")
+    if not unmasking:
         return build_gen_kwargs_dirname(gen_kwargs)
 
     try:
         from parallelbench.models.unmasking_registry import get_strategy_type
 
-        strategy_type = get_strategy_type(remasking)
+        strategy_type = get_strategy_type(unmasking)
     except (KeyError, ImportError):
         return build_gen_kwargs_dirname(gen_kwargs)
 
@@ -183,7 +183,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
     """EvaluationTracker subclass that adds structured subdirectory to output path.
 
     Overrides save_results_aggregated and save_results_samples to insert
-    a repr_param_value/run_id subdirectory between the model/remasking directories
+    a repr_param_value/run_id subdirectory between the model/unmasking directories
     and result files.
 
     Class attributes:
@@ -201,10 +201,10 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
     def _resolve_output_dir(
         self, gen_kwargs: dict | None, results: dict | None = None
     ) -> Path:
-        """Build the output directory: model/remasking/repr_param_value/run_id."""
+        """Build the output directory: model/unmasking/repr_param_value/run_id."""
         path = Path(self.output_path if self.output_path else Path.cwd())
         path = path / self.general_config_tracker.model_name_sanitized
-        path = path / extract_remasking(gen_kwargs)
+        path = path / extract_unmasking(gen_kwargs)
         path = path / _resolve_repr_param_value(gen_kwargs)
         run_id = self.__class__.run_id or "unknown"
         parent = path
@@ -266,7 +266,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
 
                 # Handle Hub pushing
                 if self.api and self.push_results_to_hub:
-                    remasking_dir = extract_remasking(gen_kwargs)
+                    unmasking_dir = extract_unmasking(gen_kwargs)
                     repr_param_dir = _resolve_repr_param_value(gen_kwargs)
                     run_id = self.__class__.run_id or "unknown"
                     repo_id = (
@@ -285,7 +285,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                         path_or_fileobj=str(file_path),
                         path_in_repo=os.path.join(
                             self.general_config_tracker.model_name,
-                            remasking_dir,
+                            unmasking_dir,
                             repr_param_dir,
                             run_id,
                             f"results_{task_name}.json",

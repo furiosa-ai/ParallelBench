@@ -17,7 +17,7 @@ OUTPUT_DIR="results"
 uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
     --model parallelbench_llada \
     --model_args model_path=GSAI-ML/LLaDA-1.5 \
-    --gen_kwargs k=1,remasking=random \
+    --gen_kwargs k=1,unmasking=random \
     --tasks parallelbench \
     --include_path parallelbench/tasks \
     --limit 2 \

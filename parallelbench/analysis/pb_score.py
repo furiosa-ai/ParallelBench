@@ -4,11 +4,11 @@ PBx = maximum tokens-per-step (TPS) that achieves >= x% average score
 across all ParallelBench tasks.
 
 Grouping logic:
-  - Top-k methods: group by (remasking, k) where k = max_tokens / steps.
+  - Top-k methods: group by (unmasking, k) where k = max_tokens / steps.
     TPS = k (deterministic from config).
-  - Threshold methods: group by (remasking, alg_threshold).
+  - Threshold methods: group by (unmasking, alg_threshold).
     TPS = max_tokens / nfe (measured after generation).
-  - Factor methods: group by (remasking, alg_factor).
+  - Factor methods: group by (unmasking, alg_factor).
     TPS = max_tokens / nfe (measured after generation).
 
 All configs assume block_length = max_tokens (fully parallel within block).
@@ -32,7 +32,7 @@ def _make_config_key(row: dict) -> tuple | None:
         (config_key, tps) tuple, or None if the row cannot be processed.
     """
     try:
-        remasking = str(row.get("remasking", ""))
+        unmasking = str(row.get("unmasking", ""))
         nfe = float(row["nfe"])
         max_tokens = int(row["max_tokens"])
     except (KeyError, ValueError, TypeError):
@@ -42,17 +42,17 @@ def _make_config_key(row: dict) -> tuple | None:
         return None
 
     try:
-        strategy_type = get_strategy_type(remasking)
+        strategy_type = get_strategy_type(unmasking)
     except KeyError:
         return None
 
     if strategy_type == "threshold":
         threshold = row.get("alg_threshold", "")
-        config_key = (remasking, f"threshold={threshold}")
+        config_key = (unmasking, f"threshold={threshold}")
         tps = max_tokens / nfe
     elif strategy_type == "factor":
         factor = row.get("alg_factor", "")
-        config_key = (remasking, f"factor={factor}")
+        config_key = (unmasking, f"factor={factor}")
         tps = max_tokens / nfe
     else:
         # Top-k: k = max_tokens / steps
@@ -63,7 +63,7 @@ def _make_config_key(row: dict) -> tuple | None:
         if steps <= 0:
             return None
         k = max_tokens / steps
-        config_key = (remasking, f"k={k}")
+        config_key = (unmasking, f"k={k}")
         tps = k
 
     return config_key, tps
@@ -82,7 +82,7 @@ def compute_pb_scores(
             - "nfe" (float): number of forward evaluations
             - "max_tokens" (int): maximum output length
             - "steps" (int): denoising steps (for top-k methods)
-            - "remasking" (str): unmasking strategy name
+            - "unmasking" (str): unmasking strategy name
             - "alg_threshold" / "alg_factor": for adaptive methods
         thresholds: Score thresholds on a 0-100 scale (e.g., [90, 80, 70, 60]).
 

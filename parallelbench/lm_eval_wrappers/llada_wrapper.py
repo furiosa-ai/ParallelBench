@@ -22,6 +22,6 @@ class LLaDAWrapper(DLLMBase):
         )
 
     def _build_generation_config(self, gen_kwargs: dict) -> dict:
-        if "remasking" not in gen_kwargs:
-            gen_kwargs = {**gen_kwargs, "remasking": "confidence_topk"}
+        if "unmasking" not in gen_kwargs:
+            gen_kwargs = {**gen_kwargs, "unmasking": "confidence_topk"}
         return super()._build_generation_config(gen_kwargs)

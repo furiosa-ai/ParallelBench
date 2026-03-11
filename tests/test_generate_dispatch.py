@@ -49,9 +49,9 @@ def test_generate_fast_dllm_dual_cache_calls_dual_cache(mock_dual_cache):
 def test_generate_passes_kwargs_to_no_cache(mock_no_cache):
     from parallelbench.models.local.generate import generate
 
-    generate("m", "p", steps=5, temperature=0.8, remasking="random")
+    generate("m", "p", steps=5, temperature=0.8, unmasking="random")
     mock_no_cache.assert_called_once_with(
-        "m", "p", steps=5, temperature=0.8, remasking="random"
+        "m", "p", steps=5, temperature=0.8, unmasking="random"
     )
 
 

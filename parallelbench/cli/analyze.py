@@ -2,7 +2,7 @@
 
 Usage:
     pb analyze results/                          Print summary table
-    pb analyze results/ --compare remasking      Group by remasking strategy
+    pb analyze results/ --compare unmasking      Group by unmasking strategy
     pb analyze results/ --export summary.csv     Export to CSV
 """
 
@@ -39,7 +39,7 @@ METRIC_KEYS = [
 GENERATION_KWARGS_KEYS = [
     "steps",
     "block_length",
-    "remasking",
+    "unmasking",
     "max_tokens",
     "temperature",
     "alg_temp",
@@ -49,7 +49,7 @@ GENERATION_KWARGS_KEYS = [
 
 DISPLAY_COLUMNS = [
     "task",
-    "remasking",
+    "unmasking",
     "tokens_per_step",
     "nfe",
     "score",
@@ -201,7 +201,7 @@ def _print_results_table(rows: list[dict], title: str | None = None) -> None:
     numeric_columns = {"score", "nfe", "tokens_per_step"}
     col_config = {
         "task": {"max_width": 30},
-        "remasking": {"max_width": 16},
+        "unmasking": {"max_width": 16},
         "tokens_per_step": {"min_width": 5},
         "nfe": {"min_width": 5},
         "score": {"min_width": 6},
@@ -292,7 +292,7 @@ def main():
         "--compare",
         type=str,
         default=None,
-        choices=["remasking", "model", "task", "steps", "block_length"],
+        choices=["unmasking", "model", "task", "steps", "block_length"],
         help="Group results by this column for comparison",
     )
     parser.add_argument(

@@ -12,8 +12,8 @@ from parallelbench.models.model_utils import decode_history
 class ExampleGenerationConfig(DllmGenerationConfig):
     example_field: str = "example_default_value"
 
-    def _validate_remasking(self):
-        super()._validate_remasking()
+    def _validate_unmasking(self):
+        super()._validate_unmasking()
         # Add any additional validation for example_field if needed
         assert isinstance(self.example_field, str), "example_field must be a string."
 

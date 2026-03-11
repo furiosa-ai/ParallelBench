@@ -136,7 +136,7 @@ class TestLLaDAWrapperIntegration:
                     "steps": 32,
                     "max_tokens": 32,
                     "block_length": 32,
-                    "remasking": "confidence_topk",
+                    "unmasking": "confidence_topk",
                 },
             )
         ]
@@ -171,7 +171,7 @@ class TestLLaDAWrapperIntegration:
                     "steps": 64,
                     "max_tokens": 128,
                     "block_length": 64,
-                    "remasking": "random",
+                    "unmasking": "random",
                     "temperature": 0.5,
                 }
             )
@@ -183,7 +183,7 @@ class TestLLaDAWrapperIntegration:
         assert gen_config["steps"] == 64
         assert gen_config["max_tokens"] == 128
         assert gen_config["block_length"] == 64
-        assert gen_config["remasking"] == "random"
+        assert gen_config["unmasking"] == "random"
         assert gen_config["temperature"] == 0.5
 
 
@@ -208,7 +208,7 @@ class TestDreamWrapperIntegration:
                     "steps": 32,
                     "max_tokens": 32,
                     "block_length": 32,
-                    "remasking": "origin",
+                    "unmasking": "origin",
                 }
             )
         ]
