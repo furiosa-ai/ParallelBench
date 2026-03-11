@@ -112,6 +112,55 @@ def load_task(split, task_name, from_hub=None):
     return task, task_config
 
 
+ICL_SEED_OFFSET = 99999
+
+
+def _validate_icl_not_in_data(icl_example, data, task_name):
+    """ICL example이 test data에 포함되어 있지 않은지 검증합니다."""
+    icl_input = icl_example["input"]
+    for i, sample in enumerate(data):
+        if sample["input"] == icl_input:
+            raise ValueError(
+                f"ICL example overlaps with test sample {i} in task '{task_name}'. "
+                f"Use a different icl_example in the task config."
+            )
+
+
+def _generate_icl_example_on_the_fly(rng, task_config, data):
+    """Flex 모드에서 ICL example을 on-the-fly로 생성하고 overlap을 검증합니다.
+
+    별도의 ICL seed로 샘플 하나를 생성한 뒤, test data와 겹치지 않는지 확인합니다.
+    겹치면 최대 100번까지 재시도합니다.
+    """
+    icl_config = {
+        **task_config,
+        "num_samples": 1,
+        "samples_per_length": 0,
+        "icl_example_count": 0,
+    }
+
+    test_inputs = {json.dumps(s["input"], sort_keys=True) for s in data}
+
+    max_attempts = 100
+    for attempt in range(max_attempts):
+        icl_seed = ICL_SEED_OFFSET + attempt
+        icl_rng = random.Random(icl_seed)
+        samples = create_parallelbench_task_random(rng=icl_rng, task=icl_config)
+        if not samples:
+            continue
+
+        icl_example = {"input": samples[0]["input"], "answer": samples[0]["answer"]}
+        icl_input_key = json.dumps(icl_example["input"], sort_keys=True)
+
+        if icl_input_key not in test_inputs:
+            return icl_example
+
+    raise RuntimeError(
+        f"Failed to generate a non-overlapping ICL example for task "
+        f"'{task_config['name']}' after {max_attempts} attempts."
+    )
+
+
 def load_task_flex(split, task_name, flex_config):
     """Generate task data on-the-fly with custom difficulty overrides.
 
@@ -154,18 +203,11 @@ def load_task_flex(split, task_name, flex_config):
 
     data = _create_task(rng, task_config)
 
-    # Handle ICL examples if configured
+    # Handle ICL examples: generate on-the-fly for flex mode
     if task_config.get("icl_example_count", 0) > 0:
-        icl_datasets = [
-            create_parallelbench_task_random(
-                rng=rng, task={**task_config, "icl_example_count": 0}
-            )
-            for _ in range(task_config["icl_example_count"])
-        ]
-        for i, sample in enumerate(data):
-            sample["input"]["icl_examples"] = [
-                icl_dataset[i] for icl_dataset in icl_datasets
-            ]
+        icl_example = _generate_icl_example_on_the_fly(rng, task_config, data)
+        for sample in data:
+            sample["input"]["icl_examples"] = [icl_example]
 
     ds = Dataset.from_list(data)
     return ds, task_config
@@ -343,17 +385,18 @@ def create_parallelbench_task(split, task, output_file, rng=None, no_save=False)
     data = _create_task(rng, task)
 
     if task.get("icl_example_count", 0) > 0:
-        icl_datasets = [
-            create_parallelbench_task_random(
-                rng=rng, task={**task, "icl_example_count": 0}
+        icl_example = task.get("icl_example")
+        if icl_example is None:
+            raise ValueError(
+                f"Task '{task['name']}' has icl_example_count > 0 but no "
+                f"icl_example defined in task config. Add an explicit "
+                f"icl_example to the task YAML."
             )
-            for _ in range(task["icl_example_count"])
-        ]
 
-        for i, sample in enumerate(data):
-            sample["input"]["icl_examples"] = [
-                icl_dataset[i] for icl_dataset in icl_datasets
-            ]
+        _validate_icl_not_in_data(icl_example, data, task["name"])
+
+        for sample in data:
+            sample["input"]["icl_examples"] = [icl_example]
 
     if not no_save:
         if not isinstance(data, pd.DataFrame):

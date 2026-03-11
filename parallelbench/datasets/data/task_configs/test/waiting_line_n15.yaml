@@ -10,46 +10,211 @@ tasks:
   copy:
     type: copy
     metric: list_match_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nYou need to record the following people in the order they arrived:\n\n{context}\n\nPlease copy the list exactly and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      You need to record the following people in the order they arrived:
+
+
+      {context}
+
+
+      Please copy the list exactly and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+      answer: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
   insert_index:
     type: insert
     random_index: false
     metric: list_match_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nA new person \"{word}\" is inserted into the line at position {index}:\n\n{context}\n\nPlease put the new person at the specified position and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      A new person "{word}" is inserted into the line at position {index}:
+
+
+      {context}
+
+
+      Please put the new person at the specified position and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+        word: Virginia Hayes
+        index: 3
+      answer: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds", "Virginia Hayes"]'
   insert_random:
     type: insert
     random_index: true
     metric: list_random_insert_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nA new person \"{word}\" is inserted into the line at a random position:\n\n{context}\n\nPlease put the new person in the random position and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      A new person "{word}" is inserted into the line at a random position:
+
+
+      {context}
+
+
+      Please put the new person in the random position and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+        word: Virginia Hayes
+      answer:
+        input:
+        - Patrick Hicks
+        - Roy Ortiz
+        - Eric Reynolds
+        word: Virginia Hayes
+        example: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds", "Virginia Hayes"]'
   remove_index:
     type: remove
     random_index: false
     metric: list_match_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nThe person at position {index} has left the waiting line:\n\n{context}\n\nPlease remove the person at the specified position and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      The person at position {index} has left the waiting line:
+
+
+      {context}
+
+
+      Please remove the person at the specified position and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+        index: 1
+      answer: '["Patrick Hicks", "Eric Reynolds"]'
   remove_random:
     type: remove
     random_index: true
     metric: list_random_remove_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nOne person has left the waiting line:\n\n{context}\n\nPlease remove a random person and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      One person has left the waiting line:
+
+
+      {context}
+
+
+      Please remove a random person and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+      answer:
+        input:
+        - Patrick Hicks
+        - Roy Ortiz
+        - Eric Reynolds
+        example: '["Patrick Hicks", "Eric Reynolds"]'
   replace_index:
     type: replace
     random_index: false
     metric: list_match_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nThe person at position {index} must be replaced with \"{word}\":\n\n{context}\n\nPlease replace the person at the specified position with \"{word}\" and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      The person at position {index} must be replaced with "{word}":
+
+
+      {context}
+
+
+      Please replace the person at the specified position with "{word}" and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+        word: Virginia Hayes
+        index: 1
+      answer: '["Patrick Hicks", "Virginia Hayes", "Eric Reynolds"]'
   replace_random:
     type: replace
     random_index: true
     metric: list_random_replace_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nOne person in the waiting line must be replaced with \"{word}\":\n\n{context}\n\nPlease replace one random person with \"{word}\" and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      One person in the waiting line must be replaced with "{word}":
+
+
+      {context}
+
+
+      Please replace one random person with "{word}" and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+        word: Virginia Hayes
+      answer:
+        input:
+        - Patrick Hicks
+        - Roy Ortiz
+        - Eric Reynolds
+        word: Virginia Hayes
+        example: '["Patrick Hicks", "Virginia Hayes", "Eric Reynolds"]'
   reverse:
     type: reverse
     metric: list_match_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nThe previous staff member put the waiting line in the wrong order.\n\nPlease reverse the order of the following people in the waiting line to correct it:\n\n{context}\n\nPlease reverse the order of the list and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      The previous staff member put the waiting line in the wrong order.
+
+
+      Please reverse the order of the following people in the waiting line to correct it:
+
+
+      {context}
+
+
+      Please reverse the order of the list and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+      answer: '["Eric Reynolds", "Roy Ortiz", "Patrick Hicks"]'
   shuffle:
     type: shuffle
     metric: list_shuffle_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nThe waiting line should be randomly shuffled to ensure fair service distribution:\n\n{context}\n\nPlease randomly shuffle the list and provide only the final list.\n\nEnsure the sequence is different from the original."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      The waiting line should be randomly shuffled to ensure fair service distribution:
+
+
+      {context}
+
+
+      Please randomly shuffle the list and provide only the final list.
+
+
+      Ensure the sequence is different from the original.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+      answer:
+        input:
+        - Patrick Hicks
+        - Roy Ortiz
+        - Eric Reynolds
+        example: '["Patrick Hicks", "Eric Reynolds", "Roy Ortiz"]'
   sort:
     type: sort
     metric: list_match_score
-    prompt: "You are managing a waiting line at a customer service desk.\n\nThe following people should be organized alphabetically by last name for efficient processing:\n\n{context}\n\nPlease sort the list in alphabetical order and provide only the final list."
+    prompt: 'You are managing a waiting line at a customer service desk.
+
+
+      The following people should be organized alphabetically by last name for efficient processing:
+
+
+      {context}
+
+
+      Please sort the list in alphabetical order and provide only the final list.'
+    icl_example:
+      input:
+        context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
+      answer: '["Eric Reynolds", "Patrick Hicks", "Roy Ortiz"]'
