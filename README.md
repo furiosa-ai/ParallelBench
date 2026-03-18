@@ -63,14 +63,9 @@ Diffusion LLMs (dLLMs) promise faster generation via parallel decoding. However,
 
 ### Features
 
-- **Information-Theoretic Analysis:**
-We derive error bounds on parallel decoding for tasks with inter-token dependencies. Even an optimal model sees accuracy degrade as parallelism grows.
-
-- **Quantitative Case Studies:**
-Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas pin down exactly where and how parallel decoding breaks.
-
-- **Realistic Benchmark Tasks:**
-17 tasks across three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily, but expose clear quality drops in dLLMs under parallel decoding.
+- **Information-Theoretic Analysis**: Error bounds on parallel decoding for tasks with inter-token dependencies, showing accuracy degradation as parallelism grows.
+- **Quantitative Case Studies**: Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas that pin down where parallel decoding breaks.
+- **17 Benchmark Tasks**: Three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily but expose quality drops in dLLMs under parallel decoding.
 
 
 ## 📐 Key Concepts
@@ -88,8 +83,6 @@ ParallelBench evaluates **model + unmasking method** combinations. The same mode
 The benchmark score is **PBx** — the maximum TPS at which a given combination still achieves at least **x%** average accuracy across all tasks. For example, PB80 = 8 means the combination can decode up to 8 tokens in parallel while maintaining ≥ 80% accuracy. Higher PBx values indicate better quality preservation under parallel decoding.
 
 ## ⚙️ Setup
-
-These steps will guide you through setting up the necessary environment and dependencies.
 
 ### 1. Prerequisites
 - **Conda**: For managing the environment.
@@ -374,7 +367,7 @@ This means TPS=8 still yields >= 80% average score (PB80), while TPS=32 only mai
 
 
 ## 🙏 Acknowledgements
-This project builds upon the work of several fantastic open-source repositories. We extend our sincere thanks to the original authors for their contributions to the community.
+Built on these open-source projects:
 
 - [LLaDA](https://github.com/ML-GSAI/LLaDA)
 - [Dream](https://github.com/DreamLM/Dream)
