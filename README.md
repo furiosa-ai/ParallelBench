@@ -83,7 +83,9 @@ ParallelBench measures how **quality degrades as parallelism increases** in dLLM
 | **k** | k tokens decoded in parallel per step |
 | **max_tokens** | Fully parallel (one-step generation) |
 
-The benchmark score is **PBx** — the maximum TPS at which a model still achieves at least **x%** average accuracy across all tasks. For example, PB80 = 8 means the model can decode up to 8 tokens in parallel while maintaining ≥ 80% accuracy. Higher PBx values indicate a model that better preserves quality under parallel decoding.
+ParallelBench evaluates **model + unmasking method** combinations. The same model can yield very different quality-speed trade-offs depending on which unmasking strategy is used.
+
+The benchmark score is **PBx** — the maximum TPS at which a given combination still achieves at least **x%** average accuracy across all tasks. For example, PB80 = 8 means the combination can decode up to 8 tokens in parallel while maintaining ≥ 80% accuracy. Higher PBx values indicate better quality preservation under parallel decoding.
 
 ## ⚙️ Setup
 
