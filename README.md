@@ -83,37 +83,6 @@ ParallelBench measures how **quality degrades as parallelism increases** in dLLM
 | **k** | k tokens decoded in parallel per step — faster but quality may degrade |
 | **max_tokens** | Fully parallel (one-step generation) — fastest but lowest quality |
 
-### Generation Parameters
-
-These parameters control the degree of parallelism when running evaluations with `pb eval`:
-
-| Parameter | Type | Default | Description |
-| --------- | ---- | ------- | ----------- |
-| `k` | int | — | Tokens per step for top-k strategies. Auto-derives `steps = max_tokens / k` and `block_length = max_tokens` |
-| `steps` | int | 128 | Total denoising steps. For top-k methods, `k = max_tokens / steps` |
-| `block_length` | int | max_tokens | Semi-AR block size. Tokens within a block are decoded in parallel; blocks are decoded left-to-right |
-| `max_tokens` | int | 128 | Maximum output length |
-| `unmasking` | str | — | Unmasking strategy (see table below) |
-| `alg_threshold` | float | — | Confidence threshold for adaptive methods (required for `confidence_threshold`) |
-| `alg_factor` | float | — | Scaling factor for factor-based methods (required for `confidence_factor`) |
-
-**Constraints**: `max_tokens % block_length == 0` and `steps % (max_tokens / block_length) == 0`
-
-### Unmasking Strategies
-
-| Strategy | Type | CLI value | Description |
-| -------- | ---- | --------- | ----------- |
-| Random | Top-k (static) | `random` | Randomly selects which masked tokens to unmask |
-| Origin | Top-k (static) | `origin` | Dream's native timestep-based unmasking (default for Dream models) |
-| Confidence | Top-k (static) | `confidence_topk` | Unmasks tokens with highest model confidence |
-| Margin | Top-k (static) | `topk_margin` | Unmasks tokens with largest margin between top-2 predictions |
-| Entropy | Top-k (static) | `entropy_topk` | Unmasks tokens with lowest prediction entropy |
-| Confidence Threshold | Adaptive | `confidence_threshold` | Unmasks all tokens above a confidence threshold (`alg_threshold`) |
-| Confidence Factor | Adaptive | `confidence_factor` | Scales unmask count by a factor (`alg_factor`) |
-
-**Top-k (static)** methods unmask a fixed number of tokens per step → tokens per step is constant.
-**Adaptive** methods unmask a variable number of tokens per step → tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
-
 ## ⚙️ Setup
 
 These steps will guide you through setting up the necessary environment and dependencies.
@@ -144,68 +113,19 @@ apt-get install openjdk-17-jdk -y
 
 ## ⚡ Quickstart
 
-> **No GPU?** You can explore all benchmark tasks without a GPU using `pb browse`. Jump to the [CLI examples](#cli-exploration) below.
-
-Here's a simple example of how to load a model and run it on a **ParallelBench** task.
-
-```python
-import torch
-from transformers import AutoModel, AutoTokenizer
-from parallelbench.datasets import ParallelBench
-
-# 1. Load the model and tokenizer
-model = AutoModel.from_pretrained(
-    "Dream-org/Dream-v0-Instruct-7B",
-    trust_remote_code=True,
-    torch_dtype=torch.bfloat16
-).cuda()
-
-tokenizer = AutoTokenizer.from_pretrained(
-    "Dream-org/Dream-v0-Instruct-7B",
-    trust_remote_code=True
-)
-
-# 2. Load a benchmark task and get a sample
-task_name = "waiting_line/copy"
-dataset = ParallelBench(task_name)
-sample = dataset[0] # Get the first sample from the task
-
-# 3. Prepare input from the benchmark sample
-messages = sample["input"]["messages"]
-input_ids = tokenizer.apply_chat_template(
-    messages,
-    add_generation_prompt=True,
-    return_tensors="pt"
-).to(model.device)
-
-# 4. Generate the model's output
-generated_ids = model.diffusion_generate(input_ids, max_tokens=32)
-response = tokenizer.decode(generated_ids[0][len(input_ids[0]):], skip_special_tokens=True)
-
-# 5. Compare the model's output with the reference label
-print(f"Task: {task_name}")
-print(f"Prompt: {messages[-1]['content']}")
-print(f"Reference Label: {sample['label']}")
-print(f"Model Output:    {response}")
-
-# To get the final score, run compute_metrics
-metrics = dataset.compute_metrics([response], [sample["label"]])
-print(f"Metrics: {metrics}")
-```
-
-### CLI Exploration
-
-You can also explore tasks directly from the command line (no GPU required):
-
 ```bash
-# List all available tasks
-pb browse
+# Browse tasks (no GPU required)
+pb browse                              # List all available tasks
+pb browse waiting_line/copy            # View samples from a specific task
+pb browse waiting_line/copy --index 3  # View a specific sample by index
 
-# View samples from a specific task (streamed from HuggingFace Hub)
-pb browse waiting_line/copy
-
-# View a specific sample by index
-pb browse waiting_line/copy --index 3
+# Run evaluation on a single task
+pb eval --model parallelbench_llada \
+  --model_args model_path=GSAI-ML/LLaDA-1.5 \
+  --gen_kwargs k=32,unmasking=random \
+  --tasks parallelbench_waiting_line_copy \
+  --include_path parallelbench/tasks \
+  --batch_size 1
 ```
 
 ## 🎯 Evaluation Coverage
@@ -248,7 +168,7 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 
 ### Unmasking Methods
 
-See the [Unmasking Strategies](#unmasking-strategies) table in Key Concepts for the full list of CLI values and descriptions.
+See the [Unmasking Strategies](#unmasking-strategies) table in Running Evaluations for the full list of CLI values and descriptions.
 
 
 ## 🛠️ Create Your Own Tasks
@@ -312,27 +232,6 @@ See `parallelbench/models/local/example/` for a working example.
 ## 🚀 Running Evaluations
 
 
-### Configuration
-
-Before running the evaluations, copy the example environment file and fill in your API keys:
-
-```bash
-cp .env.example .env
-```
-
-| Key | Required for | Notes |
-| ----- | ----------- | ------- |
-| `ANTHROPIC_API_KEY` | `parallelbench_api` (Haiku) | Only needed for API-based evaluation |
-| `INCEPTION_API_KEY` | `parallelbench_api` (Mercury) | Only needed for API-based evaluation |
-| `WANDB_ENTITY` | Logging to W&B | Optional |
-| `WANDB_PROJECT` | Logging to W&B | Optional |
-
-For logging results, log in to Weights & Biases:
-
-```bash
-uv run wandb login
-```
-
 Evaluations are launched using the `pb eval` CLI (built on [lm-eval-harness](https://github.com/EleutherAI/lm-evaluation-harness)). The general command structure is:
 
 ```bash
@@ -345,6 +244,37 @@ pb eval --model <wrapper> \
 ```
 
 > **Note**: `--include_path parallelbench/tasks` is always required to load ParallelBench task definitions.
+
+### Generation Parameters
+
+These parameters are passed via `--gen_kwargs`:
+
+| Parameter | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| `k` | int | — | Tokens per step for top-k strategies. Auto-derives `steps = max_tokens / k` and `block_length = max_tokens` |
+| `steps` | int | 128 | Total denoising steps. For top-k methods, `k = max_tokens / steps` |
+| `block_length` | int | max_tokens | Semi-AR block size. Tokens within a block are decoded in parallel; blocks are decoded left-to-right |
+| `max_tokens` | int | 128 | Maximum output length |
+| `unmasking` | str | — | Unmasking strategy (see table below) |
+| `alg_threshold` | float | — | Confidence threshold for adaptive methods (required for `confidence_threshold`) |
+| `alg_factor` | float | — | Scaling factor for factor-based methods (required for `confidence_factor`) |
+
+**Constraints**: `max_tokens % block_length == 0` and `steps % (max_tokens / block_length) == 0`
+
+### Unmasking Strategies
+
+| Strategy | Type | CLI value | Description |
+| -------- | ---- | --------- | ----------- |
+| Random | Top-k (static) | `random` | Randomly selects which masked tokens to unmask |
+| Origin | Top-k (static) | `origin` | Dream's native timestep-based unmasking (default for Dream models) |
+| Confidence | Top-k (static) | `confidence_topk` | Unmasks tokens with highest model confidence |
+| Margin | Top-k (static) | `topk_margin` | Unmasks tokens with largest margin between top-2 predictions |
+| Entropy | Top-k (static) | `entropy_topk` | Unmasks tokens with lowest prediction entropy |
+| Confidence Threshold | Adaptive | `confidence_threshold` | Unmasks all tokens above a confidence threshold (`alg_threshold`) |
+| Confidence Factor | Adaptive | `confidence_factor` | Scales unmask count by a factor (`alg_factor`) |
+
+**Top-k (static)** methods unmask a fixed number of tokens per step → tokens per step is constant.
+**Adaptive** methods unmask a variable number of tokens per step → tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
 
 ### Single Task Example
 
@@ -418,7 +348,7 @@ bash scripts/quick_start.sh --num_processes 2  # multi GPU
 
 ### Results
 
-Evaluation results are saved locally to `results/` as JSON files and optionally logged to **Weights & Biases (wandb)**.
+Evaluation results are saved locally to `results/` as JSON files.
 
 Use `pb analyze` to view results as a summary table with **PBx scores** — the maximum tokens-per-step achieving at least x% average score across all tasks:
 
