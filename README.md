@@ -136,26 +136,25 @@ pb eval --model parallelbench_llada \
 
 ### Tasks
 
-- **Waiting Line**
-    - `waiting_line/copy`
-    - `waiting_line/insert_index`
-    - `waiting_line/insert_random`
-    - `waiting_line/remove_index`
-    - `waiting_line/remove_random`
-    - `waiting_line/replace_index`
-    - `waiting_line/replace_random`
-    - `waiting_line/reverse`
-    - `waiting_line/shuffle`
-    - `waiting_line/sort`
-- **Text Writing**
-    - `text_writing/paraphrasing`
-    - `text_writing/summarization`
-    - `text_writing/words_to_sentence_easy`
-    - `text_writing/words_to_sentence_medium`
-    - `text_writing/words_to_sentence_hard`
-- **Puzzles**
-    - `puzzles/latin_square_n4`
-    - `puzzles/sudoku_n4`
+| Category | Task | CLI task name |
+| --- | --- | --- |
+| Waiting Line (10) | Copy | `parallelbench_waiting_line_copy` |
+| | Insert (index) | `parallelbench_waiting_line_insert_index` |
+| | Insert (random) | `parallelbench_waiting_line_insert_random` |
+| | Remove (index) | `parallelbench_waiting_line_remove_index` |
+| | Remove (random) | `parallelbench_waiting_line_remove_random` |
+| | Replace (index) | `parallelbench_waiting_line_replace_index` |
+| | Replace (random) | `parallelbench_waiting_line_replace_random` |
+| | Reverse | `parallelbench_waiting_line_reverse` |
+| | Shuffle | `parallelbench_waiting_line_shuffle` |
+| | Sort | `parallelbench_waiting_line_sort` |
+| Text Writing (5) | Paraphrasing | `parallelbench_text_writing_paraphrasing` |
+| | Summarization | `parallelbench_text_writing_summarization` |
+| | Words to Sentence (easy) | `parallelbench_text_writing_words_to_sentence_easy` |
+| | Words to Sentence (medium) | `parallelbench_text_writing_words_to_sentence_medium` |
+| | Words to Sentence (hard) | `parallelbench_text_writing_words_to_sentence_hard` |
+| Puzzles (2) | Latin Square (4x4) | `parallelbench_puzzles_latin_square_n4` |
+| | Sudoku (4x4) | `parallelbench_puzzles_sudoku_n4` |
 
 ### Models
 
@@ -165,8 +164,8 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 | --- | --- | --- |
 | `parallelbench_llada` | LLaDA | `GSAI-ML/LLaDA-1.5` |
 | `parallelbench_dream` | Dream, DiffuCoder | `Dream-org/Dream-v0-Instruct-7B` |
-| `parallelbench_sedd` | SEDD | `louaaron/sedd-medium` |
 | `parallelbench_trado` | SDAR, TraDo | `JetAstra/SDAR-1.5-8B` |
+| `parallelbench_sedd` | SEDD | `louaaron/sedd-medium` |
 | `parallelbench_ar` | AR baselines (vLLM) | `meta-llama/Llama-3.1-8B-Instruct` |
 | `parallelbench_api` | API models | Haiku, Mercury (requires `.env` keys) |
 
