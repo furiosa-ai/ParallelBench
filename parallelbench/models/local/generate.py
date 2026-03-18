@@ -23,6 +23,8 @@ import torch
 import torch.distributions as dists
 import torch.nn.functional as F
 
+from parallelbench.models.unmasking_registry import get_strategy_info
+
 
 def get_num_transfer_tokens(mask_index, steps):
     if steps is None:
@@ -203,29 +205,12 @@ def get_transfer_index(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if unmasking.startswith("confidence"):
-        # get probabilities of selected ids (confidence)
-        # x0_p = torch.squeeze(
-        #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
-        pass
-    elif unmasking.startswith("topk_margin"):
-        x0_p = None
-        sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
-        # Extract top1 and top2 probabilities
-        top1_probs = sorted_probs[..., 0]
-        top2_probs = sorted_probs[..., 1]
-        # Calculate confidence as top1 - top2
-        x0_p = top1_probs - top2_probs
-    elif unmasking.startswith("entropy"):
-        x0_p = None
-        epsilon = 1e-10
-        log_probs = torch.log(p + epsilon)
-        x0_p = torch.sum(p * log_probs, dim=-1)
-    elif unmasking.startswith("random"):
-        x0_p = None
-        x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
-    else:
-        raise NotImplementedError(unmasking)
+    confidence_fn = get_strategy_info(unmasking).confidence_fn
+    if confidence_fn is None:
+        raise ValueError(
+            f"Unmasking strategy '{unmasking}' has no confidence scorer registered."
+        )
+    x0_p = confidence_fn(p, x0, x0_p)
 
     x0 = torch.where(mask_index, x0, x)
     confidence = torch.where(mask_index, x0_p, -np.inf)
@@ -292,26 +277,12 @@ def get_transfer_index_dynamic(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    if unmasking.startswith("confidence"):
-        # get probabilities of selected ids (confidence)
-        # x0_p = torch.squeeze(
-        #     torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
-        pass
-    elif unmasking.startswith("topk_margin"):
-        sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
-        # Extract top1 and top2 probabilities
-        top1_probs = sorted_probs[..., 0]
-        top2_probs = sorted_probs[..., 1]
-        # Calculate confidence as top1 - top2
-        x0_p = top1_probs - top2_probs
-    elif unmasking.startswith("entropy"):
-        epsilon = 1e-10
-        log_probs = torch.log(p + epsilon)
-        x0_p = torch.sum(p * log_probs, dim=-1)
-    elif unmasking.startswith("random"):
-        x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
-    else:
-        raise NotImplementedError(unmasking)
+    confidence_fn = get_strategy_info(unmasking).confidence_fn
+    if confidence_fn is None:
+        raise ValueError(
+            f"Unmasking strategy '{unmasking}' has no confidence scorer registered."
+        )
+    x0_p = confidence_fn(p, x0, x0_p)
 
     x0 = torch.where(mask_index, x0, x)
     confidence = torch.where(mask_index, x0_p, -np.inf)

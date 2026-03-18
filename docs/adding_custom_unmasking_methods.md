@@ -18,66 +18,67 @@ There are three method types:
 
 | File | What to do |
 | ---- | ---------- |
-| `parallelbench/models/unmasking_registry.py` | Register the method type and parameter derivation |
-| `parallelbench/models/local/generate.py` | Implement the confidence score computation |
+| `parallelbench/models/confidence_scorers.py` | Implement the confidence score function |
+| `parallelbench/models/unmasking_registry.py` | Register the method with its confidence scorer |
 | `parallelbench/models/local/<model>/constants.py` | Add the method to each model's valid set |
 
-## 1. Register the Method
+## 1. Implement the Confidence Score
 
-Add your method to `UNMASKING_REGISTRY` in `parallelbench/models/unmasking_registry.py`:
-
-```python
-UNMASKING_REGISTRY: dict[str, StrategyInfo] = {
-    # ... existing entries ...
-    "my_method": StrategyInfo("topk", "k", derive_topk),
-}
-```
-
-The three arguments are: method type, representative CLI parameter, and a function that derives `steps`/`block_length` from that parameter. Reuse existing derive functions (`derive_topk`, `derive_threshold`, `derive_factor`) when possible.
-
-You can also register dynamically:
+Add a function to `parallelbench/models/confidence_scorers.py`. Every scorer has the same signature:
 
 ```python
-from parallelbench.models.unmasking_registry import StrategyInfo, register_strategy
-register_strategy("my_method", StrategyInfo("topk", "k", derive_topk))
+def my_scorer(p: torch.Tensor, x0: torch.Tensor, x0_p: torch.Tensor) -> torch.Tensor:
+    """
+    Args:
+        p: Token probability distribution (batch, seq_len, vocab_size).
+        x0: Predicted token ids (batch, seq_len).
+        x0_p: Pre-computed max/sampled probability (batch, seq_len).
+
+    Returns:
+        Per-token confidence tensor (batch, seq_len).
+    """
+    return ...
 ```
-
-## 2. Implement the Confidence Score
-
-In `parallelbench/models/local/generate.py`, find `get_transfer_index()` and add an `elif` branch. You only need to compute `x0_p` (per-token confidence) — the top-k selection is handled by the existing code.
-
-```python
-# In get_transfer_index():
-
-if unmasking.startswith("confidence"):
-    pass  # x0_p = max probability (already computed)
-elif unmasking.startswith("topk_margin"):
-    sorted_probs, _ = torch.sort(p, dim=-1, descending=True)
-    x0_p = sorted_probs[..., 0] - sorted_probs[..., 1]
-elif unmasking.startswith("entropy"):
-    log_probs = torch.log(p + 1e-10)
-    x0_p = torch.sum(p * log_probs, dim=-1)
-elif unmasking.startswith("random"):
-    x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
-
-# Add yours here:
-elif unmasking.startswith("my_method"):
-    x0_p = ...  # your confidence score
-
-else:
-    raise NotImplementedError(unmasking)
-```
-
-For `factor`-type methods, also add the same branch in `get_transfer_index_dynamic()`.
 
 ### Common confidence patterns
 
 | Pattern | Computation | Intuition |
 | ------- | ----------- | --------- |
-| Max probability | `p.max(dim=-1).values` | How certain the top prediction is |
+| Max probability | `return x0_p` | How certain the top prediction is |
 | Margin | `top1 - top2` | Gap between best and second-best |
 | Negative entropy | `sum(p * log(p))` | More concentrated = more confident |
 | Random | `torch.rand(...)` | Uniform baseline |
+
+### Existing scorers
+
+| Function | Used by |
+| -------- | ------- |
+| `max_probability` | `confidence_topk`, `confidence_threshold`, `confidence_factor` |
+| `margin` | `topk_margin` |
+| `negative_entropy` | `entropy_topk` |
+| `random_confidence` | `random` |
+
+## 2. Register the Method
+
+Add your method to `UNMASKING_REGISTRY` in `parallelbench/models/unmasking_registry.py`:
+
+```python
+from parallelbench.models.confidence_scorers import my_scorer
+
+UNMASKING_REGISTRY: dict[str, StrategyInfo] = {
+    # ... existing entries ...
+    "my_method": StrategyInfo("topk", "k", derive_topk, my_scorer),
+}
+```
+
+The four arguments are: method type, representative CLI parameter, a function that derives `steps`/`block_length` from that parameter, and the confidence scorer. Reuse existing derive functions (`derive_topk`, `derive_threshold`, `derive_factor`) and scorers when possible.
+
+You can also register dynamically:
+
+```python
+from parallelbench.models.unmasking_registry import StrategyInfo, register_strategy
+register_strategy("my_method", StrategyInfo("topk", "k", derive_topk, my_scorer))
+```
 
 ## 3. Add to Model Valid Sets
 
@@ -109,14 +110,3 @@ pb eval --model parallelbench_llada \
   --batch_size 1 \
   --limit 2
 ```
-
-## Existing Implementations
-
-| Method | Confidence score | Location |
-| ------ | ---------------- | -------- |
-| `confidence_topk` | Max token probability | `get_transfer_index()` |
-| `topk_margin` | Top-1 minus top-2 probability | `get_transfer_index()` |
-| `entropy_topk` | Negative entropy | `get_transfer_index()` |
-| `random` | Uniform random | `get_transfer_index()` |
-| `confidence_threshold` | Max probability + threshold cutoff | `get_transfer_index()` |
-| `confidence_factor` | Max probability + dynamic factor | `get_transfer_index_dynamic()` |

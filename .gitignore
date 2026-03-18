@@ -238,3 +238,5 @@ AGENTS.md
 /.agents/
 .omx/
 .omc/
+docker*
+Dockerfile*

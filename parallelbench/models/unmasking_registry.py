@@ -10,9 +10,18 @@ and derives generation kwargs (steps, block_length) from high-level parameters.
 
 from collections import namedtuple
 
+from parallelbench.models.confidence_scorers import (
+    margin,
+    max_probability,
+    negative_entropy,
+    random_confidence,
+)
+
 
 StrategyInfo = namedtuple(
-    "StrategyInfo", ["strategy_type", "representative_param", "derive_fn"]
+    "StrategyInfo",
+    ["strategy_type", "representative_param", "derive_fn", "confidence_fn"],
+    defaults=[None],
 )
 
 
@@ -67,15 +76,17 @@ def derive_factor(alg_factor: float, max_tokens: int) -> dict:
 
 
 UNMASKING_REGISTRY: dict[str, StrategyInfo] = {
-    "random": StrategyInfo("topk", "k", derive_topk),
+    "random": StrategyInfo("topk", "k", derive_topk, random_confidence),
     "origin": StrategyInfo("topk", "k", derive_topk),
-    "confidence_topk": StrategyInfo("topk", "k", derive_topk),
-    "topk_margin": StrategyInfo("topk", "k", derive_topk),
-    "entropy_topk": StrategyInfo("topk", "k", derive_topk),
+    "confidence_topk": StrategyInfo("topk", "k", derive_topk, max_probability),
+    "topk_margin": StrategyInfo("topk", "k", derive_topk, margin),
+    "entropy_topk": StrategyInfo("topk", "k", derive_topk, negative_entropy),
     "confidence_threshold": StrategyInfo(
-        "threshold", "alg_threshold", derive_threshold
+        "threshold", "alg_threshold", derive_threshold, max_probability
     ),
-    "confidence_factor": StrategyInfo("factor", "alg_factor", derive_factor),
+    "confidence_factor": StrategyInfo(
+        "factor", "alg_factor", derive_factor, max_probability
+    ),
 }
 
 
