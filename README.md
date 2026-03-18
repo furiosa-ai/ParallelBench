@@ -44,7 +44,7 @@ We are currently working to support **new models** and implement **advanced unma
 - [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
 - [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
 
-**Advanced Unmasking Strategies**
+**Advanced Unmasking Methods**
 
 - [WINO](https://github.com/Feng-Hong/WINO-DLLM?tab=readme-ov-file)
 - [DUS](https://github.com/omerlux/DUS)
@@ -78,7 +78,7 @@ ParallelBench measures how **quality degrades as parallelism increases** in dLLM
 | **k** | k tokens decoded in parallel per step |
 | **max_tokens** | Fully parallel (one-step generation) |
 
-ParallelBench evaluates **model + unmasking method** combinations. The same model can yield very different quality-speed trade-offs depending on which unmasking strategy is used.
+ParallelBench evaluates **model + unmasking method** combinations. The same model can yield very different quality-speed trade-offs depending on which unmasking method is used.
 
 The benchmark score is **PBx** — the maximum TPS at which a given combination still achieves at least **x%** average accuracy across all tasks. For example, PB80 = 8 means the combination can decode up to 8 tokens in parallel while maintaining ≥ 80% accuracy. Higher PBx values indicate better quality preservation under parallel decoding.
 
@@ -153,16 +153,18 @@ pb eval --model parallelbench_llada \
 
 For additional models and unmasking methods, please refer to the [Roadmap](https://github.com/furiosa-ai/ParallelBench/#%EF%B8%8F-roadmap) section.
 
-| CLI wrapper (`--model`) | Model family | Example `model_path` |
+| Model family | CLI wrapper (`--model`) | Example `model_path` |
 | --- | --- | --- |
-| `parallelbench_llada` | LLaDA | `GSAI-ML/LLaDA-1.5` |
-| `parallelbench_dream` | Dream, DiffuCoder | `Dream-org/Dream-v0-Instruct-7B` |
-| `parallelbench_trado` | SDAR, TraDo | `JetAstra/SDAR-1.5-8B` |
-| `parallelbench_sedd` | SEDD | `louaaron/sedd-medium` |
-| `parallelbench_ar` | AR baselines (vLLM) | `meta-llama/Llama-3.1-8B-Instruct` |
-| `parallelbench_api` | API models | Haiku, Mercury (requires `.env` keys) |
+| LLaDA | `parallelbench_llada` | `GSAI-ML/LLaDA-1.5` |
+| Dream, DiffuCoder | `parallelbench_dream` | `Dream-org/Dream-v0-Instruct-7B` |
+| SDAR, TraDo | `parallelbench_trado` | `JetAstra/SDAR-1.5-8B` |
+| SEDD | `parallelbench_sedd` | `louaaron/sedd-medium` |
+| AR baselines (vLLM) | `parallelbench_ar` | `meta-llama/Llama-3.1-8B-Instruct` |
+| API models | `parallelbench_api` | Haiku, Mercury (requires `.env` keys) |
 
-### Unmasking Strategies
+> **Adding your own model?** See the [step-by-step guide](docs_for_agents/adding_custom_models.md) and the example in `parallelbench/models/local/example/`.
+
+### Unmasking Methods
 
 | Strategy | Type | CLI value | Description |
 | -------- | ---- | --------- | ----------- |
@@ -177,10 +179,7 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 **Top-k (static)** methods unmask a fixed number of tokens per step — tokens per step is constant.
 **Adaptive** methods unmask a variable number of tokens per step — tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
 
-
-## 🧩 Adding Custom Models
-
-You can integrate your own diffusion LLM into ParallelBench. See the [Adding Custom Models](docs_for_agents/adding_custom_models.md) guide and the example in `parallelbench/models/local/example/`.
+> **Adding your own strategy?** See the [step-by-step guide](docs_for_agents/adding_custom_unmasking_methods.md).
 
 ## 🚀 Running Evaluations
 
@@ -208,7 +207,7 @@ These parameters are passed via `--gen_kwargs`:
 | `steps` | int | 128 | Total denoising steps. For top-k methods, `k = max_tokens / steps` |
 | `block_length` | int | max_tokens | Semi-AR block size. Tokens within a block are decoded in parallel; blocks are decoded left-to-right |
 | `max_tokens` | int | 128 | Maximum output length |
-| `unmasking` | str | — | Unmasking strategy (see [Unmasking Strategies](#unmasking-strategies)) |
+| `unmasking` | str | — | Unmasking method (see [Unmasking Methods](#unmasking-methods)) |
 | `alg_threshold` | float | — | Confidence threshold for adaptive methods (required for `confidence_threshold`) |
 | `alg_factor` | float | — | Scaling factor for factor-based methods (required for `confidence_factor`) |
 
@@ -294,7 +293,7 @@ Use `pb analyze` to view results as a summary table with **PBx scores** — the 
 # Summary table with PBx scores
 pb analyze results/
 
-# Group by unmasking strategy for comparison
+# Group by unmasking method for comparison
 pb analyze results/ --compare unmasking
 
 # Export to CSV
@@ -314,8 +313,6 @@ Built on these open-source projects:
 - [LLaDA](https://github.com/ML-GSAI/LLaDA)
 - [Dream](https://github.com/DreamLM/Dream)
 - [Fast-dLLM](https://github.com/NVlabs/Fast-dLLM)
-- [ReMDM](https://github.com/guanghanwang/ReMDM-LLaDA)
-- [RCR](https://github.com/autonomousvision/mdpo)
 - [Score-Entropy-Discrete-Diffusion](https://github.com/louaaron/Score-Entropy-Discrete-Diffusion)
 
 ## 📖 Citation
