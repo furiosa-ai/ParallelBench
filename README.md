@@ -167,24 +167,6 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 See the [Unmasking Strategies](#unmasking-strategies) table in Running Evaluations for the full list of CLI values and descriptions.
 
 
-## 🛠️ Create Your Own Tasks
-
-You can easily generate custom tasks from YAML configuration files. For example, to generate the test split and save locally:
-
-```bash
-pb data --split test --output_dir ./output
-```
-
-To generate and push directly to HuggingFace Hub:
-
-```bash
-pb data --split test --push --repo_id org/parallelbench
-```
-
-This command uses the configurations specified in `parallelbench/datasets/data/task_configs/`.
-
-***
-
 ## 🧩 Adding Custom Models
 
 You can integrate your own diffusion LLM by following the example in `parallelbench/models/local/example/`. For a detailed step-by-step guide (useful for AI agents), see [`docs_for_agents/adding_custom_models.md`](docs_for_agents/adding_custom_models.md). This directory contains:

@@ -1,4 +1,9 @@
-"""Generate ParallelBench data and optionally push to HuggingFace Hub.
+"""Generate ParallelBench data from YAML task configs and push to HuggingFace Hub.
+
+This command is intended for benchmark maintainers who need to regenerate
+the official dataset or publish a custom variant to the Hub. End users
+typically do not need this — evaluation data is streamed from the Hub
+automatically via ``pb eval``.
 
 Usage via CLI:
     pb data --output_dir ./output
@@ -205,7 +210,11 @@ def generate(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate ParallelBench data and optionally push to HuggingFace Hub."
+        description=(
+            "Generate ParallelBench data from YAML task configs and push to "
+            "HuggingFace Hub. Intended for benchmark maintainers — end users "
+            "do not need this command."
+        )
     )
     parser.add_argument(
         "--output_dir",

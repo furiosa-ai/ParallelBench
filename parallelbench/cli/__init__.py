@@ -2,7 +2,7 @@
 
 Usage:
     pb eval [lm-eval options]     Run lm-eval evaluation
-    pb data [options]             Generate benchmark data
+    pb data [options]             Generate benchmark data and push to Hub (maintainer use)
     pb browse [task] [options]    Browse benchmark tasks and samples
     pb analyze [results_dir]      Analyze evaluation results
 """
@@ -21,7 +21,10 @@ COMMANDS = {
         "Run lm-eval evaluation",
         "pb eval --model parallelbench_llada --model_args ...",
     ),
-    "data": ("Generate benchmark data", "pb data --output_dir ./output"),
+    "data": (
+        "Generate benchmark data and push to Hub (maintainer use)",
+        "pb data --push --repo_id org/parallelbench",
+    ),
     "browse": ("Browse benchmark tasks and samples", "pb browse waiting_line/copy"),
     "analyze": ("Analyze evaluation results", "pb analyze results/"),
 }
