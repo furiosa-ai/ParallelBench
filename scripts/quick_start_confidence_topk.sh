@@ -25,7 +25,7 @@ for K in 1 2 4 8 16 32; do
         --gen_kwargs k=${K},unmasking=confidence_topk \
         --tasks parallelbench_all \
         --include_path parallelbench/tasks \
-        --batch_size 16 \
+        --batch_size 1 \
         --log_samples \
         --output_path "$OUTPUT_DIR"
 done
