@@ -23,7 +23,7 @@ import torch
 import torch.distributions as dists
 import torch.nn.functional as F
 
-from parallelbench.models.unmasking_registry import get_strategy_info
+from parallelbench.models.unmasking_registry import get_method_info
 
 
 def get_num_transfer_tokens(mask_index, steps):
@@ -81,7 +81,7 @@ def generate(
         block_length: Block length, less than or equal to gen_length. If less than gen_length, it means using semi_autoregressive unmasking.
         temperature: Categorical distribution sampling temperature.
         cfg_scale: Unsupervised classifier-free guidance scale.
-        unmasking: Unmasking strategy. 'confidence_topk' or 'random'.
+        unmasking: Unmasking method. 'confidence_topk' or 'random'.
         mask_id: The toke id of [MASK] is 126336.
     """
     x = torch.full((1, prompt.shape[1] + gen_length), mask_id, dtype=torch.long).to(
@@ -205,10 +205,10 @@ def get_transfer_index(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    confidence_fn = get_strategy_info(unmasking).confidence_fn
+    confidence_fn = get_method_info(unmasking).confidence_fn
     if confidence_fn is None:
         raise ValueError(
-            f"Unmasking strategy '{unmasking}' has no confidence scorer registered."
+            f"Unmasking method '{unmasking}' has no confidence scorer registered."
         )
     x0_p = confidence_fn(p, x0, x0_p)
 
@@ -277,10 +277,10 @@ def get_transfer_index_dynamic(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    confidence_fn = get_strategy_info(unmasking).confidence_fn
+    confidence_fn = get_method_info(unmasking).confidence_fn
     if confidence_fn is None:
         raise ValueError(
-            f"Unmasking strategy '{unmasking}' has no confidence scorer registered."
+            f"Unmasking method '{unmasking}' has no confidence scorer registered."
         )
     x0_p = confidence_fn(p, x0, x0_p)
 
@@ -357,7 +357,7 @@ def generate_batch(
         gen_length: Generated answer length (same for all samples).
         block_length: Block length for semi-autoregressive unmasking.
         temperature: Categorical distribution sampling temperature.
-        unmasking: Unmasking strategy.
+        unmasking: Unmasking method.
         mask_id: The token id of [MASK].
         pad_id: The token id used for right-padding.
         threshold: Confidence threshold for threshold-based unmasking.

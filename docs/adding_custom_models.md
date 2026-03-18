@@ -14,7 +14,7 @@ This guide walks you through integrating your own diffusion language model into 
 parallelbench/models/local/<name>/
 ├── __init__.py
 ├── <name>_model.py      # Model implementation
-└── constants.py         # Mask token ID, valid methods
+└── constants.py         # Mask token ID, valid unmasking methods
 parallelbench/lm_eval_wrappers/
 └── <name>_wrapper.py    # lm-eval wrapper
 ```
@@ -25,7 +25,7 @@ parallelbench/lm_eval_wrappers/
 # parallelbench/models/local/<name>/constants.py
 
 <NAME>_MASK_TOKEN_ID = <int>  # Check your tokenizer
-<NAME>_VALID_STRATEGIES = {
+<NAME>_VALID_METHODS = {
     "random",
     "confidence_topk",
     # Full list: random, origin, confidence_topk, topk_margin,

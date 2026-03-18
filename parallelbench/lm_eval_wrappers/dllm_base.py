@@ -21,7 +21,7 @@ from parallelbench.lm_eval_wrappers.metadata_store import (
     GenerationMetadata,
     MetadataStore,
 )
-from parallelbench.models.unmasking_registry import get_strategy_info
+from parallelbench.models.unmasking_registry import get_method_info
 
 
 class DLLMBase(LM):
@@ -39,7 +39,7 @@ class DLLMBase(LM):
         steps: int               - Diffusion steps (default: 128)
         max_tokens: int          - Maximum generation length (default: 128)
         block_length: int        - Block length for semi-AR generation (default: 128)
-        unmasking: str           - Unmasking strategy (default: "random")
+        unmasking: str           - Unmasking method (default: "random")
         temperature: float       - Sampling temperature (default: 0.0)
         alg_temp: float          - Algorithm temperature (default: 0.0)
         alg_threshold: float     - Confidence threshold
@@ -88,7 +88,7 @@ class DLLMBase(LM):
 
         If "k" (tokens per step) is present in gen_kwargs and neither "steps"
         nor "block_length" are explicitly provided, derives steps and block_length
-        from the unmasking registry's derive_fn for the given unmasking strategy.
+        from the unmasking registry's derive_fn for the given unmasking method.
         Explicit "steps"/"block_length" values always take priority.
         """
         max_tokens = int(gen_kwargs.get("max_tokens", 128))
@@ -98,7 +98,7 @@ class DLLMBase(LM):
         block_length_explicit = "block_length" in gen_kwargs
 
         if "k" in gen_kwargs and not steps_explicit and not block_length_explicit:
-            info = get_strategy_info(unmasking)
+            info = get_method_info(unmasking)
             k = float(gen_kwargs["k"])
             derived = info.derive_fn(k, max_tokens)
             steps = derived["steps"]

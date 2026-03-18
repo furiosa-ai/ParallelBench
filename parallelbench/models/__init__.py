@@ -12,11 +12,16 @@ from parallelbench.models.local.vllm_model import vllmModel
 # Unmasking registry
 from parallelbench.models.unmasking_registry import (
     UNMASKING_REGISTRY,
+    MethodInfo,
     StrategyInfo,
+    get_all_methods,
     get_all_strategies,
     get_representative_param,
+    get_method_info,
+    get_method_type,
     get_strategy_info,
     get_strategy_type,
+    register_method,
     register_strategy,
 )
 
@@ -35,11 +40,16 @@ __all__ = [
     "TransformersModel",
     "vllmModel",
     "UNMASKING_REGISTRY",
+    "MethodInfo",
     "StrategyInfo",
+    "get_all_methods",
     "get_all_strategies",
     "get_representative_param",
+    "get_method_info",
+    "get_method_type",
     "get_strategy_info",
     "get_strategy_type",
+    "register_method",
     "register_strategy",
 ]
 

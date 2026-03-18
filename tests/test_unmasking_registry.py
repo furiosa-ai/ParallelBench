@@ -1,27 +1,28 @@
 """
-Tests for unmasking strategy registry.
+Tests for unmasking method registry.
 
-Tests verify all registered strategies, helper functions, derivation functions,
-and extensibility via register_strategy().
+Tests verify all registered methods, helper functions, derivation functions,
+and extensibility via register_method().
 """
 
 import pytest
 
 from parallelbench.models.unmasking_registry import (
     UNMASKING_REGISTRY,
+    MethodInfo,
     StrategyInfo,
     derive_factor,
     derive_threshold,
     derive_topk,
-    get_all_strategies,
+    get_all_methods,
     get_representative_param,
-    get_strategy_info,
-    get_strategy_type,
-    register_strategy,
+    get_method_info,
+    get_method_type,
+    register_method,
 )
-from parallelbench.models.local.llada.constants import LLADA_VALID_STRATEGIES
-from parallelbench.models.local.dream.constants import DREAM_VALID_STRATEGIES
-from parallelbench.models.local.trado.constants import TRADO_VALID_STRATEGIES
+from parallelbench.models.local.llada.constants import LLADA_VALID_METHODS
+from parallelbench.models.local.dream.constants import DREAM_VALID_METHODS
+from parallelbench.models.local.trado.constants import TRADO_VALID_METHODS
 
 
 # ============================================================
@@ -29,8 +30,8 @@ from parallelbench.models.local.trado.constants import TRADO_VALID_STRATEGIES
 # ============================================================
 
 
-def test_all_seven_strategies_are_registered():
-    """All 7 expected strategy names are present in the registry."""
+def test_all_seven_methods_are_registered():
+    """All 7 expected method names are present in the registry."""
     expected = {
         "random",
         "origin",
@@ -43,20 +44,20 @@ def test_all_seven_strategies_are_registered():
     assert expected == set(UNMASKING_REGISTRY.keys())
 
 
-def test_get_all_strategies_matches_registry_keys():
-    assert get_all_strategies() == set(UNMASKING_REGISTRY.keys())
+def test_get_all_methods_matches_registry_keys():
+    assert get_all_methods() == set(UNMASKING_REGISTRY.keys())
 
 
-def test_registry_is_superset_of_per_model_valid_strategies():
-    """The registry must cover every strategy accepted by each model."""
-    all_strategies = get_all_strategies()
-    assert LLADA_VALID_STRATEGIES.issubset(all_strategies)
-    assert DREAM_VALID_STRATEGIES.issubset(all_strategies)
-    assert TRADO_VALID_STRATEGIES.issubset(all_strategies)
+def test_registry_is_superset_of_per_model_valid_methods():
+    """The registry must cover every method accepted by each model."""
+    all_methods = get_all_methods()
+    assert LLADA_VALID_METHODS.issubset(all_methods)
+    assert DREAM_VALID_METHODS.issubset(all_methods)
+    assert TRADO_VALID_METHODS.issubset(all_methods)
 
 
 # ============================================================
-# get_strategy_type
+# get_method_type
 # ============================================================
 
 
@@ -72,8 +73,8 @@ def test_registry_is_superset_of_per_model_valid_strategies():
         ("confidence_factor", "factor"),
     ],
 )
-def test_get_strategy_type(name, expected_type):
-    assert get_strategy_type(name) == expected_type
+def test_get_method_type(name, expected_type):
+    assert get_method_type(name) == expected_type
 
 
 # ============================================================
@@ -81,31 +82,31 @@ def test_get_strategy_type(name, expected_type):
 # ============================================================
 
 
-def test_get_representative_param_for_topk_strategy():
+def test_get_representative_param_for_topk_method():
     assert get_representative_param("random") == "k"
 
 
-def test_get_representative_param_for_threshold_strategy():
+def test_get_representative_param_for_threshold_method():
     assert get_representative_param("confidence_threshold") == "alg_threshold"
 
 
-def test_get_representative_param_for_factor_strategy():
+def test_get_representative_param_for_factor_method():
     assert get_representative_param("confidence_factor") == "alg_factor"
 
 
 # ============================================================
-# get_strategy_info
+# get_method_info
 # ============================================================
 
 
-def test_get_strategy_info_returns_strategy_info_namedtuple():
-    info = get_strategy_info("random")
-    assert isinstance(info, StrategyInfo)
+def test_get_method_info_returns_method_info_namedtuple():
+    info = get_method_info("random")
+    assert isinstance(info, MethodInfo)
 
 
-def test_get_strategy_info_unknown_name_raises_key_error():
-    with pytest.raises(KeyError, match="unknown_strategy"):
-        get_strategy_info("unknown_strategy")
+def test_get_method_info_unknown_name_raises_key_error():
+    with pytest.raises(KeyError, match="unknown_method"):
+        get_method_info("unknown_method")
 
 
 # ============================================================
@@ -166,22 +167,31 @@ def test_derive_factor_ignores_alg_factor_value():
 
 
 # ============================================================
-# register_strategy (extensibility)
+# register_method (extensibility)
 # ============================================================
 
 
-def test_register_strategy_adds_new_strategy_that_is_queryable():
-    new_info = StrategyInfo("topk", "k", derive_topk)
-    register_strategy("test_custom_strategy", new_info)
-    assert get_strategy_type("test_custom_strategy") == "topk"
-    assert get_representative_param("test_custom_strategy") == "k"
+def test_register_method_adds_new_method_that_is_queryable():
+    new_info = MethodInfo("topk", "k", derive_topk)
+    register_method("test_custom_method", new_info)
+    assert get_method_type("test_custom_method") == "topk"
+    assert get_representative_param("test_custom_method") == "k"
     # Cleanup
-    del UNMASKING_REGISTRY["test_custom_strategy"]
+    del UNMASKING_REGISTRY["test_custom_method"]
 
 
-def test_register_strategy_appears_in_get_all_strategies():
-    new_info = StrategyInfo("threshold", "alg_threshold", derive_threshold)
-    register_strategy("test_threshold_strategy", new_info)
-    assert "test_threshold_strategy" in get_all_strategies()
+def test_register_method_appears_in_get_all_methods():
+    new_info = MethodInfo("threshold", "alg_threshold", derive_threshold)
+    register_method("test_threshold_method", new_info)
+    assert "test_threshold_method" in get_all_methods()
     # Cleanup
-    del UNMASKING_REGISTRY["test_threshold_strategy"]
+    del UNMASKING_REGISTRY["test_threshold_method"]
+
+
+# ============================================================
+# Backward compatibility aliases
+# ============================================================
+
+
+def test_strategy_info_is_alias_for_method_info():
+    assert StrategyInfo is MethodInfo

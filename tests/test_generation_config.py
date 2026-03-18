@@ -47,37 +47,37 @@ def test_dllm_generation_config_valid():
 
 
 def test_dllm_generation_config_threshold_unmasking():
-    """Test threshold-based unmasking strategies with custom valid_strategies."""
+    """Test threshold-based unmasking methods with custom valid_methods."""
     config = DllmGenerationConfig(
         unmasking="confidence_threshold",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_threshold=0.5,
-        valid_strategies={"confidence_topk", "confidence_threshold"},
+        valid_methods={"confidence_topk", "confidence_threshold"},
     )
     assert config.is_threshold_unmasking is True
     assert config.is_default_unmasking is False
 
 
 def test_dllm_generation_config_factor_unmasking():
-    """Test factor-based unmasking strategies with custom valid_strategies."""
+    """Test factor-based unmasking methods with custom valid_methods."""
     config = DllmGenerationConfig(
         unmasking="confidence_factor",
         block_length=128,
         max_tokens=128,
         steps=128,
         alg_factor=2.0,
-        valid_strategies={"confidence_topk", "confidence_factor"},
+        valid_methods={"confidence_topk", "confidence_factor"},
     )
     assert config.is_factor_unmasking is True
 
 
 def test_dllm_generation_config_invalid_unmasking():
-    """Invalid unmasking strategy should raise ValueError."""
-    with pytest.raises(ValueError, match="Unsupported unmasking strategy"):
+    """Invalid unmasking method should raise ValueError."""
+    with pytest.raises(ValueError, match="Unsupported unmasking method"):
         DllmGenerationConfig(
-            unmasking="invalid_strategy",
+            unmasking="invalid_method",
             block_length=128,
             max_tokens=128,
         )

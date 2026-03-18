@@ -80,13 +80,13 @@ def test_trado_default_alg_threshold():
     assert config.alg_threshold == 0.85
 
 
-def test_trado_valid_strategies():
+def test_trado_valid_methods():
     config = TradoGenerationConfig()
-    assert config.valid_strategies == {"confidence_topk", "confidence_threshold"}
+    assert config.valid_methods == {"confidence_topk", "confidence_threshold"}
 
 
-def test_trado_invalid_strategy_random_raises():
-    with pytest.raises(ValueError, match="Unsupported unmasking strategy"):
+def test_trado_invalid_method_random_raises():
+    with pytest.raises(ValueError, match="Unsupported unmasking method"):
         TradoGenerationConfig(unmasking="random")
 
 

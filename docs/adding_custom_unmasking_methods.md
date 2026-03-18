@@ -65,9 +65,9 @@ Add your method to `UNMASKING_REGISTRY` in `parallelbench/models/unmasking_regis
 ```python
 from parallelbench.models.confidence_scorers import my_scorer
 
-UNMASKING_REGISTRY: dict[str, StrategyInfo] = {
+UNMASKING_REGISTRY: dict[str, MethodInfo] = {
     # ... existing entries ...
-    "my_method": StrategyInfo("topk", "k", derive_topk, my_scorer),
+    "my_method": MethodInfo("topk", "k", derive_topk, my_scorer),
 }
 ```
 
@@ -76,17 +76,17 @@ The four arguments are: method type, representative CLI parameter, a function th
 You can also register dynamically:
 
 ```python
-from parallelbench.models.unmasking_registry import StrategyInfo, register_strategy
-register_strategy("my_method", StrategyInfo("topk", "k", derive_topk, my_scorer))
+from parallelbench.models.unmasking_registry import MethodInfo, register_method
+register_method("my_method", MethodInfo("topk", "k", derive_topk, my_scorer))
 ```
 
 ## 3. Add to Model Valid Sets
 
-Each model declares which methods it supports. Add your method name to the relevant `VALID_STRATEGIES` sets:
+Each model declares which methods it supports. Add your method name to the relevant `VALID_METHODS` sets:
 
 ```python
 # parallelbench/models/local/llada/constants.py
-LLADA_VALID_STRATEGIES = {
+LLADA_VALID_METHODS = {
     "random",
     "confidence_topk",
     "confidence_threshold",

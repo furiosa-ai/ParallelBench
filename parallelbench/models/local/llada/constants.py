@@ -1,5 +1,5 @@
 LLADA_MASK_TOKEN_ID = 126336
-LLADA_VALID_STRATEGIES = {
+LLADA_VALID_METHODS = {
     "random",
     "confidence_topk",
     "confidence_threshold",
@@ -7,3 +7,6 @@ LLADA_VALID_STRATEGIES = {
     "topk_margin",
     "entropy_topk",
 }
+
+# Backward-compatible alias
+LLADA_VALID_STRATEGIES = LLADA_VALID_METHODS

@@ -13,21 +13,21 @@ from parallelbench.models.model_utils import (
 )
 from parallelbench.models.registry import ModelRegistry
 
-from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_STRATEGIES
+from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_METHODS
 from .dream_model_utils import sample_block
 
 
 @dataclass
 class DreamGenerationConfig(DllmGenerationConfig):
     unmasking: str = (
-        "origin"  # Set the default unmasking strategy to "origin" for Dream models
+        "origin"  # Set the default unmasking method to "origin" for Dream models
     )
     block_length: int = 128  # Set the default block length for Dream models
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
 
-    valid_strategies: set = field(default_factory=lambda: set(DREAM_VALID_STRATEGIES))
+    valid_methods: set = field(default_factory=lambda: set(DREAM_VALID_METHODS))
 
     def __post_init__(self):
         super().__post_init__()

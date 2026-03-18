@@ -177,7 +177,7 @@ def block_diffusion_generate(
                 logits, temperature=temperature, top_k=top_k, top_p=top_p
             )
 
-            # Sampling strategy
+            # Sampling method
             if unmasking == "sequential":
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)
                 for j in range(cur_x.shape[0]):
@@ -214,7 +214,7 @@ def block_diffusion_generate(
                         _, idx = torch.topk(confidence[j], num_transfer_tokens[step])
                         transfer_index[j, idx] = True
             else:
-                raise ValueError(f"Unknown unmasking strategy: {unmasking}")
+                raise ValueError(f"Unknown unmasking method: {unmasking}")
 
             cur_x[transfer_index] = x0[transfer_index]
 

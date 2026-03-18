@@ -2,10 +2,10 @@ from abc import ABC
 from dataclasses import dataclass, field
 from typing import Optional
 
-from parallelbench.models.unmasking_registry import get_strategy_type
+from parallelbench.models.unmasking_registry import get_method_type
 
 
-DEFAULT_VALID_STRATEGIES = {
+DEFAULT_VALID_METHODS = {
     "random",
     "origin",
     "confidence_topk",
@@ -14,6 +14,9 @@ DEFAULT_VALID_STRATEGIES = {
     "confidence_threshold",
     "confidence_factor",
 }
+
+# Backward-compatible alias
+DEFAULT_VALID_STRATEGIES = DEFAULT_VALID_METHODS
 
 
 @dataclass
@@ -34,7 +37,7 @@ class DllmGenerationConfig(BaseGenerationConfig):
     alg_temp: float = 0.0
     alg_threshold: Optional[float] = None
     alg_factor: Optional[float] = None
-    valid_strategies: set = field(default_factory=lambda: set(DEFAULT_VALID_STRATEGIES))
+    valid_methods: set = field(default_factory=lambda: set(DEFAULT_VALID_METHODS))
 
     def __post_init__(self):
         if self.block_length is None:
@@ -62,22 +65,22 @@ class DllmGenerationConfig(BaseGenerationConfig):
             raise ValueError("max_tokens must be divisible by block_length")
 
     def _validate_unmasking(self):
-        if self.unmasking not in self.valid_strategies:
-            raise ValueError(f"Unsupported unmasking strategy: {self.unmasking}")
+        if self.unmasking not in self.valid_methods:
+            raise ValueError(f"Unsupported unmasking method: {self.unmasking}")
 
-        self.is_threshold_unmasking = get_strategy_type(self.unmasking) == "threshold"
-        self.is_factor_unmasking = get_strategy_type(self.unmasking) == "factor"
-        self.is_default_unmasking = get_strategy_type(self.unmasking) == "topk"
+        self.is_threshold_unmasking = get_method_type(self.unmasking) == "threshold"
+        self.is_factor_unmasking = get_method_type(self.unmasking) == "factor"
+        self.is_default_unmasking = get_method_type(self.unmasking) == "topk"
 
         # Validate default unmasking
         if self.is_default_unmasking:
             if self.alg_threshold is not None and self.alg_threshold != 0.0:
                 raise ValueError(
-                    "alg_threshold must be None or 0.0 for default unmasking strategies"
+                    "alg_threshold must be None or 0.0 for default unmasking methods"
                 )
             if self.alg_factor is not None and self.alg_factor != 1.0:
                 raise ValueError(
-                    "alg_factor must be None or 1.0 for default unmasking strategies"
+                    "alg_factor must be None or 1.0 for default unmasking methods"
                 )
 
         # Validate threshold unmasking

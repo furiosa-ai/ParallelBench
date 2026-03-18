@@ -11,7 +11,7 @@ from parallelbench.models.generation_config import DllmGenerationConfig
 from parallelbench.models.local.generate import generate, generate_batch
 from parallelbench.models.local.llada.constants import (
     LLADA_MASK_TOKEN_ID,
-    LLADA_VALID_STRATEGIES,
+    LLADA_VALID_METHODS,
 )
 from parallelbench.models.model_utils import (
     compute_decoding_order_correlation_from_history,
@@ -22,10 +22,10 @@ from parallelbench.models.registry import ModelRegistry
 
 @dataclass
 class LladaGenerationConfig(DllmGenerationConfig):
-    unmasking: str = "confidence_topk"  # Set the default unmasking strategy
+    unmasking: str = "confidence_topk"  # Set the default unmasking method
     block_length: int = 128  # Set the default block length
 
-    valid_strategies: set = field(default_factory=lambda: set(LLADA_VALID_STRATEGIES))
+    valid_methods: set = field(default_factory=lambda: set(LLADA_VALID_METHODS))
 
     pass
 

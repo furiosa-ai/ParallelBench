@@ -2,7 +2,7 @@
 
 Usage:
     pb analyze results/                          Print summary table
-    pb analyze results/ --compare unmasking      Group by unmasking strategy
+    pb analyze results/ --compare unmasking      Group by unmasking method
     pb analyze results/ --export summary.csv     Export to CSV
 """
 

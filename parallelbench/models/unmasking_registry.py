@@ -1,10 +1,10 @@
 """
-Unmasking Strategy Registry for dLLM generation.
+Unmasking Method Registry for dLLM generation.
 
-Provides a lightweight dict-based registry that classifies unmasking strategies
+Provides a lightweight dict-based registry that classifies unmasking methods
 and derives generation kwargs (steps, block_length) from high-level parameters.
 
-# If a fourth strategy type is added, consider whether the derive_fn signature
+# If a fourth method type is added, consider whether the derive_fn signature
 # needs to become polymorphic, and whether a class hierarchy is warranted.
 """
 
@@ -18,16 +18,19 @@ from parallelbench.models.confidence_scorers import (
 )
 
 
-StrategyInfo = namedtuple(
-    "StrategyInfo",
-    ["strategy_type", "representative_param", "derive_fn", "confidence_fn"],
+MethodInfo = namedtuple(
+    "MethodInfo",
+    ["method_type", "representative_param", "derive_fn", "confidence_fn"],
     defaults=[None],
 )
+
+# Backward-compatible alias
+StrategyInfo = MethodInfo
 
 
 def derive_topk(k: float, max_tokens: int) -> dict:
     """
-    Derive generation kwargs for top-k unmasking strategies.
+    Derive generation kwargs for top-k unmasking methods.
 
     Args:
         k: Number of tokens unmasked per step. Must divide max_tokens evenly.
@@ -49,7 +52,7 @@ def derive_topk(k: float, max_tokens: int) -> dict:
 
 def derive_threshold(alg_threshold: float, max_tokens: int) -> dict:
     """
-    Derive generation kwargs for threshold-based unmasking strategies.
+    Derive generation kwargs for threshold-based unmasking methods.
 
     Args:
         alg_threshold: Confidence threshold for unmasking.
@@ -63,7 +66,7 @@ def derive_threshold(alg_threshold: float, max_tokens: int) -> dict:
 
 def derive_factor(alg_factor: float, max_tokens: int) -> dict:
     """
-    Derive generation kwargs for factor-based unmasking strategies.
+    Derive generation kwargs for factor-based unmasking methods.
 
     Args:
         alg_factor: Multiplicative factor for unmasking.
@@ -75,90 +78,97 @@ def derive_factor(alg_factor: float, max_tokens: int) -> dict:
     return {"steps": max_tokens, "block_length": max_tokens}
 
 
-UNMASKING_REGISTRY: dict[str, StrategyInfo] = {
-    "random": StrategyInfo("topk", "k", derive_topk, random_confidence),
-    "origin": StrategyInfo("topk", "k", derive_topk),
-    "confidence_topk": StrategyInfo("topk", "k", derive_topk, max_probability),
-    "topk_margin": StrategyInfo("topk", "k", derive_topk, margin),
-    "entropy_topk": StrategyInfo("topk", "k", derive_topk, negative_entropy),
-    "confidence_threshold": StrategyInfo(
+UNMASKING_REGISTRY: dict[str, MethodInfo] = {
+    "random": MethodInfo("topk", "k", derive_topk, random_confidence),
+    "origin": MethodInfo("topk", "k", derive_topk),
+    "confidence_topk": MethodInfo("topk", "k", derive_topk, max_probability),
+    "topk_margin": MethodInfo("topk", "k", derive_topk, margin),
+    "entropy_topk": MethodInfo("topk", "k", derive_topk, negative_entropy),
+    "confidence_threshold": MethodInfo(
         "threshold", "alg_threshold", derive_threshold, max_probability
     ),
-    "confidence_factor": StrategyInfo(
+    "confidence_factor": MethodInfo(
         "factor", "alg_factor", derive_factor, max_probability
     ),
 }
 
 
-def get_strategy_info(name: str) -> StrategyInfo:
+def get_method_info(name: str) -> MethodInfo:
     """
-    Retrieve StrategyInfo for the given strategy name.
+    Retrieve MethodInfo for the given unmasking method name.
 
     Args:
-        name: The unmasking strategy name.
+        name: The unmasking method name.
 
     Returns:
-        StrategyInfo namedtuple for the strategy.
+        MethodInfo namedtuple for the method.
 
     Raises:
-        KeyError: If the strategy name is not registered.
+        KeyError: If the method name is not registered.
     """
     if name not in UNMASKING_REGISTRY:
         raise KeyError(
-            f"Unknown unmasking strategy: '{name}'. "
-            f"Valid strategies: {sorted(UNMASKING_REGISTRY.keys())}"
+            f"Unknown unmasking method: '{name}'. "
+            f"Valid methods: {sorted(UNMASKING_REGISTRY.keys())}"
         )
     return UNMASKING_REGISTRY[name]
 
 
-def get_strategy_type(name: str) -> str:
+def get_method_type(name: str) -> str:
     """
-    Return the strategy type ("topk", "threshold", or "factor") for the given name.
+    Return the method type ("topk", "threshold", or "factor") for the given name.
 
     Args:
-        name: The unmasking strategy name.
+        name: The unmasking method name.
 
     Returns:
-        Strategy type string.
+        Method type string.
 
     Raises:
-        KeyError: If the strategy name is not registered.
+        KeyError: If the method name is not registered.
     """
-    return get_strategy_info(name).strategy_type
+    return get_method_info(name).method_type
 
 
 def get_representative_param(name: str) -> str:
     """
-    Return the representative parameter name for the given strategy.
+    Return the representative parameter name for the given unmasking method.
 
     Args:
-        name: The unmasking strategy name.
+        name: The unmasking method name.
 
     Returns:
         Representative parameter name string.
 
     Raises:
-        KeyError: If the strategy name is not registered.
+        KeyError: If the method name is not registered.
     """
-    return get_strategy_info(name).representative_param
+    return get_method_info(name).representative_param
 
 
-def get_all_strategies() -> set[str]:
+def get_all_methods() -> set[str]:
     """
-    Return the set of all registered unmasking strategy names.
+    Return the set of all registered unmasking method names.
 
     Returns:
-        Set of strategy name strings.
+        Set of method name strings.
     """
     return set(UNMASKING_REGISTRY.keys())
 
 
-def register_strategy(name: str, info: StrategyInfo) -> None:
+def register_method(name: str, info: MethodInfo) -> None:
     """
-    Register a new unmasking strategy in the registry.
+    Register a new unmasking method in the registry.
 
     Args:
-        name: The strategy name to register.
-        info: StrategyInfo namedtuple describing the strategy.
+        name: The method name to register.
+        info: MethodInfo namedtuple describing the method.
     """
     UNMASKING_REGISTRY[name] = info
+
+
+# Backward-compatible aliases
+get_strategy_info = get_method_info
+get_strategy_type = get_method_type
+get_all_strategies = get_all_methods
+register_strategy = register_method

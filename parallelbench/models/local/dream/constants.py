@@ -1,5 +1,5 @@
 DREAM_MASK_TOKEN_ID = 151666
-DREAM_VALID_STRATEGIES = {
+DREAM_VALID_METHODS = {
     "origin",
     "confidence_topk",
     "confidence_threshold",
@@ -9,3 +9,6 @@ DREAM_VALID_STRATEGIES = {
     "random",
 }
 DIFFUCODER_EPS = 1e-12
+
+# Backward-compatible alias
+DREAM_VALID_STRATEGIES = DREAM_VALID_METHODS

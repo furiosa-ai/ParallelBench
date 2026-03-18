@@ -14,7 +14,7 @@ from parallelbench.models.model_utils import (
 )
 from parallelbench.models.registry import ModelRegistry
 
-from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_STRATEGIES
+from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_METHODS
 from .trado_model_utils import block_diffusion_generate
 
 
@@ -27,7 +27,7 @@ class TradoGenerationConfig(DllmGenerationConfig):
     top_p: Optional[float] = None
     top_k: Optional[float] = None
 
-    valid_strategies: set = field(default_factory=lambda: set(TRADO_VALID_STRATEGIES))
+    valid_methods: set = field(default_factory=lambda: set(TRADO_VALID_METHODS))
 
     def to_generation_kwargs(self):
         gen_kwargs = {

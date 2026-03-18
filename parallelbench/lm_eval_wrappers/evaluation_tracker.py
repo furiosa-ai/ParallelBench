@@ -6,10 +6,10 @@ lm-eval's default output structure:
 ParallelBench output structure:
     {output_path}/{model_sanitized}/{unmasking}/{repr_param_value}/{run_id}/results_{task_name}.json
 
-The repr_param_value encodes the representative parameter for the unmasking strategy:
-    - topk strategies: "k{k}" (e.g., k4)
-    - threshold strategies: "t{alg_threshold}" (e.g., t0.3)
-    - factor strategies: "f{alg_factor}" (e.g., f2.0)
+The repr_param_value encodes the representative parameter for the unmasking method:
+    - topk methods: "k{k}" (e.g., k4)
+    - threshold methods: "t{alg_threshold}" (e.g., t0.3)
+    - factor methods: "f{alg_factor}" (e.g., f2.0)
 
 This allows browsing results by (model, unmasking, repr_param) tuple and comparing
 across tasks and hyperparameter sweeps.
@@ -102,7 +102,7 @@ def build_gen_kwargs_dirname(gen_kwargs: dict | None) -> str:
 
 
 def extract_unmasking(gen_kwargs: dict | None) -> str:
-    """Extract unmasking strategy from gen_kwargs.
+    """Extract unmasking method from gen_kwargs.
 
     Returns 'default' when gen_kwargs is empty or unmasking is not specified.
     """
@@ -134,7 +134,7 @@ def extract_task_name(results: dict) -> str:
 def _resolve_repr_param_value(gen_kwargs: dict | None) -> str:
     """Compute the representative parameter value directory segment.
 
-    Uses the unmasking registry to determine the strategy type and
+    Uses the unmasking registry to determine the method type and
     format the representative parameter accordingly:
       - topk: "k{int(max_tokens / steps)}" (e.g., k4)
       - threshold: "t{alg_threshold}" (e.g., t0.3)
@@ -150,13 +150,13 @@ def _resolve_repr_param_value(gen_kwargs: dict | None) -> str:
         return build_gen_kwargs_dirname(gen_kwargs)
 
     try:
-        from parallelbench.models.unmasking_registry import get_strategy_type
+        from parallelbench.models.unmasking_registry import get_method_type
 
-        strategy_type = get_strategy_type(unmasking)
+        method_type = get_method_type(unmasking)
     except (KeyError, ImportError):
         return build_gen_kwargs_dirname(gen_kwargs)
 
-    if strategy_type == "topk":
+    if method_type == "topk":
         max_tokens = gen_kwargs.get("max_tokens")
         steps = gen_kwargs.get("steps")
         if max_tokens is not None and steps is not None and steps != 0:
@@ -164,13 +164,13 @@ def _resolve_repr_param_value(gen_kwargs: dict | None) -> str:
             return f"k{k_value}"
         return build_gen_kwargs_dirname(gen_kwargs)
 
-    if strategy_type == "threshold":
+    if method_type == "threshold":
         alg_threshold = gen_kwargs.get("alg_threshold")
         if alg_threshold is not None:
             return f"t{alg_threshold}"
         return build_gen_kwargs_dirname(gen_kwargs)
 
-    if strategy_type == "factor":
+    if method_type == "factor":
         alg_factor = gen_kwargs.get("alg_factor")
         if alg_factor is not None:
             return f"f{alg_factor}"

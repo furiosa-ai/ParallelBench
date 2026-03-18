@@ -20,7 +20,7 @@ Example:
 
 from __future__ import annotations
 
-from parallelbench.models.unmasking_registry import get_strategy_type
+from parallelbench.models.unmasking_registry import get_method_type
 
 DEFAULT_THRESHOLDS = [90, 80, 70, 60]
 
@@ -42,15 +42,15 @@ def _make_config_key(row: dict) -> tuple | None:
         return None
 
     try:
-        strategy_type = get_strategy_type(unmasking)
+        method_type = get_method_type(unmasking)
     except KeyError:
         return None
 
-    if strategy_type == "threshold":
+    if method_type == "threshold":
         threshold = row.get("alg_threshold", "")
         config_key = (unmasking, f"threshold={threshold}")
         tps = max_tokens / nfe
-    elif strategy_type == "factor":
+    elif method_type == "factor":
         factor = row.get("alg_factor", "")
         config_key = (unmasking, f"factor={factor}")
         tps = max_tokens / nfe
@@ -82,7 +82,7 @@ def compute_pb_scores(
             - "nfe" (float): number of forward evaluations
             - "max_tokens" (int): maximum output length
             - "steps" (int): denoising steps (for top-k methods)
-            - "unmasking" (str): unmasking strategy name
+            - "unmasking" (str): unmasking method name
             - "alg_threshold" / "alg_factor": for adaptive methods
         thresholds: Score thresholds on a 0-100 scale (e.g., [90, 80, 70, 60]).
 
