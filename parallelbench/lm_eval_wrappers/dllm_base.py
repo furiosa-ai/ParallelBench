@@ -69,10 +69,15 @@ class DLLMBase(LM):
         self._extra_kwargs = kwargs
 
         self._inner_model: BaseModel = self._create_inner_model()
+        self._apply_chat_template_active = False
 
     @property
     def device(self) -> torch.device:
         return self._device
+
+    @property
+    def tokenizer_name(self) -> str:
+        return self.model_path
 
     @abstractmethod
     def _create_inner_model(self) -> BaseModel:
@@ -231,6 +236,26 @@ class DLLMBase(LM):
             "Use generate_until tasks only."
         )
 
+    def apply_chat_template(
+        self, chat_history: list[dict[str, str]], add_generation_prompt: bool = True
+    ) -> str:
+        """Apply chat template to render messages into a prompt string.
+
+        Follows lm-eval's official HF model pattern. Called by lm-eval's
+        fewshot_context() when --apply_chat_template is used.
+        """
+        return self._inner_model.tokenizer.apply_chat_template(
+            chat_history,
+            tokenize=False,
+            add_generation_prompt=add_generation_prompt,
+        )
+
+    def chat_template(self, chat_template=False):
+        """Set chat template and track activation for context handling."""
+        result = super().chat_template(chat_template)
+        self._apply_chat_template_active = True
+        return result
+
     # ─── Helper methods ──────────────────────────────────────────────────
 
     BRIDGED_KEYS = (
@@ -281,11 +306,16 @@ class DLLMBase(LM):
         )
 
     def _context_to_messages(self, context: str | list) -> list[dict] | str:
-        """Convert lm-eval context to the messages format expected by inner model.
+        """Convert lm-eval context to the format expected by inner model.
 
-        lm-eval may pass either a plain string or a list of chat messages.
+        When apply_chat_template is active, context is already a rendered
+        prompt string from lm-eval's fewshot pipeline. Pass it directly
+        so the inner model tokenizes without re-applying the template.
+        When inactive, wrap as messages for the model to apply its template.
         """
         if isinstance(context, list):
+            return context
+        if getattr(self, "_apply_chat_template_active", False):
             return context
         return [{"role": "user", "content": context}]
 

@@ -1,5 +1,6 @@
 class: !function ../parallelbench_task.ParallelBenchTask
 dataset_path: furiosa-ai/ParallelBench
+num_fewshot: 0
 output_type: generate_until
 generation_kwargs:
   until:

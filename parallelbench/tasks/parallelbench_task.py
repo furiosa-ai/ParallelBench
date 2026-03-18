@@ -74,6 +74,48 @@ class ParallelBenchTask(ConfigurableTask):
 
         super().__init__(config=config, **kwargs)
 
+    def fewshot_docs(self):
+        """Provide ICL examples from task config as fewshot documents.
+
+        lm-eval's ContextSampler uses these docs to build fewshot context
+        via doc_to_text() and doc_to_target(). When --num_fewshot 1 is used
+        with --apply_chat_template --fewshot_as_multiturn, the sampler builds
+        multi-turn chat history from these examples.
+
+        Returns an empty list for tasks without ICL examples (e.g., text_writing).
+        """
+        if len(self._parallelbench) == 0:
+            return []
+
+        first_sample = self._parallelbench.ds[0]
+        input_data = first_sample.get("input", {})
+        if isinstance(input_data, str):
+            import json
+
+            try:
+                input_data = json.loads(input_data)
+            except (json.JSONDecodeError, ValueError):
+                return []
+
+        icl_examples = input_data.get("icl_examples")
+        if not icl_examples:
+            return []
+
+        prompt = self._parallelbench.prompt
+        docs = []
+        for icl_example in icl_examples:
+            question = prompt.format(**icl_example["input"]).replace("\\n", "\n")
+            answer = icl_example["answer"]
+            if isinstance(answer, dict):
+                answer = answer.get("example", answer.get("result", str(answer)))
+            docs.append(
+                {
+                    "messages": [{"role": "user", "content": question}],
+                    "label": answer,
+                }
+            )
+        return docs
+
     def download(self, dataset_kwargs=None) -> None:
         """Build a HuggingFace DatasetDict from local ParallelBench data."""
         docs = []
