@@ -1539,6 +1539,15 @@ wheels = [
 ]
 
 [[package]]
+name = "install-jdk"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/67/502a753533e9b4deb691f3f7ba6303682494f2d8ee651d6253cd78045b66/install_jdk-1.1.0.tar.gz", hash = "sha256:2bfd53caf660e4916df0215a5715519dcb9547fa2a5f07421fd97a8046851eaa", size = 15181, upload-time = "2023-07-21T01:18:36.591Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/5e/af84054b0ff9f9fbe49a7079d46ba8b4ee7ab6192a0310d4bd2c91254626/install_jdk-1.1.0-py3-none-any.whl", hash = "sha256:b63f0fcd63f7abab3443d4120ba92716397753b8a8ea3c85762a629925a9936e", size = 15648, upload-time = "2023-07-21T01:18:35.501Z" },
+]
+
+[[package]]
 name = "interegular"
 version = "0.3.3"
 source = { registry = "https://pypi.org/simple" }
@@ -2994,6 +3003,7 @@ dependencies = [
     { name = "datasets" },
     { name = "evaluate" },
     { name = "flash-attn" },
+    { name = "install-jdk" },
     { name = "language-tool-python" },
     { name = "lm-eval" },
     { name = "python-dotenv" },
@@ -3018,6 +3028,7 @@ requires-dist = [
     { name = "datasets", specifier = ">=2.14.0" },
     { name = "evaluate", specifier = ">=0.4.6" },
     { name = "flash-attn" },
+    { name = "install-jdk", specifier = ">=1.1.0" },
     { name = "language-tool-python", specifier = ">=3.2.2" },
     { name = "lm-eval", specifier = ">=0.4.8" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
