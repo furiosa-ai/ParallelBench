@@ -85,29 +85,20 @@ The benchmark score is **PBx** — the maximum TPS at which a given combination 
 ## ⚙️ Setup
 
 ### 1. Prerequisites
-- **Conda**: For managing the environment.
 - **NVIDIA GPU**: CUDA >= 11.8.
-- **Java Development Kit (JDK)**: Required only for grammar-based evaluation metrics.
 
-### 2. Set Python Environment
+### 2. Install
 
-We use `uv` for faster package installation. The following commands will install PyTorch, `vLLM` for the LLM baselines, and all other required packages from `requirements.txt`.
+We use `uv` for faster package installation. The following command will install all dependencies including Python packages, PyTorch, `vLLM`, and JDK 17 (for grammar-based evaluation metrics).
 
 ```bash
-# Use curl to download the script and execute it with sh:
+# Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
-# Install core dependencies
-uv sync
+# Install all dependencies (Python + Java)
+make install
 ```
 
-### 3. Install Java (Optional)
-
-If you need to run the **grammar-based** evaluations, install the JDK:
-
-```bash
-apt update
-apt-get install openjdk-17-jdk -y
-```
+> **Note**: JDK 17 is installed locally via the `install-jdk` Python package — no `sudo` required. If you already have Java installed, the script will skip the installation.
 
 ## ⚡ Quickstart
 
