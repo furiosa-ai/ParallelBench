@@ -75,13 +75,15 @@ Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy for
 
 ## 📐 Key Concepts
 
-ParallelBench measures how **quality degrades as parallelism increases** in dLLMs. The central metric is **tokens per step** — the number of tokens generated in parallel at each denoising step.
+ParallelBench measures how **quality degrades as parallelism increases** in dLLMs. The key variable is **tokens per step (TPS)** — the number of tokens generated in parallel at each denoising step.
 
 | Tokens per step | Meaning |
 | :-: | --- |
-| **1** | One-by-one decoding (equivalent to AR) — slow but highest quality |
-| **k** | k tokens decoded in parallel per step — faster but quality may degrade |
-| **max_tokens** | Fully parallel (one-step generation) — fastest but lowest quality |
+| **1** | One-by-one decoding (equivalent to AR) |
+| **k** | k tokens decoded in parallel per step |
+| **max_tokens** | Fully parallel (one-step generation) |
+
+The benchmark score is **PBx** — the maximum TPS at which a model still achieves at least **x%** average accuracy across all tasks. For example, PB80 = 8 means the model can decode up to 8 tokens in parallel while maintaining ≥ 80% accuracy. Higher PBx values indicate a model that better preserves quality under parallel decoding.
 
 ## ⚙️ Setup
 
