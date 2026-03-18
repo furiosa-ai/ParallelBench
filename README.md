@@ -180,43 +180,7 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 
 ## 🧩 Adding Custom Models
 
-You can integrate your own diffusion LLM by following the example in `parallelbench/models/local/example/`. For a detailed step-by-step guide (useful for AI agents), see [`docs_for_agents/adding_custom_models.md`](docs_for_agents/adding_custom_models.md). This directory contains:
-
-- **`example_model.py`**: Template for implementing a custom model class that inherits from `LocalModel`
-- **`constants.py`**: Example constants such as mask token IDs and valid unmasking strategies
-
-### Implementation Steps
-
-1. **Define Generation Config**: Extend `DllmGenerationConfig` to include model-specific parameters
-2. **Implement Model Class**: Create a class that inherits from `LocalModel` and implements the `generate()` method
-3. **Register Your Model**: Use the `@ModelRegistry.register()` decorator with a name pattern matcher
-
-Example structure:
-
-```python
-from parallelbench.models.base_model import DLLMOutput, LocalModel
-from parallelbench.models.generation_config import DllmGenerationConfig
-from parallelbench.models.registry import ModelRegistry
-
-@dataclass
-class CustomGenerationConfig(DllmGenerationConfig):
-    custom_param: str = "default_value"
-
-    def to_generation_kwargs(self):
-        gen_kwargs = super().to_generation_kwargs()
-        gen_kwargs.update({"custom_param": self.custom_param})
-        return gen_kwargs
-
-@ModelRegistry.register(
-    lambda name: name.startswith("your-model-prefix")
-)
-class CustomModel(LocalModel):
-    def generate(self, messages, output_prefix=None, gen_config=None, output_history=False):
-        # Your generation logic here
-        return DLLMOutput(...)
-```
-
-See `parallelbench/models/local/example/` for a working example.
+You can integrate your own diffusion LLM into ParallelBench. See the [Adding Custom Models](docs_for_agents/adding_custom_models.md) guide and the example in `parallelbench/models/local/example/`.
 
 ## 🚀 Running Evaluations
 
