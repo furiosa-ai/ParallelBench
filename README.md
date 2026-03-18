@@ -271,7 +271,7 @@ This command uses the configurations specified in `parallelbench/datasets/data/t
 
 ## 🧩 Adding Custom Models
 
-You can integrate your own diffusion LLM by following the example in `parallelbench/models/local/example/`. This directory contains:
+You can integrate your own diffusion LLM by following the example in `parallelbench/models/local/example/`. For a detailed step-by-step guide (useful for AI agents), see [`docs_for_agents/adding_custom_models.md`](docs_for_agents/adding_custom_models.md). This directory contains:
 
 - **`example_model.py`**: Template for implementing a custom model class that inherits from `LocalModel`
 - **`constants.py`**: Example constants such as mask token IDs and valid unmasking strategies
