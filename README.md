@@ -162,9 +162,20 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 | `parallelbench_ar` | AR baselines (vLLM) | `meta-llama/Llama-3.1-8B-Instruct` |
 | `parallelbench_api` | API models | Haiku, Mercury (requires `.env` keys) |
 
-### Unmasking Methods
+### Unmasking Strategies
 
-See the [Unmasking Strategies](#unmasking-strategies) table in Running Evaluations for the full list of CLI values and descriptions.
+| Strategy | Type | CLI value | Description |
+| -------- | ---- | --------- | ----------- |
+| Random | Top-k (static) | `random` | Randomly selects which masked tokens to unmask |
+| Origin | Top-k (static) | `origin` | Dream's native timestep-based unmasking (default for Dream models) |
+| Confidence | Top-k (static) | `confidence_topk` | Unmasks tokens with highest model confidence |
+| Margin | Top-k (static) | `topk_margin` | Unmasks tokens with largest margin between top-2 predictions |
+| Entropy | Top-k (static) | `entropy_topk` | Unmasks tokens with lowest prediction entropy |
+| Confidence Threshold | Adaptive | `confidence_threshold` | Unmasks all tokens above a confidence threshold (`alg_threshold`) |
+| Confidence Factor | Adaptive | `confidence_factor` | Scales unmask count by a factor (`alg_factor`) |
+
+**Top-k (static)** methods unmask a fixed number of tokens per step — tokens per step is constant.
+**Adaptive** methods unmask a variable number of tokens per step — tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
 
 
 ## 🧩 Adding Custom Models
@@ -233,26 +244,11 @@ These parameters are passed via `--gen_kwargs`:
 | `steps` | int | 128 | Total denoising steps. For top-k methods, `k = max_tokens / steps` |
 | `block_length` | int | max_tokens | Semi-AR block size. Tokens within a block are decoded in parallel; blocks are decoded left-to-right |
 | `max_tokens` | int | 128 | Maximum output length |
-| `unmasking` | str | — | Unmasking strategy (see table below) |
+| `unmasking` | str | — | Unmasking strategy (see [Unmasking Strategies](#unmasking-strategies)) |
 | `alg_threshold` | float | — | Confidence threshold for adaptive methods (required for `confidence_threshold`) |
 | `alg_factor` | float | — | Scaling factor for factor-based methods (required for `confidence_factor`) |
 
 **Constraints**: `max_tokens % block_length == 0` and `steps % (max_tokens / block_length) == 0`
-
-### Unmasking Strategies
-
-| Strategy | Type | CLI value | Description |
-| -------- | ---- | --------- | ----------- |
-| Random | Top-k (static) | `random` | Randomly selects which masked tokens to unmask |
-| Origin | Top-k (static) | `origin` | Dream's native timestep-based unmasking (default for Dream models) |
-| Confidence | Top-k (static) | `confidence_topk` | Unmasks tokens with highest model confidence |
-| Margin | Top-k (static) | `topk_margin` | Unmasks tokens with largest margin between top-2 predictions |
-| Entropy | Top-k (static) | `entropy_topk` | Unmasks tokens with lowest prediction entropy |
-| Confidence Threshold | Adaptive | `confidence_threshold` | Unmasks all tokens above a confidence threshold (`alg_threshold`) |
-| Confidence Factor | Adaptive | `confidence_factor` | Scales unmask count by a factor (`alg_factor`) |
-
-**Top-k (static)** methods unmask a fixed number of tokens per step → tokens per step is constant.
-**Adaptive** methods unmask a variable number of tokens per step → tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
 
 ### Single Task Example
 
