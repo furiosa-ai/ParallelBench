@@ -162,7 +162,7 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 | AR baselines (vLLM) | `parallelbench_ar` | `meta-llama/Llama-3.1-8B-Instruct` |
 | API models | `parallelbench_api` | Haiku, Mercury (requires `.env` keys) |
 
-> **Adding your own model?** See the [step-by-step guide](docs_for_agents/adding_custom_models.md) and the example in `parallelbench/models/local/example/`.
+> **Adding your own model?** See the [step-by-step guide](docs/adding_custom_models.md) and the example in `parallelbench/models/local/example/`.
 
 ### Unmasking Methods
 
@@ -179,7 +179,7 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 **Top-k (static)** methods unmask a fixed number of tokens per step — tokens per step is constant.
 **Adaptive** methods unmask a variable number of tokens per step — tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
 
-> **Adding your own strategy?** See the [step-by-step guide](docs_for_agents/adding_custom_unmasking_methods.md).
+> **Adding your own method?** See the [step-by-step guide](docs/adding_custom_unmasking_methods.md).
 
 ## 🚀 Running Evaluations
 
