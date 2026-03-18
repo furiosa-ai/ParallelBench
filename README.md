@@ -104,6 +104,7 @@ These parameters control the degree of parallelism when running evaluations with
 | Strategy | Type | CLI value | Description |
 | -------- | ---- | --------- | ----------- |
 | Random | Top-k (static) | `random` | Randomly selects which masked tokens to unmask |
+| Origin | Top-k (static) | `origin` | Dream's native timestep-based unmasking (default for Dream models) |
 | Confidence | Top-k (static) | `confidence_topk` | Unmasks tokens with highest model confidence |
 | Margin | Top-k (static) | `topk_margin` | Unmasks tokens with largest margin between top-2 predictions |
 | Entropy | Top-k (static) | `entropy_topk` | Unmasks tokens with lowest prediction entropy |
