@@ -1,7 +1,7 @@
 # ParallelBench: Understanding the Tradeoffs of Parallel Decoding in Diffusion LLMs
 
 <p align="center">
-<img src = "docs/banner.png" width="70%" height="auto">
+<img src = "docs/img/banner.png" width="70%" height="auto">
 </p>
 
 <p align="center">
@@ -56,7 +56,7 @@ We are currently working to support **new models** and implement **advanced unma
 
 ## 🔎 Overview
 <p align="center">
-<img src = "docs/teaser.png" width="100%" height="auto">
+<img src = "docs/img/teaser.png" width="100%" height="auto">
 </p>
 
 Diffusion LLMs (dLLMs) promise faster generation via parallel decoding. However, this speed often comes at the cost of quality, as they ignore token dependencies, an issue that existing benchmarks do not sufficiently capture. To address this issue, we introduce **ParallelBench**, the first benchmark designed to rigorously test this trade-off through realistic tasks that humans and autoregressive (AR) LLMs can easily solve, but which cause dLLMs to collapse as parallelism grows. We release **ParallelBench** to drive research towards truly efficient dLLMs that can overcome this challenge.
