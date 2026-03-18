@@ -105,6 +105,7 @@ uv sync
 If you need to run the **grammar-based** evaluations, install the JDK:
 
 ```bash
+apt update
 apt-get install openjdk-17-jdk -y
 ```
 
