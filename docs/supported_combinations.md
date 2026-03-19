@@ -54,19 +54,19 @@ See [`parallelbench/models/local/sdar/README.md`](../parallelbench/models/local/
 
 ## TODO Methods (Not Yet Implemented)
 
-These methods have placeholder scripts that exit with an error message:
+These methods have placeholder scripts that exit with an error message. Sweep parameters are TBD.
 
-| Method | Models |
-|--------|--------|
-| left_to_right | LLaDA 1.5, LLaDA 8B, Dream 7B, DiffuCoder |
-| klass | LLaDA 1.5, Dream 7B |
-| eb_sampler | LLaDA 1.5, Dream 7B |
-| pc_sampler_confidence | LLaDA 1.5 |
-| pc_sampler_random | LLaDA 1.5 |
-| slowfast | LLaDA 1.5 |
-| dus | LLaDA 1.5 |
-| wino_dllm | LLaDA 1.5 |
-| apd | Dream 7B |
+| Method | Full Name | Models | Paper | Code |
+|--------|-----------|--------|-------|------|
+| left_to_right | Left-to-Right Sequential Decoding | LLaDA 1.5, LLaDA 8B, Dream 7B, DiffuCoder | Baseline strategy defined in [LLaDA](https://arxiv.org/abs/2502.09992) | — |
+| klass | KL-Adaptive Stability Sampling | LLaDA 1.5, Dream 7B | [KLASS (NeurIPS 2025 Spotlight)](https://arxiv.org/abs/2511.05664) | [github.com/shkim0116/KLASS](https://github.com/shkim0116/KLASS) |
+| eb_sampler | Entropy Bounded Sampler | LLaDA 1.5, Dream 7B | [EB-Sampler](https://arxiv.org/abs/2505.24857) | — |
+| pc_sampler_confidence | Position-aware Calibration Sampler (Confidence) | LLaDA 1.5 | [PC-Sampler](https://arxiv.org/abs/2508.13021) | — |
+| pc_sampler_random | Position-aware Calibration Sampler (Random) | LLaDA 1.5 | [PC-Sampler](https://arxiv.org/abs/2508.13021) | — |
+| slowfast | SlowFast Sampling | LLaDA 1.5 | [SlowFast Sampling](https://arxiv.org/abs/2506.10848) | [github.com/LiangrunFlora/Slow-Fast-Sampling](https://github.com/LiangrunFlora/Slow-Fast-Sampling) |
+| dus | Dilated Unmasking Scheduler | LLaDA 1.5 | [DUS](https://arxiv.org/abs/2506.19037) | [Project Page](https://omerlux.github.io/DUS-for-MDLMs/) |
+| wino_dllm | Wide-In, Narrow-Out Revokable Decoding | LLaDA 1.5 | [WINO-DLLM](https://arxiv.org/abs/2507.18578) | [github.com/Feng-Hong/WINO-DLLM](https://github.com/Feng-Hong/WINO-DLLM) |
+| apd | Adaptive Parallel Decoding | Dream 7B | [APD](https://arxiv.org/abs/2506.00413) | [github.com/danielmisrael/apd](https://github.com/danielmisrael/apd) |
 
 ## Scripts
 
