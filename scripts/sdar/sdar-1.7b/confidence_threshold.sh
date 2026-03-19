@@ -20,7 +20,7 @@ for alg_threshold in 0.5 0.6 0.7 0.8 0.9 1.0; do
     echo "============================================"
 
     uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
-        --model parallelbench_trado \
+        --model parallelbench_sdar \
         --model_args model_path=JetLM/SDAR-1.7B-Chat \
         --gen_kwargs alg_threshold=${alg_threshold},unmasking=confidence_threshold \
         --tasks parallelbench_all \

@@ -20,7 +20,7 @@ for K in 1 2 4 8 16 32; do
     echo "============================================"
 
     uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
-        --model parallelbench_trado \
+        --model parallelbench_sdar \
         --model_args model_path=JetLM/SDAR-8B-Chat \
         --gen_kwargs k=${K},unmasking=random \
         --tasks parallelbench_all \

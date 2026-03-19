@@ -14,12 +14,12 @@ from parallelbench.models.model_utils import (
 )
 from parallelbench.models.registry import ModelRegistry
 
-from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_METHODS
-from .trado_model_utils import block_diffusion_generate
+from .constants import SDAR_MASK_TOKEN_ID, SDAR_VALID_METHODS
+from parallelbench.models.local.block_diffusion_utils import block_diffusion_generate
 
 
 @dataclass
-class TradoGenerationConfig(DllmGenerationConfig):
+class SdarGenerationConfig(DllmGenerationConfig):
     unmasking: str = "confidence_threshold"
     block_length: int = 128
     alg_threshold: Optional[float] = 0.85
@@ -27,7 +27,7 @@ class TradoGenerationConfig(DllmGenerationConfig):
     top_p: Optional[float] = None
     top_k: Optional[float] = None
 
-    valid_methods: set = field(default_factory=lambda: set(TRADO_VALID_METHODS))
+    valid_methods: set = field(default_factory=lambda: set(SDAR_VALID_METHODS))
 
     def to_generation_kwargs(self):
         gen_kwargs = {
@@ -44,18 +44,8 @@ class TradoGenerationConfig(DllmGenerationConfig):
         return gen_kwargs
 
 
-@ModelRegistry.register(
-    lambda name: (
-        name
-        in (
-            "Gen-Verse/TraDo-4B-Instruct",
-            "Gen-Verse/TraDo-8B-Instruct",
-            "Gen-Verse/TraDo-8B-Thinking",
-        )
-        or "trado" in name.lower()
-    )
-)
-class TradoModel(LocalModel):
+@ModelRegistry.register(lambda name: "sdar" in name.lower())
+class SdarModel(LocalModel):
     def __init__(self, model_name):
         # Use AutoModelForCausalLM to load the model
         self.model = AutoModelForCausalLM.from_pretrained(
@@ -69,9 +59,9 @@ class TradoModel(LocalModel):
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, trust_remote_code=True
         )
-        self.tokenizer.mask_token_id = TRADO_MASK_TOKEN_ID
+        self.tokenizer.mask_token_id = SDAR_MASK_TOKEN_ID
 
-        self.mask_id = TRADO_MASK_TOKEN_ID
+        self.mask_id = SDAR_MASK_TOKEN_ID
 
     def _generate(self, input_ids, gen_config, output_history=False, output0_ids=None):
         gen_kwargs = gen_config.to_generation_kwargs()
@@ -106,16 +96,14 @@ class TradoModel(LocalModel):
         else:
             prompt = messages
 
-        gen_config = TradoGenerationConfig(**gen_config)
+        gen_config = SdarGenerationConfig(**gen_config)
 
         input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
             self.model.device
         )
         block_length = gen_config.block_length
-        assert (
-            block_length == 4
-            or self.model.name_or_path.endswith(f"-b{block_length}")
-            or "TraDo" in self.model.name_or_path
+        assert block_length == 128 or self.model.name_or_path.endswith(
+            f"-b{block_length}"
         ), (
             f"Block length {block_length} is not supported by the model {self.model.name_or_path}."
         )
