@@ -315,7 +315,7 @@ def generate_sudoku_task(rng, task_config):
 
         puzzle = [row[:] for row in grid]
         for r, c in holes:
-            puzzle[r][c] = "_"
+            puzzle[r][c] = 0
 
         puzzle_str = "\n".join("".join(str(cell) for cell in row) for row in puzzle)
 

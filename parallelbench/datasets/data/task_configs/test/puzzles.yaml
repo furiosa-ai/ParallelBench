@@ -30,8 +30,8 @@ tasks:
     type: sudoku
     metric: sudoku_score
     size: 4
-    num_holes: 12
-    prompt: 'Fill the positions where the values are _ in a {size}x{size} grid with digits 1-{size} so that each column, each row, and each of the four 2x2 subgrids that compose the grid contains all of the digits from 1 to {size}.
+    num_holes: 4
+    prompt: 'Fill the positions where the values are 0 in a {size}x{size} grid with digits 1-{size} so that each column, each row, and each of the four 2x2 subgrids that compose the grid contains all of the digits from 1 to {size}.
 
 
       Input:
@@ -44,17 +44,17 @@ tasks:
     icl_example:
       input:
         size: 4
-        puzzle: '_41_
+        puzzle: '0143
 
-          _2_3
+          4301
 
-          __3_
+          1034
 
-          4_21'
-      answer: '3412
+          3410'
+      answer: '2143
 
-        1243
+        4321
 
-        2134
+        1234
 
-        4321'
+        3412'
