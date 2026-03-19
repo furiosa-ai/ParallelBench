@@ -8,6 +8,7 @@ from parallelbench.lm_eval_wrappers import (  # noqa: F401
     dream_wrapper,
     sedd_wrapper,
     trado_wrapper,
+    sdar_wrapper,
     ar_wrapper,
     api_wrapper,
 )
