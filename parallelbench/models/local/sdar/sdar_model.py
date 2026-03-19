@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+import sys
+import types
+
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -46,7 +49,23 @@ class SdarGenerationConfig(DllmGenerationConfig):
 
 @ModelRegistry.register(lambda name: "sdar" in name.lower())
 class SdarModel(LocalModel):
+    @staticmethod
+    def _patch_missing_imports():
+        """Inject dummy fused_linear_diffusion_cross_entropy module for SDAR compatibility.
+
+        SDAR's HF modeling_sdar.py imports this module at top-level, but it's
+        missing from the repo. It's only used for training loss, not inference.
+        """
+        module_name = "fused_linear_diffusion_cross_entropy"
+        if module_name not in sys.modules:
+            dummy = types.ModuleType(module_name)
+            # Add a dummy class so `from .fused_linear_diffusion_cross_entropy import FusedLinearDiffusionCrossEntropyLoss` works
+            dummy.FusedLinearDiffusionCrossEntropyLoss = type("FusedLinearDiffusionCrossEntropyLoss", (torch.nn.Module,), {})
+            sys.modules[module_name] = dummy
+
     def __init__(self, model_name):
+        self._patch_missing_imports()
+
         # Use AutoModelForCausalLM to load the model
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,

@@ -1,6 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+import importlib
+import os
+import sys
+
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -56,7 +60,18 @@ class TradoGenerationConfig(DllmGenerationConfig):
     )
 )
 class TradoModel(LocalModel):
+    @staticmethod
+    def _patch_missing_imports():
+        """Inject missing LossKwargs into transformers.utils for TraDo compatibility."""
+        import transformers.utils as _tu
+        if not hasattr(_tu, "LossKwargs"):
+            from transformers.modeling_flash_attention_utils import FlashAttentionKwargs
+            # LossKwargs is a simple TypedDict used only for type hints
+            _tu.LossKwargs = type("LossKwargs", (FlashAttentionKwargs,), {})
+
     def __init__(self, model_name):
+        self._patch_missing_imports()
+
         # Use AutoModelForCausalLM to load the model
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
