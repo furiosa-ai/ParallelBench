@@ -57,12 +57,14 @@ class SdarModel(LocalModel):
         missing from the repo. Transformers tries to download it before Python
         import, so we must create a stub file in the cache directory.
         """
-        try:
-            from huggingface_hub import try_to_load_from_cache, snapshot_download
-            import os
+        import os
+        from huggingface_hub.utils import HfFolder
+        from huggingface_hub import try_to_load_from_cache
 
-            # Ensure model files are cached
-            cache_dir = snapshot_download(model_name, local_files_only=False)
+        # Find the cached snapshot directory by locating an existing file
+        cached = try_to_load_from_cache(model_name, "config.json")
+        if cached is not None and isinstance(cached, str):
+            cache_dir = os.path.dirname(cached)
             stub_path = os.path.join(cache_dir, "fused_linear_diffusion_cross_entropy.py")
             if not os.path.exists(stub_path):
                 with open(stub_path, "w") as f:
@@ -73,8 +75,6 @@ class SdarModel(LocalModel):
                         "    '''Dummy stub for inference — training-only loss function.'''\n"
                         "    pass\n"
                     )
-        except Exception:
-            pass  # Best effort — will fail at from_pretrained if file is truly needed
 
     def __init__(self, model_name):
         self._patch_missing_hf_file(model_name)
