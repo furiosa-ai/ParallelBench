@@ -20,6 +20,19 @@ Module for SDAR (Semi-autoregressive Discrete Absorbing diffusion with Refinemen
 - `JetLM/SDAR-4B-Chat`
 - `JetLM/SDAR-8B-Chat`
 
+## Known Issues
+
+### `flex_attention` + `torch.compile` runtime error
+SDAR's `modeling_sdar.py` uses `@torch.compile` with `flex_attention`, which causes `InternalTorchDynamoError: AttributeError: 'Tensor' object has no attribute 'BLOCK_SIZE'` at inference time. This is an environment compatibility issue (PyTorch/CUDA version mismatch with `flex_attention`).
+
+**Status:** Blocked — SDAR models cannot run inference until this is resolved.
+
+**Possible solutions:**
+1. Replace `flex_attention` with `flash_attn` in the patched modeling file (referencing TraDo's implementation)
+2. Use the official [JetAstra/SDAR](https://github.com/JetAstra/SDAR) repo's `generate.py` for inference
+3. Wait for upstream fix from the model authors
+
 ## TODO
+- [ ] Resolve `flex_attention` runtime error for inference
 - [ ] Once the HF repo author adds `fused_linear_diffusion_cross_entropy.py`, revert to `AutoModelForCausalLM` and remove local patched files
 - [ ] Related: https://huggingface.co/JetLM/SDAR-1.7B-Chat/discussions/1
