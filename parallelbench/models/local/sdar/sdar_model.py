@@ -107,11 +107,6 @@ class SdarModel(LocalModel):
             self.model.device
         )
         block_length = gen_config.block_length
-        assert block_length == 128 or self.model.name_or_path.endswith(
-            f"-b{block_length}"
-        ), (
-            f"Block length {block_length} is not supported by the model {self.model.name_or_path}."
-        )
         # pad input_ids to be multiple of block_length
         if input_ids.shape[1] % block_length != 0:
             pad_length = block_length - (input_ids.shape[1] % block_length)
