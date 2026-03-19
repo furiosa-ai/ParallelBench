@@ -80,9 +80,12 @@ class SdarModel(LocalModel):
         self._patch_missing_hf_file(model_name)
 
         # Use AutoModelForCausalLM to load the model
+        # local_files_only=True to avoid remote check for missing
+        # fused_linear_diffusion_cross_entropy.py (stub created in cache)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             trust_remote_code=True,
+            local_files_only=True,
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
