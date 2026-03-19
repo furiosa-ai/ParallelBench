@@ -25,7 +25,7 @@ for alg_threshold in 0.5 0.6 0.7 0.8 0.9 1.0; do
         --gen_kwargs alg_threshold=${alg_threshold},unmasking=confidence_threshold \
         --tasks parallelbench_all \
         --include_path parallelbench/tasks \
-        --batch_size 8 \
+        --batch_size 1 \
         --apply_chat_template \
         --fewshot_as_multiturn \
         --log_samples \

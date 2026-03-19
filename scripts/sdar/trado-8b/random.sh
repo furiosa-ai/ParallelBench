@@ -25,7 +25,7 @@ for K in 1 2 4 8 16 32; do
         --gen_kwargs k=${K},unmasking=random \
         --tasks parallelbench_all \
         --include_path parallelbench/tasks \
-        --batch_size 8 \
+        --batch_size 1 \
         --apply_chat_template \
         --fewshot_as_multiturn \
         --log_samples \
