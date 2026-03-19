@@ -5,14 +5,14 @@
 
 #
 # Usage:
-#   bash scripts/confidence_threshold/text_writing.sh                    # single GPU
-#   bash scripts/confidence_threshold/text_writing.sh --num_processes 2  # multi GPU
+#   bash scripts/confidence_threshold/all.sh                    # single GPU
+#   bash scripts/confidence_threshold/all.sh --num_processes 2  # multi GPU
 
 set -euo pipefail
 
 EXTRA_ARGS="${*}"
 OUTPUT_DIR="results"
-export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_text_writing}"
+export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_all}"
 
 for alg_threshold in 0.5 0.6 0.7 0.8 0.9 1.0; do
     echo ""
@@ -24,7 +24,7 @@ for alg_threshold in 0.5 0.6 0.7 0.8 0.9 1.0; do
         --model parallelbench_llada \
         --model_args model_path=GSAI-ML/LLaDA-1.5 \
         --gen_kwargs alg_threshold=${alg_threshold},unmasking=confidence_threshold \
-        --tasks parallelbench_text_writing \
+        --tasks parallelbench_all \
         --include_path parallelbench/tasks \
         --batch_size 8 \
         --apply_chat_template \

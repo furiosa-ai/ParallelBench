@@ -5,14 +5,14 @@
 
 #
 # Usage:
-#   bash scripts/confidence_topk/puzzles.sh                    # single GPU
-#   bash scripts/confidence_topk/puzzles.sh --num_processes 2  # multi GPU
+#   bash scripts/confidence_topk/all.sh                    # single GPU
+#   bash scripts/confidence_topk/all.sh --num_processes 2  # multi GPU
 
 set -euo pipefail
 
 EXTRA_ARGS="${*}"
 OUTPUT_DIR="results"
-export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_puzzles}"
+export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_all}"
 
 for K in 1 2 4 8 16 32; do
     echo ""
@@ -24,7 +24,7 @@ for K in 1 2 4 8 16 32; do
         --model parallelbench_llada \
         --model_args model_path=GSAI-ML/LLaDA-1.5 \
         --gen_kwargs k=${K},unmasking=confidence_topk \
-        --tasks parallelbench_puzzles \
+        --tasks parallelbench_all \
         --include_path parallelbench/tasks \
         --batch_size 8 \
         --apply_chat_template \
