@@ -3,37 +3,39 @@ and uses a custom EvaluationTracker for gen_kwargs-based output organization."""
 
 import sys
 import uuid
+from datetime import datetime
 
 
-def _extract_run_id() -> str:
-    """Extract --run_id from sys.argv, removing it before passing to lm-eval.
+def _extract_run_name() -> str:
+    """Extract --run_name from sys.argv, removing it before passing to lm-eval.
 
-    lm-eval rejects unknown arguments, so we must pop --run_id before
+    lm-eval rejects unknown arguments, so we must pop --run_name before
     cli_evaluate() parses sys.argv.
 
     Returns:
-        The run_id string: either the user-provided value or an 8-char hex UUID.
+        The run_name string: either the user-provided value or a timestamp+suffix
+        in the format "YYYYMMDD_HHMMSS_XXXX" (e.g., "20260319_143052_a3f2").
     """
-    run_id = None
+    run_name = None
     args = sys.argv[:]
     i = 0
     while i < len(args):
-        if args[i] == "--run_id":
+        if args[i] == "--run_name":
             if i + 1 < len(args):
-                run_id = args[i + 1]
+                run_name = args[i + 1]
                 del args[i : i + 2]
             else:
                 del args[i]
-        elif args[i].startswith("--run_id="):
-            run_id = args[i].split("=", 1)[1]
+        elif args[i].startswith("--run_name="):
+            run_name = args[i].split("=", 1)[1]
             del args[i]
         else:
             i += 1
     sys.argv = args
 
-    if run_id is None:
-        run_id = uuid.uuid4().hex[:8]
-    return run_id
+    if run_name is None:
+        run_name = datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + uuid.uuid4().hex[:4]
+    return run_name
 
 
 def main():
@@ -48,8 +50,8 @@ def main():
         ParallelBenchEvaluationTracker,
     )
 
-    run_id = _extract_run_id()
-    ParallelBenchEvaluationTracker.run_id = run_id
+    run_name = _extract_run_name()
+    ParallelBenchEvaluationTracker.run_name = run_name
 
     _lm_eval_main.EvaluationTracker = ParallelBenchEvaluationTracker
     _lm_eval_main.cli_evaluate()

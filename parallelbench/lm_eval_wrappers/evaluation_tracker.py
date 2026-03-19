@@ -4,12 +4,15 @@ lm-eval's default output structure:
     {output_path}/{model_sanitized}/results_{timestamp}.json
 
 ParallelBench output structure:
-    {output_path}/{model_sanitized}/{unmasking}/{repr_param_value}/{run_id}/results_{task_name}.json
+    {output_path}/{model_sanitized}/{unmasking}/{repr_param_value}/{run_name}/results_{task_name}.json
 
 The repr_param_value encodes the representative parameter for the unmasking method:
     - topk methods: "k{k}" (e.g., k4)
     - threshold methods: "t{alg_threshold}" (e.g., t0.3)
     - factor methods: "f{alg_factor}" (e.g., f2.0)
+
+The run_name is either user-provided via --run_name or auto-generated as
+"YYYYMMDD_HHMMSS_XXXX" (e.g., "20260319_143052_a3f2").
 
 This allows browsing results by (model, unmasking, repr_param) tuple and comparing
 across tasks and hyperparameter sweeps.
@@ -183,15 +186,16 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
     """EvaluationTracker subclass that adds structured subdirectory to output path.
 
     Overrides save_results_aggregated and save_results_samples to insert
-    a repr_param_value/run_id subdirectory between the model/unmasking directories
+    a repr_param_value/run_name subdirectory between the model/unmasking directories
     and result files.
 
     Class attributes:
-        run_id: Set by parallelbench/cli/eval.py before instantiation.
-                Either user-provided via --run_id or an auto-generated 8-char hex UUID.
+        run_name: Set by parallelbench/cli/eval.py before instantiation.
+                  Either user-provided via --run_name or auto-generated as
+                  "YYYYMMDD_HHMMSS_XXXX" (e.g., "20260319_143052_a3f2").
     """
 
-    run_id: str | None = None
+    run_name: str | None = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -201,25 +205,14 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
     def _resolve_output_dir(
         self, gen_kwargs: dict | None, results: dict | None = None
     ) -> Path:
-        """Build the output directory: model/unmasking/repr_param_value/run_id."""
+        """Build the output directory: model/unmasking/repr_param_value/run_name."""
         path = Path(self.output_path if self.output_path else Path.cwd())
         path = path / self.general_config_tracker.model_name_sanitized
         path = path / extract_unmasking(gen_kwargs)
         path = path / _resolve_repr_param_value(gen_kwargs)
-        run_id = self.__class__.run_id or "unknown"
-        parent = path
-        path = path / run_id
+        run_name = self.__class__.run_name or "unknown"
+        path = path / run_name
         path.mkdir(parents=True, exist_ok=True)
-
-        # Create/update .latest symlink pointing to the current run_id
-        latest = parent / ".latest"
-        try:
-            if latest.is_symlink() or latest.exists():
-                latest.unlink()
-            latest.symlink_to(run_id)
-        except OSError:
-            pass  # Symlinks may not be supported on all filesystems
-
         return path
 
     def save_results_aggregated(
@@ -268,7 +261,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                 if self.api and self.push_results_to_hub:
                     unmasking_dir = extract_unmasking(gen_kwargs)
                     repr_param_dir = _resolve_repr_param_value(gen_kwargs)
-                    run_id = self.__class__.run_id or "unknown"
+                    run_name = self.__class__.run_name or "unknown"
                     repo_id = (
                         self.results_repo
                         if self.public_repo
@@ -287,7 +280,7 @@ class ParallelBenchEvaluationTracker(EvaluationTracker):
                             self.general_config_tracker.model_name,
                             unmasking_dir,
                             repr_param_dir,
-                            run_id,
+                            run_name,
                             f"results_{task_name}.json",
                         ),
                         repo_type="dataset",

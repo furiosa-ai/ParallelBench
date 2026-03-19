@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -22,6 +23,9 @@ from parallelbench.analysis.pb_score import DEFAULT_THRESHOLDS, compute_pb_score
 
 console = Console()
 console_err = Console(stderr=True)
+
+# Matches run directories named with timestamp prefix: YYYYMMDD_HHMMSS
+TIMESTAMP_DIR_RE = re.compile(r"^\d{8}_\d{6}")
 
 METRIC_KEYS = [
     "score",
@@ -113,6 +117,44 @@ def _extract_rows_from_results(results_file: Path) -> list[dict]:
         rows.append(row)
 
     return rows
+
+
+def _find_latest_run_dirs(results_dir: Path) -> list[Path]:
+    """Find the latest run directory under each repr_param group.
+
+    Algorithm:
+    1. Glob all results_*.json files under results_dir
+    2. Group files by grandparent path (the repr_param level)
+    3. Within each group, collect unique parent directory names (the run dirs)
+    4. Filter to only dirs matching TIMESTAMP_DIR_RE (^\\d{8}_\\d{6})
+    5. If any timestamp dirs exist, pick the lexicographically last one
+    6. If NO timestamp dirs exist (all legacy dirs), fall back to
+       picking the lexicographically last of ALL dirs
+    7. Return the list of selected run directory paths
+    """
+    all_results_files = list(results_dir.rglob("results_*.json"))
+    if not all_results_files:
+        return []
+
+    # Group run dirs by their parent (repr_param level = grandparent of each results file)
+    groups: dict[Path, set[Path]] = {}
+    for results_file in all_results_files:
+        run_dir = results_file.parent
+        group_key = run_dir.parent
+        if group_key not in groups:
+            groups[group_key] = set()
+        groups[group_key].add(run_dir)
+
+    selected_run_dirs: list[Path] = []
+    for run_dirs in groups.values():
+        timestamp_dirs = [d for d in run_dirs if TIMESTAMP_DIR_RE.match(d.name)]
+        if timestamp_dirs:
+            selected_run_dirs.append(max(timestamp_dirs, key=lambda d: d.name))
+        else:
+            # Fall back to lexicographically last of all dirs (e.g. legacy UUID dirs)
+            selected_run_dirs.append(max(run_dirs, key=lambda d: d.name))
+
+    return selected_run_dirs
 
 
 def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list[dict]:
@@ -319,36 +361,32 @@ def main():
         help="Export results to CSV file",
     )
     parser.add_argument(
-        "--latest",
+        "--all-runs",
         action="store_true",
-        default=True,
-        help="Use .latest symlink to find the most recent run (default: True)",
-    )
-    parser.add_argument(
-        "--no-latest",
-        action="store_false",
-        dest="latest",
-        help="Scan all runs instead of just the latest",
+        default=False,
+        help=(
+            "Scan every run directory instead of only the latest. "
+            "By default, the latest run per repr_param group is selected "
+            "by sorting timestamp-prefixed directories (YYYYMMDD_HHMMSS). "
+            "Directories without a timestamp prefix are used as fallback."
+        ),
     )
     args = parser.parse_args()
 
     results_dir = args.results_dir
     sort_keys = [k.strip() for k in args.sort.split(",")] if args.sort else None
 
-    # If .latest symlinks exist, collect results only from latest runs
-    if args.latest:
-        latest_links = list(results_dir.rglob(".latest"))
-        if latest_links:
-            console_err.print(
-                f"[dim]Using {len(latest_links)} latest run(s)[/dim]",
-            )
+    if args.all_runs:
+        rows = _collect_rows(results_dir, sort_keys=sort_keys)
+    else:
+        latest_dirs = _find_latest_run_dirs(results_dir)
+        if latest_dirs:
+            console_err.print(f"[dim]Using {len(latest_dirs)} latest run(s)[/dim]")
             rows = []
-            for link in latest_links:
-                rows.extend(_collect_rows(link.resolve(), sort_keys=sort_keys))
+            for run_dir in latest_dirs:
+                rows.extend(_collect_rows(run_dir, sort_keys=sort_keys))
         else:
             rows = _collect_rows(results_dir, sort_keys=sort_keys)
-    else:
-        rows = _collect_rows(results_dir, sort_keys=sort_keys)
 
     if not rows:
         sys.exit(1)
