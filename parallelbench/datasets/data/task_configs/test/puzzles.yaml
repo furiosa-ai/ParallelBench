@@ -8,7 +8,7 @@ tasks:
     type: latin_square
     metric: latin_square_score
     size: 4
-    prompt: Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV without header.
+    prompt: Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV.
     icl_example:
       input:
         size: 4
@@ -31,10 +31,16 @@ tasks:
     metric: sudoku_score
     size: 4
     num_holes: 12
-    prompt: 'Solve the following {size}x{size} Sudoku puzzle. Replace each _ with a digit from 1 to {size}. Only output the final result.
+    prompt: 'Fill the positions where the values are _ in a {size}x{size} grid with digits 1-{size} so that each column, each row, and each of the four 2x2 subgrids that compose the grid contains all of the digits from 1 to {size}.
 
 
-      {puzzle}'
+      Input:
+
+      {puzzle}
+
+      Output:
+
+      '
     icl_example:
       input:
         size: 4
