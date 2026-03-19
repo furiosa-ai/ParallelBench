@@ -42,8 +42,8 @@ tasks:
       input:
         context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
         word: Virginia Hayes
-        index: 3
-      answer: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds", "Virginia Hayes"]'
+        index: 1
+      answer: '["Patrick Hicks", "Virginia Hayes", "Roy Ortiz", "Eric Reynolds"]'
   insert_random:
     type: insert
     random_index: true
