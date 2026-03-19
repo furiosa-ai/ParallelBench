@@ -12,6 +12,7 @@ set -euo pipefail
 
 EXTRA_ARGS="${*}"
 OUTPUT_DIR="results"
+export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_puzzles}"
 
 for alg_threshold in 0.5 0.6 0.7 0.8 0.9 1.0; do
     echo ""

@@ -129,42 +129,43 @@ def _extract_rows_from_results(results_file: Path) -> list[dict]:
     return rows
 
 
-def _find_latest_run_dirs(results_dir: Path) -> list[Path]:
-    """Find the latest run directory under each repr_param group.
+def _find_latest_result_files(results_dir: Path) -> list[Path]:
+    """Find the latest result file per (repr_param group, task) combination.
+
+    This is a file-level selection: when category-specific scripts produce
+    results in different run directories under the same repr_param group,
+    each task's latest file is selected independently.
 
     Algorithm:
     1. Glob all results_*.json files under results_dir
-    2. Group files by grandparent path (the repr_param level)
-    3. Within each group, collect unique parent directory names (the run dirs)
-    4. Filter to only dirs matching TIMESTAMP_DIR_RE (^\\d{8}_\\d{6})
-    5. If any timestamp dirs exist, pick the lexicographically last one
-    6. If NO timestamp dirs exist (all legacy dirs), fall back to
-       picking the lexicographically last of ALL dirs
-    7. Return the list of selected run directory paths
+    2. Group files by (grandparent path, filename) — i.e., (repr_param, task)
+    3. Within each group, filter to files whose parent dir matches TIMESTAMP_DIR_RE
+    4. If any timestamp dirs exist, pick the file from the lexicographically last one
+    5. If NO timestamp dirs exist, fall back to the lexicographically last parent dir
+    6. Return the list of selected result file paths
     """
     all_results_files = list(results_dir.rglob("results_*.json"))
     if not all_results_files:
         return []
 
-    # Group run dirs by their parent (repr_param level = grandparent of each results file)
-    groups: dict[Path, set[Path]] = {}
+    # Group by (repr_param dir, filename) so each task is resolved independently
+    groups: dict[tuple[Path, str], list[Path]] = {}
     for results_file in all_results_files:
         run_dir = results_file.parent
-        group_key = run_dir.parent
+        group_key = (run_dir.parent, results_file.name)
         if group_key not in groups:
-            groups[group_key] = set()
-        groups[group_key].add(run_dir)
+            groups[group_key] = []
+        groups[group_key].append(results_file)
 
-    selected_run_dirs: list[Path] = []
-    for run_dirs in groups.values():
-        timestamp_dirs = [d for d in run_dirs if TIMESTAMP_DIR_RE.match(d.name)]
-        if timestamp_dirs:
-            selected_run_dirs.append(max(timestamp_dirs, key=lambda d: d.name))
+    selected_files: list[Path] = []
+    for files in groups.values():
+        timestamp_files = [f for f in files if TIMESTAMP_DIR_RE.match(f.parent.name)]
+        if timestamp_files:
+            selected_files.append(max(timestamp_files, key=lambda f: f.parent.name))
         else:
-            # Fall back to lexicographically last of all dirs (e.g. legacy UUID dirs)
-            selected_run_dirs.append(max(run_dirs, key=lambda d: d.name))
+            selected_files.append(max(files, key=lambda f: f.parent.name))
 
-    return selected_run_dirs
+    return selected_files
 
 
 def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list[dict]:
@@ -248,6 +249,72 @@ def _format_value(key: str, value) -> str:
     return str(value)
 
 
+def _compute_average_rows(rows: list[dict], method_type: str) -> list[dict]:
+    """Compute per-hyperparameter average rows when multiple tasks exist.
+
+    Groups rows by the representative hyperparameter (k, alg_threshold, or
+    alg_factor) and averages numeric metrics across tasks within each group.
+    Returns an empty list when fewer than 2 distinct tasks exist.
+
+    Rows without ``nfe`` are excluded to match PBx score computation, which
+    skips group-level aggregate rows (e.g., "puzzles", "text_writing") that
+    lack per-sample generation metrics.
+    """
+    # Exclude group-level aggregate rows whose task name is a strict prefix
+    # of another task (e.g., "puzzles" is a prefix of "puzzles_sudoku_n4").
+    # This matches PBx score computation which only uses leaf-level tasks.
+    all_tasks = {row.get("task") for row in rows}
+    group_tasks = {
+        t for t in all_tasks if any(o != t and o.startswith(t + "_") for o in all_tasks)
+    }
+    leaf_rows = [r for r in rows if r.get("task") not in group_tasks]
+    tasks = {row.get("task") for row in leaf_rows}
+    if len(tasks) < 2:
+        return []
+
+    group_key_map = {
+        "topk": "k",
+        "threshold": "alg_threshold",
+        "factor": "alg_factor",
+    }
+    group_key = group_key_map.get(method_type)
+    if not group_key:
+        return []
+
+    groups: dict[str, list[dict]] = {}
+    for row in leaf_rows:
+        key = str(row.get(group_key, ""))
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(row)
+
+    avg_rows = []
+    for param_value, group_rows in sorted(groups.items()):
+        avg_row: dict = {"task": "Average", group_key: param_value}
+        for metric in METRIC_KEYS:
+            values = []
+            for r in group_rows:
+                v = r.get(metric)
+                if v not in ("", None):
+                    try:
+                        values.append(float(v))
+                    except (ValueError, TypeError):
+                        pass
+            avg_row[metric] = sum(values) / len(values) if values else ""
+        avg_rows.append(avg_row)
+
+    # Sort by tokens_per_step ascending to match the main table sort order
+    def _tps_sort_key(row):
+        try:
+            return float(row.get("tokens_per_step", 0))
+        except (ValueError, TypeError):
+            return 0
+
+    avg_rows.sort(key=_tps_sort_key)
+
+    return avg_rows
+
+
 def _get_display_columns(rows: list[dict]) -> list[str]:
     """Return display columns, including model column when multiple models exist."""
     models = {row.get("model", "unknown") for row in rows}
@@ -273,9 +340,16 @@ def _get_columns_for_method_type(method_type: str) -> list[str]:
 
 
 def _print_results_table(
-    rows: list[dict], title: str | None = None, columns: list[str] | None = None
+    rows: list[dict],
+    title: str | None = None,
+    columns: list[str] | None = None,
+    average_rows: list[dict] | None = None,
 ) -> None:
-    """Print a Rich-formatted results table."""
+    """Print a Rich-formatted results table.
+
+    When *average_rows* is provided, they are appended after a section
+    separator with bold styling to distinguish them from individual results.
+    """
     if title is None:
         models = sorted({row.get("model", "unknown") for row in rows})
         title = f"Results ({', '.join(models)})"
@@ -329,6 +403,15 @@ def _print_results_table(
             *[_format_value(col, display_row.get(col, "")) for col in display_columns]
         )
 
+    if average_rows:
+        table.add_section()
+        for row in average_rows:
+            styled = [
+                f"[bold]{_format_value(col, row.get(col, ''))}[/bold]"
+                for col in display_columns
+            ]
+            table.add_row(*styled)
+
     console.print()
     console.print(table)
 
@@ -380,8 +463,8 @@ def main():
     parser.add_argument(
         "--sort",
         type=str,
-        default="task,block_length,steps",
-        help="Comma-separated column names to sort by (default: task,block_length,steps)",
+        default="task,tokens_per_step,alg_threshold",
+        help="Comma-separated column names to sort by (default: task,tokens_per_step,alg_threshold)",
     )
     parser.add_argument(
         "--export",
@@ -408,12 +491,32 @@ def main():
     if args.all_runs:
         rows = _collect_rows(results_dir, sort_keys=sort_keys)
     else:
-        latest_dirs = _find_latest_run_dirs(results_dir)
-        if latest_dirs:
-            console_err.print(f"[dim]Using {len(latest_dirs)} latest run(s)[/dim]")
+        latest_files = _find_latest_result_files(results_dir)
+        if latest_files:
+            console_err.print(
+                f"[dim]Using {len(latest_files)} latest result file(s)[/dim]"
+            )
             rows = []
-            for run_dir in latest_dirs:
-                rows.extend(_collect_rows(run_dir, sort_keys=sort_keys))
+            for results_file in latest_files:
+                try:
+                    rows.extend(_extract_rows_from_results(results_file))
+                except (json.JSONDecodeError, KeyError) as e:
+                    console.print(
+                        f"[yellow]Warning:[/yellow] skipping {results_file}: {e}",
+                    )
+            if sort_keys:
+
+                def sort_key(row):
+                    values = []
+                    for key in sort_keys:
+                        val = row.get(key, "")
+                        try:
+                            values.append((0, float(val)))
+                        except (ValueError, TypeError):
+                            values.append((1, str(val)))
+                    return values
+
+                rows.sort(key=sort_key)
         else:
             rows = _collect_rows(results_dir, sort_keys=sort_keys)
 
@@ -438,8 +541,12 @@ def main():
         except KeyError:
             method_type = "unknown"
         columns = _get_columns_for_method_type(method_type)
+        avg_rows = _compute_average_rows(group_rows, method_type)
         _print_results_table(
-            group_rows, title=f"{model} / {unmasking}", columns=columns
+            group_rows,
+            title=f"{model} / {unmasking}",
+            columns=columns,
+            average_rows=avg_rows,
         )
         _print_pb_scores(group_rows)
 

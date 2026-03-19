@@ -1,6 +1,7 @@
 """Wrapper around lm_eval CLI that pre-registers ParallelBench model wrappers
 and uses a custom EvaluationTracker for gen_kwargs-based output organization."""
 
+import os
 import sys
 import uuid
 from datetime import datetime
@@ -12,9 +13,14 @@ def _extract_run_name() -> str:
     lm-eval rejects unknown arguments, so we must pop --run_name before
     cli_evaluate() parses sys.argv.
 
-    Returns:
-        The run_name string: either the user-provided value or a timestamp+suffix
-        in the format "YYYYMMDD_HHMMSS_XXXX" (e.g., "20260319_143052_a3f2").
+    Resolution order:
+        1. ``--run_name`` CLI flag (highest priority)
+        2. ``PB_RUN_NAME`` environment variable
+        3. Auto-generated ``YYYYMMDD_HHMMSS_XXXX`` timestamp
+
+    The ``PB_RUN_NAME`` env var is useful for grouping results from multiple
+    ``pb eval`` invocations into the same run directory (e.g., when running
+    category-specific scripts separately).
     """
     run_name = None
     args = sys.argv[:]
@@ -33,6 +39,8 @@ def _extract_run_name() -> str:
             i += 1
     sys.argv = args
 
+    if run_name is None:
+        run_name = os.environ.get("PB_RUN_NAME")
     if run_name is None:
         run_name = datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + uuid.uuid4().hex[:4]
     return run_name

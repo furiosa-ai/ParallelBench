@@ -12,6 +12,7 @@ set -euo pipefail
 
 EXTRA_ARGS="${*}"
 OUTPUT_DIR="results"
+export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_conf_topk}"
 
 for K in 1 2 4 8 16 32; do
     echo ""
