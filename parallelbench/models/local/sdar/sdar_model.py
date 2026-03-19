@@ -25,7 +25,7 @@ from parallelbench.models.local.block_diffusion_utils import block_diffusion_gen
 class SdarGenerationConfig(DllmGenerationConfig):
     unmasking: str = "confidence_threshold"
     block_length: int = 128
-    alg_threshold: Optional[float] = 0.85
+    alg_threshold: Optional[float] = None
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
