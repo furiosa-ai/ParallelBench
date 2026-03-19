@@ -31,7 +31,7 @@ tasks:
     metric: sudoku_score
     size: 4
     num_holes: 4
-    prompt: 'Fill the positions where the values are 0 in a {size}x{size} grid with digits 1-{size} so that each column, each row, and each of the four 2x2 subgrids that compose the grid contains all of the digits from 1 to {size}.
+    prompt: 'Fill the positions where the values are _ in a {size}x{size} grid with digits 1-{size} so that each column, each row, and each of the four 2x2 subgrids that compose the grid contains all of the digits from 1 to {size}.
 
 
       Input:
@@ -44,13 +44,13 @@ tasks:
     icl_example:
       input:
         size: 4
-        puzzle: '0143
+        puzzle: '_143
 
-          4301
+          43_1
 
-          1034
+          1_34
 
-          3410'
+          341_'
       answer: '2143
 
         4321

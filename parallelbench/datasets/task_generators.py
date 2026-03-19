@@ -140,7 +140,7 @@ def generate_insert_task(rng, task_config):
         target_list.insert(index_to_insert, word_to_insert)
 
         if not task_config["random_index"]:
-            sample_input["index"] = index_to_insert
+            sample_input["index"] = index_to_insert + 1
             answer = list_to_str(target_list)
         else:
             index_to_insert = None
@@ -175,7 +175,7 @@ def generate_remove_task(rng, task_config):
         target_list.pop(index_to_remove)
 
         if not task_config["random_index"]:
-            sample_input["index"] = index_to_remove
+            sample_input["index"] = index_to_remove + 1
             answer = list_to_str(target_list)
         else:
             index_to_remove = None
@@ -204,7 +204,7 @@ def generate_replace_task(rng, task_config):
         target_list[index_to_replace] = new_word
 
         if not task_config["random_index"]:
-            sample_input["index"] = index_to_replace
+            sample_input["index"] = index_to_replace + 1
             answer = list_to_str(target_list)
         else:
             index_to_replace = None
@@ -315,7 +315,7 @@ def generate_sudoku_task(rng, task_config):
 
         puzzle = [row[:] for row in grid]
         for r, c in holes:
-            puzzle[r][c] = 0
+            puzzle[r][c] = "_"
 
         puzzle_str = "\n".join("".join(str(cell) for cell in row) for row in puzzle)
 

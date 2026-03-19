@@ -42,7 +42,7 @@ tasks:
       input:
         context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
         word: Virginia Hayes
-        index: 3
+        index: 4
       answer: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds", "Virginia Hayes"]'
   insert_random:
     type: insert
@@ -86,7 +86,7 @@ tasks:
     icl_example:
       input:
         context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
-        index: 1
+        index: 2
       answer: '["Patrick Hicks", "Eric Reynolds"]'
   remove_random:
     type: remove
@@ -129,7 +129,7 @@ tasks:
       input:
         context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
         word: Virginia Hayes
-        index: 1
+        index: 2
       answer: '["Patrick Hicks", "Virginia Hayes", "Eric Reynolds"]'
   replace_random:
     type: replace
