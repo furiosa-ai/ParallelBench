@@ -50,21 +50,34 @@ class SdarGenerationConfig(DllmGenerationConfig):
 @ModelRegistry.register(lambda name: "sdar" in name.lower())
 class SdarModel(LocalModel):
     @staticmethod
-    def _patch_missing_imports():
-        """Inject dummy fused_linear_diffusion_cross_entropy module for SDAR compatibility.
+    def _patch_missing_hf_file(model_name: str):
+        """Create dummy fused_linear_diffusion_cross_entropy.py in HF cache.
 
         SDAR's HF modeling_sdar.py imports this module at top-level, but it's
-        missing from the repo. It's only used for training loss, not inference.
+        missing from the repo. Transformers tries to download it before Python
+        import, so we must create a stub file in the cache directory.
         """
-        module_name = "fused_linear_diffusion_cross_entropy"
-        if module_name not in sys.modules:
-            dummy = types.ModuleType(module_name)
-            # Add a dummy class so `from .fused_linear_diffusion_cross_entropy import FusedLinearDiffusionCrossEntropyLoss` works
-            dummy.FusedLinearDiffusionCrossEntropyLoss = type("FusedLinearDiffusionCrossEntropyLoss", (torch.nn.Module,), {})
-            sys.modules[module_name] = dummy
+        try:
+            from huggingface_hub import try_to_load_from_cache, snapshot_download
+            import os
+
+            # Ensure model files are cached
+            cache_dir = snapshot_download(model_name, local_files_only=False)
+            stub_path = os.path.join(cache_dir, "fused_linear_diffusion_cross_entropy.py")
+            if not os.path.exists(stub_path):
+                with open(stub_path, "w") as f:
+                    f.write(
+                        "import torch\n"
+                        "import torch.nn as nn\n\n"
+                        "class FusedLinearDiffusionCrossEntropyLoss(nn.Module):\n"
+                        "    '''Dummy stub for inference — training-only loss function.'''\n"
+                        "    pass\n"
+                    )
+        except Exception:
+            pass  # Best effort — will fail at from_pretrained if file is truly needed
 
     def __init__(self, model_name):
-        self._patch_missing_imports()
+        self._patch_missing_hf_file(model_name)
 
         # Use AutoModelForCausalLM to load the model
         self.model = AutoModelForCausalLM.from_pretrained(
