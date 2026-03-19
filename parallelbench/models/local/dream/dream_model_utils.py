@@ -225,6 +225,13 @@ def sample_block(
         )
         alg = "confidence_topk"
 
+    # confidence_factor uses confidence_topk sampling + factor-based dynamic transfer
+    if alg == "confidence_factor":
+        assert factor is not None, (
+            "factor must be provided for confidence_factor algorithm"
+        )
+        alg = "confidence_topk"
+
     # Process each block
     for num_block in range(num_blocks):
         current_block_start = input_ids.shape[1] + num_block * block_length
