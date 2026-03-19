@@ -30,7 +30,7 @@ tasks:
     type: sudoku
     metric: sudoku_score
     size: 4
-    num_holes: 8
+    num_holes: 12
     prompt: 'Solve the following {size}x{size} Sudoku puzzle. Replace each _ with a digit from 1 to {size}. Only output the final result.
 
 
