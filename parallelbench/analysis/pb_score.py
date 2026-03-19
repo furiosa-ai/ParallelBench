@@ -46,23 +46,30 @@ def _make_config_key(row: dict) -> tuple | None:
     except KeyError:
         return None
 
+    # Use tokens_per_step metric (actual measured parallelism) for TPS
+    try:
+        tps = float(row["tokens_per_step"])
+    except (KeyError, ValueError, TypeError):
+        tps = max_tokens / nfe
+
     if method_type == "threshold":
         threshold = row.get("alg_threshold", "")
         config_key = (unmasking, f"threshold={threshold}")
-        tps = max_tokens / nfe
     elif method_type == "factor":
         factor = row.get("alg_factor", "")
         config_key = (unmasking, f"factor={factor}")
-        tps = max_tokens / nfe
     else:
-        # Top-k: k = max_tokens / steps
+        # Top-k: use k from gen_kwargs, or derive from max_tokens / steps
         try:
-            steps = int(row["steps"])
+            k = float(row["k"])
         except (KeyError, ValueError, TypeError):
-            return None
-        if steps <= 0:
-            return None
-        k = max_tokens / steps
+            try:
+                steps = int(row["steps"])
+            except (KeyError, ValueError, TypeError):
+                return None
+            if steps <= 0:
+                return None
+            k = max_tokens / steps
         config_key = (unmasking, f"k={k}")
         tps = k
 

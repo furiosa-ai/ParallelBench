@@ -1,8 +1,7 @@
 """Analyze ParallelBench evaluation results.
 
 Usage:
-    pb analyze results/                          Print summary table
-    pb analyze results/ --compare unmasking      Group by unmasking method
+    pb analyze results/                    Print summary table grouped by (model, unmasking)
     pb analyze results/ --export summary.csv     Export to CSV
 """
 
@@ -20,6 +19,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from parallelbench.analysis.pb_score import DEFAULT_THRESHOLDS, compute_pb_scores
+from parallelbench.models.unmasking_registry import get_method_type
 
 console = Console()
 console_err = Console(stderr=True)
@@ -41,6 +41,7 @@ METRIC_KEYS = [
 ]
 
 GENERATION_KWARGS_KEYS = [
+    "k",
     "steps",
     "block_length",
     "unmasking",
@@ -110,6 +111,15 @@ def _extract_rows_from_results(results_file: Path) -> list[dict]:
                 row["tokens_per_step"] = max_tokens / nfe if nfe > 0 else ""
             except (ValueError, TypeError):
                 row["tokens_per_step"] = ""
+
+        # Compute k = max_tokens / steps (tokens unmasked per step)
+        if not row.get("k"):
+            try:
+                max_tokens_val = int(row["max_tokens"])
+                steps_val = int(row["steps"])
+                row["k"] = max_tokens_val / steps_val if steps_val > 0 else ""
+            except (ValueError, TypeError):
+                row["k"] = ""
 
         task_n_samples = n_samples.get(task_name, {})
         row["n_samples"] = task_n_samples.get("effective", "")
@@ -224,6 +234,17 @@ def _format_value(key: str, value) -> str:
             return f"{float(value):.1f}"
         except (ValueError, TypeError):
             return str(value)
+    if key == "k":
+        try:
+            v = float(value)
+            return f"{int(v)}" if v == int(v) else f"{v:.1f}"
+        except (ValueError, TypeError):
+            return str(value)
+    if key in ("alg_threshold", "alg_factor"):
+        try:
+            return f"{float(value):.2f}"
+        except (ValueError, TypeError):
+            return str(value)
     return str(value)
 
 
@@ -235,13 +256,31 @@ def _get_display_columns(rows: list[dict]) -> list[str]:
     return list(DISPLAY_COLUMNS)
 
 
-def _print_results_table(rows: list[dict], title: str | None = None) -> None:
+def _get_group_key(row: dict) -> tuple[str, str]:
+    """Return (model, unmasking) group key for a row."""
+    return (row.get("model", "unknown"), row.get("unmasking", "unknown"))
+
+
+def _get_columns_for_method_type(method_type: str) -> list[str]:
+    """Return display columns based on unmasking method type."""
+    if method_type == "topk":
+        return ["task", "k", "score"]
+    elif method_type == "threshold":
+        return ["task", "alg_threshold", "tokens_per_step", "score"]
+    elif method_type == "factor":
+        return ["task", "alg_factor", "tokens_per_step", "score"]
+    return ["task", "tokens_per_step", "score"]
+
+
+def _print_results_table(
+    rows: list[dict], title: str | None = None, columns: list[str] | None = None
+) -> None:
     """Print a Rich-formatted results table."""
     if title is None:
         models = sorted({row.get("model", "unknown") for row in rows})
         title = f"Results ({', '.join(models)})"
 
-    display_columns = _get_display_columns(rows)
+    display_columns = columns if columns is not None else _get_display_columns(rows)
 
     table = Table(
         title=title,
@@ -250,7 +289,14 @@ def _print_results_table(rows: list[dict], title: str | None = None) -> None:
         padding=(0, 1),
     )
 
-    numeric_columns = {"score", "nfe", "tokens_per_step"}
+    numeric_columns = {
+        "score",
+        "nfe",
+        "tokens_per_step",
+        "k",
+        "alg_threshold",
+        "alg_factor",
+    }
     col_config = {
         "model": {"max_width": 30},
         "task": {"max_width": 30},
@@ -258,6 +304,9 @@ def _print_results_table(rows: list[dict], title: str | None = None) -> None:
         "tokens_per_step": {"min_width": 5},
         "nfe": {"min_width": 5},
         "score": {"min_width": 6},
+        "k": {"min_width": 4},
+        "alg_threshold": {"min_width": 9},
+        "alg_factor": {"min_width": 9},
     }
     for col in display_columns:
         justify = "right" if col in numeric_columns else "left"
@@ -282,19 +331,6 @@ def _print_results_table(rows: list[dict], title: str | None = None) -> None:
 
     console.print()
     console.print(table)
-
-
-def _print_comparison_table(rows: list[dict], group_by: str) -> None:
-    """Print results grouped by the specified column."""
-    groups: dict[str, list[dict]] = {}
-    for row in rows:
-        key = str(row.get(group_by, "unknown"))
-        if key not in groups:
-            groups[key] = []
-        groups[key].append(row)
-
-    for group_name, group_rows in sorted(groups.items()):
-        _print_results_table(group_rows, title=f"{group_by} = {group_name}")
 
 
 def _print_pb_scores(rows: list[dict]) -> None:
@@ -340,13 +376,6 @@ def main():
         "results_dir",
         type=Path,
         help="Root directory containing results_*.json files",
-    )
-    parser.add_argument(
-        "--compare",
-        type=str,
-        default=None,
-        choices=["unmasking", "model", "task", "steps", "block_length"],
-        help="Group results by this column for comparison",
     )
     parser.add_argument(
         "--sort",
@@ -395,12 +424,25 @@ def main():
         _export_csv(rows, args.export)
         return
 
-    if args.compare:
-        _print_comparison_table(rows, args.compare)
-    else:
-        _print_results_table(rows)
+    # Group by (model, unmasking)
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for row in rows:
+        key = _get_group_key(row)
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(row)
 
-    _print_pb_scores(rows)
+    for (model, unmasking), group_rows in sorted(groups.items()):
+        try:
+            method_type = get_method_type(unmasking)
+        except KeyError:
+            method_type = "unknown"
+        columns = _get_columns_for_method_type(method_type)
+        _print_results_table(
+            group_rows, title=f"{model} / {unmasking}", columns=columns
+        )
+        _print_pb_scores(group_rows)
+
     console.print()
 
 
