@@ -218,7 +218,6 @@ __marimo__/
 .vscode
 /wandb/
 /untracked/
-/results/**/samples*.jsonl
 /temp/
 /src/
 /logs/
