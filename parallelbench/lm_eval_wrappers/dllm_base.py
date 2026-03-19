@@ -91,9 +91,10 @@ class DLLMBase(LM):
         merged with --gen_kwargs CLI). Subclasses can override to change defaults
         or add model-specific parameters.
 
-        If "k" (tokens per step) is present in gen_kwargs and neither "steps"
-        nor "block_length" are explicitly provided, derives steps and block_length
-        from the unmasking registry's derive_fn for the given unmasking method.
+        If the representative parameter for the unmasking method (e.g., "k" for
+        topk, "alg_threshold" for threshold) is present in gen_kwargs and neither
+        "steps" nor "block_length" are explicitly provided, derives steps and
+        block_length from the unmasking registry's derive_fn.
         Explicit "steps"/"block_length" values always take priority.
         """
         max_tokens = int(gen_kwargs.get("max_tokens", 128))
@@ -102,12 +103,16 @@ class DLLMBase(LM):
         steps_explicit = "steps" in gen_kwargs
         block_length_explicit = "block_length" in gen_kwargs
 
-        if "k" in gen_kwargs and not steps_explicit and not block_length_explicit:
+        if not steps_explicit and not block_length_explicit:
             info = get_method_info(unmasking)
-            k = float(gen_kwargs["k"])
-            derived = info.derive_fn(k, max_tokens)
-            steps = derived["steps"]
-            block_length = derived["block_length"]
+            param = info.representative_param
+            if param in gen_kwargs:
+                derived = info.derive_fn(float(gen_kwargs[param]), max_tokens)
+                steps = derived["steps"]
+                block_length = derived["block_length"]
+            else:
+                steps = int(gen_kwargs.get("steps", 128))
+                block_length = int(gen_kwargs.get("block_length", 128))
         else:
             steps = int(gen_kwargs.get("steps", 128))
             block_length = int(gen_kwargs.get("block_length", 128))
