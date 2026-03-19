@@ -1,12 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-import sys
-import types
-
 import torch
 import torch.nn.functional as F
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoTokenizer
 
 from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
 from parallelbench.models.base_model import DLLMOutput, LocalModel
@@ -49,61 +46,16 @@ class SdarGenerationConfig(DllmGenerationConfig):
 
 @ModelRegistry.register(lambda name: "sdar" in name.lower())
 class SdarModel(LocalModel):
-    @staticmethod
-    def _patch_missing_hf_file(model_name: str):
-        """Create dummy fused_linear_diffusion_cross_entropy.py in HF caches.
-
-        SDAR's HF modeling_sdar.py imports this module at top-level, but it's
-        missing from the repo. We must create a stub file in BOTH:
-        1. The model snapshot cache (hub/models--*/snapshots/*)
-        2. The transformers module cache (modules/transformers_modules/*)
-        """
-        import os
-        import glob
-        from huggingface_hub import try_to_load_from_cache
-
-        stub_content = (
-            "import torch\n"
-            "import torch.nn as nn\n\n"
-            "class FusedLinearDiffusionCrossEntropyLoss(nn.Module):\n"
-            "    '''Dummy stub for inference — training-only loss function.'''\n"
-            "    pass\n"
-        )
-        stub_name = "fused_linear_diffusion_cross_entropy.py"
-
-        # 1. Snapshot cache
-        cached = try_to_load_from_cache(model_name, "config.json")
-        if cached is not None and isinstance(cached, str):
-            stub_path = os.path.join(os.path.dirname(cached), stub_name)
-            if not os.path.exists(stub_path):
-                with open(stub_path, "w") as f:
-                    f.write(stub_content)
-
-        # 2. Transformers module cache — find all revision dirs for this model
-        hf_home = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
-        model_slug = model_name.replace("/", "/").replace("-", "_hyphen_").replace(".", "_dot_")
-        # Build the slug the way transformers does: org/name with special chars
-        org, name = model_name.split("/", 1)
-        hf_name = name.replace("-", "_hyphen_").replace(".", "_dot_")
-        module_base = os.path.join(hf_home, "modules", "transformers_modules", org, hf_name)
-        if os.path.isdir(module_base):
-            for rev_dir in glob.glob(os.path.join(module_base, "*/")):
-                if os.path.isdir(rev_dir):
-                    stub_path = os.path.join(rev_dir, stub_name)
-                    if not os.path.exists(stub_path):
-                        with open(stub_path, "w") as f:
-                            f.write(stub_content)
-
     def __init__(self, model_name):
-        self._patch_missing_hf_file(model_name)
+        # Load SDAR using local patched modeling file to avoid
+        # missing fused_linear_diffusion_cross_entropy.py in HF repo
+        from .modeling_sdar_patched import SDARForCausalLM
+        from .configuration_sdar import SDARConfig
 
-        # Use AutoModelForCausalLM to load the model
-        # local_files_only=True to avoid remote check for missing
-        # fused_linear_diffusion_cross_entropy.py (stub created in cache)
-        self.model = AutoModelForCausalLM.from_pretrained(
+        config = SDARConfig.from_pretrained(model_name)
+        self.model = SDARForCausalLM.from_pretrained(
             model_name,
-            trust_remote_code=True,
-            local_files_only=True,
+            config=config,
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
