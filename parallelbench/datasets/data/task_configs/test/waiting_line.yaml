@@ -31,18 +31,18 @@ tasks:
     prompt: 'You are managing a waiting line at a customer service desk.
 
 
-      A new person "{word}" is inserted into the line at position {index}:
+      A new person "{word}" joins the line after the person at position {index}:
 
 
       {context}
 
 
-      Please put the new person at the specified position and provide only the final list.'
+      Please place the new person right after the specified person and provide only the final list.'
     icl_example:
       input:
         context: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds"]'
         word: Virginia Hayes
-        index: 4
+        index: 3
       answer: '["Patrick Hicks", "Roy Ortiz", "Eric Reynolds", "Virginia Hayes"]'
   insert_random:
     type: insert

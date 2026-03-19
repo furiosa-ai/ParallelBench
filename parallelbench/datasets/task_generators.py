@@ -134,13 +134,16 @@ def generate_insert_task(rng, task_config):
 
         sample_input = {"context": list_to_str(input_list), "word": word_to_insert}
 
-        index_to_insert = rng.randint(0, len(input_list))
+        if not task_config["random_index"]:
+            index_to_insert = rng.randint(1, len(input_list))
+        else:
+            index_to_insert = rng.randint(0, len(input_list))
 
         target_list = input_list[:]
         target_list.insert(index_to_insert, word_to_insert)
 
         if not task_config["random_index"]:
-            sample_input["index"] = index_to_insert + 1
+            sample_input["index"] = index_to_insert
             answer = list_to_str(target_list)
         else:
             index_to_insert = None
