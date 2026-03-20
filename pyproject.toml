@@ -24,6 +24,9 @@ dependencies = [
     "bert-score>=0.3.13",
     "rich>=13.0.0",
     "install-jdk>=1.1.0",
+    "jupyter>=1.1.1",
+    "notebook>=7.5.5",
+    "ipywidgets>=8.1.8",
 ]
 
 
