@@ -103,6 +103,7 @@ We use `uv` for faster package installation. The following command will install 
 ```bash
 # Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env  # Reload PATH to use uv
 # Install all dependencies (Python + Java)
 make install
 ```
