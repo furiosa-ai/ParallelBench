@@ -132,7 +132,7 @@ class TestStaticIclExample:
         }
         # Remove the explicit icl_example but keep icl_example_count > 0
         task_config.pop("icl_example", None)
-        with pytest.raises(ValueError, match="no icl_example defined"):
+        with pytest.raises(ValueError, match="no icl_example or icl_examples defined"):
             create_parallelbench_task(
                 split="test", task=task_config, output_file=None, no_save=True
             )

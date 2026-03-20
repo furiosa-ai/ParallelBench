@@ -40,7 +40,6 @@ METRIC_KEYS: dict[str, list[str]] = {
     "sentence_random_replace_score": ["score", "score_strict"],
     "sentence_random_insert_score": ["score", "score_strict"],
     "latin_square_score": ["score", "score_strict"],
-    "latin_square_concat_score": ["score", "score_strict"],
     "math_op_score": ["score", "score_strict"],
     "domino_score": ["score", "score_strict"],
     "text_to_regex_score": ["score", "score_strict"],

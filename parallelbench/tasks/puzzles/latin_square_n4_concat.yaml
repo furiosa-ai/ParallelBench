@@ -1,7 +1,0 @@
-include: _base.yml
-task: parallelbench_puzzles_latin_square_n4_concat
-metadata:
-  parallelbench_task: "puzzles/latin_square_n4_concat"
-  flex_config:
-    size: 4
-    num_samples: 100
