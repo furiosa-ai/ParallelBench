@@ -25,9 +25,6 @@ def _make_dllm_output(text="hello world", nfe=42, input_len=10, output_len=5):
         nfe=nfe,
         input_ids=input_ids,
         output_ids=output_ids,
-        history=None,
-        decoding_order=None,
-        decoding_order_corrs={"dec_order_kendall": 0.5, "dec_order_spearman": 0.6},
     )
 
 
@@ -149,7 +146,6 @@ class TestLLaDAWrapperIntegration:
         store = MetadataStore.instance()
         meta = store.pop()
         assert meta.nfe == 42
-        assert meta.decoding_order_corrs["dec_order_kendall"] == 0.5
 
     @patch("parallelbench.lm_eval_wrappers.llada_wrapper.LladaModel")
     def test_generation_config_passed_correctly(self, MockLladaModel):

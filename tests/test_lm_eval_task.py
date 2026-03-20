@@ -97,6 +97,6 @@ class TestMetadataMetricKeys:
     def test_contains_nfe(self):
         assert "nfe" in METADATA_METRIC_KEYS
 
-    def test_contains_decoding_order_keys(self):
-        assert "dec_order_kendall" in METADATA_METRIC_KEYS
-        assert "dec_order_spearman" in METADATA_METRIC_KEYS
+    def test_does_not_contain_decoding_order_keys(self):
+        assert "dec_order_kendall" not in METADATA_METRIC_KEYS
+        assert "dec_order_spearman" not in METADATA_METRIC_KEYS

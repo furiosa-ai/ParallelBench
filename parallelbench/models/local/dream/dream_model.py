@@ -7,10 +7,7 @@ from transformers import AutoModel
 
 from parallelbench.models.base_model import DLLMOutput, LocalModel
 from parallelbench.models.generation_config import DllmGenerationConfig
-from parallelbench.models.model_utils import (
-    compute_decoding_order_correlation_from_history,
-    decode_history,
-)
+
 from parallelbench.models.registry import ModelRegistry
 
 from parallelbench.models.unmasking_registry import get_method_type
@@ -201,19 +198,6 @@ class DreamModel(LocalModel):
                 sample_output_ids[0], skip_special_tokens=True
             )
 
-            if output_history:
-                history = [h[i : i + 1, input_len:] for h in model_output.history]
-                decoding_order, decoding_order_corrs = (
-                    compute_decoding_order_correlation_from_history(
-                        self.tokenizer, history
-                    )
-                )
-                if output_history != "pt":
-                    history = decode_history(self.tokenizer, history)
-            else:
-                decoding_order, decoding_order_corrs = None, None
-                history = None
-
             results.append(
                 DLLMOutput(
                     output=output_text,
@@ -221,9 +205,6 @@ class DreamModel(LocalModel):
                     output_ids=sample_output_ids,
                     pad_token_id=self.tokenizer.pad_token_id,
                     nfe=nfe,
-                    history=history,
-                    decoding_order=decoding_order,
-                    decoding_order_corrs=decoding_order_corrs,
                 )
             )
 
@@ -251,25 +232,10 @@ class DreamModel(LocalModel):
 
         output = self.tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
 
-        if output_history:
-            history = [h[:, input_ids.shape[1] :] for h in model_output.history]
-            decoding_order, decoding_order_corrs = (
-                compute_decoding_order_correlation_from_history(self.tokenizer, history)
-            )
-
-            if output_history != "pt":
-                history = decode_history(self.tokenizer, history)
-        else:
-            decoding_order, decoding_order_corrs = None, None
-            history = None
-
         return DLLMOutput(
             output=output,
             input_ids=input_ids,
             output_ids=output_ids,
             pad_token_id=self.tokenizer.pad_token_id,
             nfe=nfe,
-            history=history,
-            decoding_order=decoding_order,
-            decoding_order_corrs=decoding_order_corrs,
         )

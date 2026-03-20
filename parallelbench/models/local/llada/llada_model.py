@@ -14,10 +14,7 @@ from parallelbench.models.local.llada.constants import (
     LLADA_VALID_METHODS,
 )
 from parallelbench.models.unmasking_registry import get_method_type
-from parallelbench.models.model_utils import (
-    compute_decoding_order_correlation_from_history,
-    decode_history,
-)
+
 from parallelbench.models.registry import ModelRegistry
 
 
@@ -224,22 +221,12 @@ class LladaModel(LocalModel):
             "History should not be None if output_history is True."
         )
 
-        if history is not None:
-            decoding_order, decoding_order_corrs = (
-                compute_decoding_order_correlation_from_history(self.tokenizer, history)
-            )
-        else:
-            decoding_order, decoding_order_corrs = None, None
-
         return DLLMOutput(
             output=output,
             input_ids=input_ids,
             output_ids=output_ids,
             pad_token_id=self.tokenizer.pad_token_id,
             nfe=nfe,
-            history=decode_history(self.tokenizer, history),
-            decoding_order=decoding_order,
-            decoding_order_corrs=decoding_order_corrs,
         )
 
     def generate_batch(
@@ -309,16 +296,6 @@ class LladaModel(LocalModel):
                 output_ids.squeeze(0), skip_special_tokens=True
             )
 
-            sample_history = histories[i] if histories else None
-            if sample_history is not None:
-                decoding_order, decoding_order_corrs = (
-                    compute_decoding_order_correlation_from_history(
-                        self.tokenizer, sample_history
-                    )
-                )
-            else:
-                decoding_order, decoding_order_corrs = None, None
-
             outputs.append(
                 DLLMOutput(
                     output=output_text,
@@ -326,9 +303,6 @@ class LladaModel(LocalModel):
                     output_ids=output_ids,
                     pad_token_id=self.tokenizer.pad_token_id,
                     nfe=nfe,
-                    history=decode_history(self.tokenizer, sample_history),
-                    decoding_order=decoding_order,
-                    decoding_order_corrs=decoding_order_corrs,
                 )
             )
 

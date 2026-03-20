@@ -22,9 +22,6 @@ class TestGenerationMetadata:
     def test_default_values(self):
         meta = GenerationMetadata()
         assert meta.nfe == 0
-        assert meta.history is None
-        assert meta.decoding_order is None
-        assert meta.decoding_order_corrs is None
         assert meta.input_length is None
         assert meta.output_length is None
 
@@ -56,7 +53,6 @@ class TestMetadataStore:
         store = MetadataStore.instance()
         meta = store.pop()
         assert meta.nfe == 0
-        assert meta.history is None
 
     def test_len(self):
         store = MetadataStore.instance()

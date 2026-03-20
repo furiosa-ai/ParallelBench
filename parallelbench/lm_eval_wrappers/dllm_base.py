@@ -32,7 +32,6 @@ class DLLMBase(LM):
 
     Constructor model_args (passed via --model_args):
         model_path: str          - HuggingFace model name/path
-        output_history: bool     - Whether to track generation history
         infill: bool             - Whether to use infill mode
 
     Generation parameters (passed via --gen_kwargs or task YAML generation_kwargs):
@@ -49,7 +48,6 @@ class DLLMBase(LM):
     def __init__(
         self,
         model_path: str,
-        output_history: bool = True,
         infill: bool = False,
         batch_size: int = 1,
         **kwargs,
@@ -63,7 +61,6 @@ class DLLMBase(LM):
         self._device = torch.device(str(self.accelerator.device))
 
         self.model_path = model_path
-        self._output_history = output_history
         self._infill = infill
         self._batch_size = int(batch_size)
         self._extra_kwargs = kwargs
@@ -195,7 +192,6 @@ class DLLMBase(LM):
                 messages=messages,
                 gen_config=gen_config,
                 output_prefix=output_prefix,
-                output_history=self._output_history,
             )
 
             store.append(self._build_metadata(dllm_output, gen_config))
@@ -249,7 +245,6 @@ class DLLMBase(LM):
                 messages_list=messages_list,
                 gen_config=gen_config,
                 output_prefix_list=output_prefix_list,
-                output_history=self._output_history,
             )
 
             for dllm_output in dllm_outputs:
@@ -344,9 +339,6 @@ class DLLMBase(LM):
         return GenerationMetadata(
             nfe=dllm_output.nfe,
             tokens_per_step=tokens_per_step,
-            history=dllm_output.history,
-            decoding_order=dllm_output.decoding_order,
-            decoding_order_corrs=dllm_output.decoding_order_corrs,
             input_length=dllm_output.input_length,
             output_length=dllm_output.output_length,
         )

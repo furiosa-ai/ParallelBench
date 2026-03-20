@@ -8,10 +8,7 @@ from transformers import AutoTokenizer
 from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
 from parallelbench.models.base_model import DLLMOutput, LocalModel
 from parallelbench.models.generation_config import DllmGenerationConfig
-from parallelbench.models.model_utils import (
-    compute_decoding_order_correlation_from_history,
-    decode_history,
-)
+
 from parallelbench.models.registry import ModelRegistry
 
 from .constants import SDAR_MASK_TOKEN_ID, SDAR_VALID_METHODS
@@ -144,17 +141,10 @@ class SdarModel(LocalModel):
             "History should not be None if output_history is True."
         )
 
-        decoding_order, decoding_order_corrs = (
-            compute_decoding_order_correlation_from_history(self.tokenizer, history)
-        )
-
         return DLLMOutput(
             output=output,
             input_ids=input_ids,
             output_ids=output_ids,
             pad_token_id=self.tokenizer.pad_token_id,
             nfe=nfe,
-            history=decode_history(self.tokenizer, history),
-            decoding_order=decoding_order,
-            decoding_order_corrs=decoding_order_corrs,
         )

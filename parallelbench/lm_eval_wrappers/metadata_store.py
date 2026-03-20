@@ -16,8 +16,6 @@ from collections import deque
 from dataclasses import dataclass
 from typing import Optional
 
-import torch
-
 
 @dataclass
 class GenerationMetadata:
@@ -25,9 +23,6 @@ class GenerationMetadata:
 
     nfe: int = 0
     tokens_per_step: Optional[float] = None
-    history: Optional[list] = None
-    decoding_order: Optional[torch.Tensor] = None
-    decoding_order_corrs: Optional[dict] = None
     input_length: Optional[int] = None
     output_length: Optional[int] = None
 

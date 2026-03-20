@@ -8,10 +8,7 @@ from transformers import GPT2TokenizerFast
 
 from parallelbench.models.base_model import DLLMOutput, LocalModel
 from parallelbench.models.generation_config import DllmGenerationConfig
-from parallelbench.models.model_utils import (
-    compute_decoding_order_correlation_from_history,
-    decode_history,
-)
+
 from parallelbench.models.registry import ModelRegistry
 
 
@@ -99,20 +96,10 @@ class SeddModel(LocalModel):
 
         output = self.tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
 
-        if history is not None:
-            decoding_order, decoding_order_corrs = (
-                compute_decoding_order_correlation_from_history(self.tokenizer, history)
-            )
-        else:
-            decoding_order, decoding_order_corrs = None, None
-
         return DLLMOutput(
             output=output,
             input_ids=input_ids,
             output_ids=output_ids,
             pad_token_id=self.tokenizer.pad_token_id,
             nfe=nfe,
-            history=decode_history(self.tokenizer, history),
-            decoding_order=decoding_order,
-            decoding_order_corrs=decoding_order_corrs,
         )

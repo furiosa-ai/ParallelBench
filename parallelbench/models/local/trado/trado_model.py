@@ -1,9 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-import importlib
-import os
-import sys
 
 import torch
 import torch.nn.functional as F
@@ -12,10 +9,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
 from parallelbench.models.base_model import DLLMOutput, LocalModel
 from parallelbench.models.generation_config import DllmGenerationConfig
-from parallelbench.models.model_utils import (
-    compute_decoding_order_correlation_from_history,
-    decode_history,
-)
+
 from parallelbench.models.registry import ModelRegistry
 
 from .constants import TRADO_MASK_TOKEN_ID, TRADO_VALID_METHODS
@@ -64,8 +58,10 @@ class TradoModel(LocalModel):
     def _patch_missing_imports():
         """Inject missing LossKwargs into transformers.utils for TraDo compatibility."""
         import transformers.utils as _tu
+
         if not hasattr(_tu, "LossKwargs"):
             from transformers.modeling_flash_attention_utils import FlashAttentionKwargs
+
             # LossKwargs is a simple TypedDict used only for type hints
             _tu.LossKwargs = type("LossKwargs", (FlashAttentionKwargs,), {})
 
@@ -171,17 +167,10 @@ class TradoModel(LocalModel):
             "History should not be None if output_history is True."
         )
 
-        decoding_order, decoding_order_corrs = (
-            compute_decoding_order_correlation_from_history(self.tokenizer, history)
-        )
-
         return DLLMOutput(
             output=output,
             input_ids=input_ids,
             output_ids=output_ids,
             pad_token_id=self.tokenizer.pad_token_id,
             nfe=nfe,
-            history=decode_history(self.tokenizer, history),
-            decoding_order=decoding_order,
-            decoding_order_corrs=decoding_order_corrs,
         )

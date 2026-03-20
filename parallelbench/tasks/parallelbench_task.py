@@ -172,23 +172,6 @@ class ParallelBenchTask(ConfigurableTask):
         sample_metrics["input_length"] = float(metadata.input_length or 0)
         sample_metrics["output_length"] = float(metadata.output_length or 0)
 
-        if metadata.decoding_order_corrs:
-            for key in [
-                "dec_order_kendall",
-                "dec_order_spearman",
-                "dec_order_kendall_ignore_pad",
-                "dec_order_spearman_ignore_pad",
-            ]:
-                sample_metrics[key] = float(metadata.decoding_order_corrs.get(key, 0.0))
-        else:
-            for key in [
-                "dec_order_kendall",
-                "dec_order_spearman",
-                "dec_order_kendall_ignore_pad",
-                "dec_order_spearman_ignore_pad",
-            ]:
-                sample_metrics[key] = 0.0
-
         return sample_metrics
 
     def aggregation(self) -> dict:
@@ -211,10 +194,6 @@ class ParallelBenchTask(ConfigurableTask):
         result["tokens_per_step"] = True
         result["input_length"] = None
         result["output_length"] = None
-        result["dec_order_kendall"] = None
-        result["dec_order_spearman"] = None
-        result["dec_order_kendall_ignore_pad"] = None
-        result["dec_order_spearman_ignore_pad"] = None
         return result
 
 

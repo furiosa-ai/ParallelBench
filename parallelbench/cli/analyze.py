@@ -39,10 +39,6 @@ METRIC_KEYS = [
     "tokens_per_step",
     "input_length",
     "output_length",
-    "dec_order_kendall",
-    "dec_order_spearman",
-    "dec_order_kendall_ignore_pad",
-    "dec_order_spearman_ignore_pad",
 ]
 
 _BASE_GENERATION_KWARGS_KEYS = [

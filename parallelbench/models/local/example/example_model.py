@@ -5,7 +5,6 @@ import torch
 
 from parallelbench.models.base_model import DLLMOutput, LocalModel
 from parallelbench.models.generation_config import DllmGenerationConfig
-from parallelbench.models.model_utils import decode_history
 
 
 @dataclass
@@ -63,17 +62,10 @@ class ExampleModel(LocalModel):
         input_ids = torch.tensor([[0, 1, 2]])  # Dummy input
         output_ids = torch.tensor([[0, 1, 2, 3, 4]])  # Dummy output
         nfe = 10  # Dummy number of function evaluations
-        history = []  # Dummy history
-        decoding_order = []  # Dummy decoding order
-        decoding_order_corrs = []  # Dummy decoding order correlations
-
         return DLLMOutput(
             output=output,
             input_ids=input_ids,
             output_ids=output_ids,
             pad_token_id=self.tokenizer.pad_token_id,
             nfe=nfe,
-            history=decode_history(self.tokenizer, history) if output_history else None,
-            decoding_order=decoding_order if output_history else None,
-            decoding_order_corrs=decoding_order_corrs if output_history else None,
         )

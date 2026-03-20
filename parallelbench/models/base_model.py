@@ -98,10 +98,7 @@ class DLLMOutput:
     nfe: int = 0
     input_ids: Optional[torch.Tensor] = None
     output_ids: Optional[torch.Tensor] = None
-    history: Optional[dict] = None
     pad_token_id: Optional[int] = None
-    decoding_order: Optional[torch.Tensor] = None
-    decoding_order_corrs: Optional[dict] = None
 
     @property
     def input_length(self):
