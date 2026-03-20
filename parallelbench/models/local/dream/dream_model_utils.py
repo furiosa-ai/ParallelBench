@@ -309,10 +309,12 @@ def sample_block(
                         mask_logits, temperature=temperature, top_p=top_p, top_k=top_k
                     )
                     # Override confidence with negative position indices
+                    # mask_index is (B, L), positions need to match flattened mask_logits shape
                     positions = torch.arange(
                         x.shape[1], device=self.device, dtype=confidence.dtype
                     )
-                    confidence = -positions[mask_index[0]]
+                    full_positions = positions.unsqueeze(0).expand_as(mask_index)
+                    confidence = -full_positions[mask_index]
                 else:
                     raise RuntimeError(f"Unknown alg: {alg}")
 
