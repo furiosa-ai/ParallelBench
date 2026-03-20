@@ -21,8 +21,14 @@ from parallelbench.models.confidence_scorers import (
 
 MethodInfo = namedtuple(
     "MethodInfo",
-    ["method_type", "representative_param", "derive_fn", "confidence_fn"],
-    defaults=[None],
+    [
+        "method_type",
+        "representative_param",
+        "derive_fn",
+        "confidence_fn",
+        "config_params",
+    ],
+    defaults=[None, None],
 )
 
 # Backward-compatible alias
@@ -98,19 +104,29 @@ def derive_adaptive(k: float, max_tokens: int) -> dict:
 
 
 UNMASKING_REGISTRY: dict[str, MethodInfo] = {
-    "random": MethodInfo("topk", "k", derive_topk, random_confidence),
-    "origin": MethodInfo("topk", "k", derive_topk),
-    "confidence_topk": MethodInfo("topk", "k", derive_topk, max_probability),
-    "topk_margin": MethodInfo("topk", "k", derive_topk, margin),
-    "entropy_topk": MethodInfo("topk", "k", derive_topk, negative_entropy),
+    "random": MethodInfo("topk", "k", derive_topk, random_confidence, ("k",)),
+    "origin": MethodInfo("topk", "k", derive_topk, None, ("k",)),
+    "confidence_topk": MethodInfo("topk", "k", derive_topk, max_probability, ("k",)),
+    "topk_margin": MethodInfo("topk", "k", derive_topk, margin, ("k",)),
+    "entropy_topk": MethodInfo("topk", "k", derive_topk, negative_entropy, ("k",)),
     "confidence_threshold": MethodInfo(
-        "threshold", "alg_threshold", derive_threshold, max_probability
+        "threshold",
+        "alg_threshold",
+        derive_threshold,
+        max_probability,
+        ("alg_threshold",),
     ),
     "confidence_factor": MethodInfo(
-        "factor", "alg_factor", derive_factor, max_probability
+        "factor", "alg_factor", derive_factor, max_probability, ("alg_factor",)
     ),
-    "left_to_right": MethodInfo("topk", "k", derive_topk, left_to_right),
-    "klass": MethodInfo("adaptive", "k", derive_adaptive, max_probability),
+    "left_to_right": MethodInfo("topk", "k", derive_topk, left_to_right, ("k",)),
+    "klass": MethodInfo(
+        "adaptive",
+        "k",
+        derive_adaptive,
+        max_probability,
+        ("conf_threshold", "kl_threshold", "kl_history_length"),
+    ),
 }
 
 
@@ -165,6 +181,46 @@ def get_representative_param(name: str) -> str:
         KeyError: If the method name is not registered.
     """
     return get_method_info(name).representative_param
+
+
+def get_config_params(name: str) -> tuple[str, ...]:
+    """Return the config parameter keys for the given unmasking method.
+
+    These are the gen_kwargs keys used to distinguish different configs
+    of the same method (e.g., ("k",) for topk, ("alg_threshold",) for
+    threshold, ("conf_threshold", "kl_threshold", ...) for klass).
+
+    Args:
+        name: The unmasking method name.
+
+    Returns:
+        Tuple of parameter key strings.
+
+    Raises:
+        KeyError: If the method name is not registered.
+    """
+    info = get_method_info(name)
+    if info.config_params is not None:
+        return info.config_params
+    # Fallback: use representative_param
+    return (info.representative_param,)
+
+
+def get_all_config_params() -> set[str]:
+    """Return the union of all config_params across all registered methods.
+
+    Useful for extracting all relevant gen_kwargs from result files.
+
+    Returns:
+        Set of parameter key strings.
+    """
+    params: set[str] = set()
+    for info in UNMASKING_REGISTRY.values():
+        if info.config_params is not None:
+            params.update(info.config_params)
+        else:
+            params.add(info.representative_param)
+    return params
 
 
 def get_all_methods() -> set[str]:

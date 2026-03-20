@@ -6,13 +6,14 @@ This guide explains how to add a new unmasking method to ParallelBench.
 
 At each denoising step, the model predicts tokens for all masked positions. The **unmasking method** decides which predictions to accept and which to keep masked for later refinement. Each method computes a per-token **confidence score** — higher scores get unmasked first.
 
-There are three method types:
+There are four method types:
 
-| Type | Behavior | CLI parameter |
-| ---- | -------- | ------------- |
-| `topk` | Fixed `k` tokens unmasked per step | `k` |
-| `threshold` | Unmask tokens above a confidence threshold | `alg_threshold` |
-| `factor` | Scale unmask count by a factor | `alg_factor` |
+| Type | Behavior | CLI parameter | TPS | PBx scoring |
+| ---- | -------- | ------------- | --- | ----------- |
+| `topk` | Fixed `k` tokens unmasked per step | `k` | Deterministic (= k) | Discrete |
+| `threshold` | Unmask tokens above a confidence threshold | `alg_threshold` | Measured | Interpolated |
+| `factor` | Scale unmask count by a factor | `alg_factor` | Measured | Interpolated |
+| `adaptive` | Dynamic per-step unmasking (e.g., KLASS) | Method-specific | Measured | Interpolated |
 
 ## What You Need to Change
 
@@ -67,17 +68,36 @@ from parallelbench.models.confidence_scorers import my_scorer
 
 UNMASKING_REGISTRY: dict[str, MethodInfo] = {
     # ... existing entries ...
-    "my_method": MethodInfo("topk", "k", derive_topk, my_scorer),
+    "my_method": MethodInfo("topk", "k", derive_topk, my_scorer, ("k",)),
 }
 ```
 
-The four arguments are: method type, representative CLI parameter, a function that derives `steps`/`block_length` from that parameter, and the confidence scorer. Reuse existing derive functions (`derive_topk`, `derive_threshold`, `derive_factor`) and scorers when possible.
+The five arguments are:
+
+| Argument | Description |
+| -------- | ----------- |
+| `method_type` | `"topk"`, `"threshold"`, `"factor"`, or `"adaptive"` |
+| `representative_param` | Primary CLI parameter used for deriving `steps`/`block_length` |
+| `derive_fn` | Function that derives `steps`/`block_length` from the representative param |
+| `confidence_fn` | Confidence scorer function (or `None`) |
+| `config_params` | Tuple of gen_kwargs keys used to distinguish configs in PBx scoring |
+
+The `config_params` field is critical: it tells `pb analyze` which hyperparameters to extract from results and how to group configs for PBx score computation. For top-k methods this is `("k",)`. For methods with multiple hyperparameters (like KLASS), list all of them:
+
+```python
+"klass": MethodInfo(
+    "adaptive", "k", derive_adaptive, max_probability,
+    ("conf_threshold", "kl_threshold", "kl_history_length"),
+),
+```
+
+Reuse existing derive functions (`derive_topk`, `derive_threshold`, `derive_factor`, `derive_adaptive`) and scorers when possible.
 
 You can also register dynamically:
 
 ```python
 from parallelbench.models.unmasking_registry import MethodInfo, register_method
-register_method("my_method", MethodInfo("topk", "k", derive_topk, my_scorer))
+register_method("my_method", MethodInfo("topk", "k", derive_topk, my_scorer, ("k",)))
 ```
 
 ## 3. Add to Model Valid Sets

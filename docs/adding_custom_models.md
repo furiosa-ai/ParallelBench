@@ -78,6 +78,8 @@ class MyModel(LocalModel):
 
 Only needed if your model has extra generation parameters beyond `DllmGenerationConfig`. The base config already provides `max_tokens`, `temperature`, `unmasking`, `steps`, `block_length`, `alg_temp`, `alg_threshold`, and `alg_factor`. See `parallelbench/models/generation_config.py` for details.
 
+If your model introduces new unmasking methods with custom parameters (e.g., KLASS uses `conf_threshold`, `kl_threshold`, `kl_history_length`), register them in `unmasking_registry.py` with `config_params` so that `pb analyze` can automatically extract and group them for PBx scoring. See [Adding Custom Unmasking Methods](adding_custom_unmasking_methods.md) for details.
+
 ### Batch Generation (optional)
 
 Override `supports_batch` and `generate_batch()` for batched inference. Without this, `batch_size > 1` raises `NotImplementedError`.

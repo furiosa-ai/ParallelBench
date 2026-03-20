@@ -21,7 +21,10 @@ from rich.panel import Panel
 from rich.table import Table
 
 from parallelbench.analysis.pb_score import DEFAULT_THRESHOLDS, compute_pb_scores
-from parallelbench.models.unmasking_registry import get_method_type
+from parallelbench.models.unmasking_registry import (
+    get_all_config_params,
+    get_method_type,
+)
 
 console = Console()
 console_err = Console(stderr=True)
@@ -42,7 +45,7 @@ METRIC_KEYS = [
     "dec_order_spearman_ignore_pad",
 ]
 
-GENERATION_KWARGS_KEYS = [
+_BASE_GENERATION_KWARGS_KEYS = [
     "k",
     "steps",
     "block_length",
@@ -50,8 +53,12 @@ GENERATION_KWARGS_KEYS = [
     "max_tokens",
     "temperature",
     "alg_temp",
-    "alg_threshold",
-    "alg_factor",
+]
+
+# Dynamically include all config params from the unmasking registry
+GENERATION_KWARGS_KEYS = [
+    *_BASE_GENERATION_KWARGS_KEYS,
+    *sorted(get_all_config_params() - set(_BASE_GENERATION_KWARGS_KEYS)),
 ]
 
 DISPLAY_COLUMNS = [

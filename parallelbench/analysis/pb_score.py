@@ -5,11 +5,13 @@ across all ParallelBench tasks.
 
 Grouping logic:
   - Top-k methods: group by (unmasking, k) where k = max_tokens / steps.
-    TPS = k (deterministic from config).
+    TPS = k (deterministic from config). Discrete scoring.
   - Threshold methods: group by (unmasking, alg_threshold).
-    TPS = max_tokens / nfe (measured after generation).
+    TPS = max_tokens / nfe (measured). Linear interpolation.
   - Factor methods: group by (unmasking, alg_factor).
-    TPS = max_tokens / nfe (measured after generation).
+    TPS = max_tokens / nfe (measured). Linear interpolation.
+  - Adaptive methods (klass, etc.): group by (unmasking, adaptive params).
+    TPS = max_tokens / nfe (measured). Linear interpolation.
 
 All configs assume block_length = max_tokens (fully parallel within block).
 
@@ -20,7 +22,10 @@ Example:
 
 from __future__ import annotations
 
-from parallelbench.models.unmasking_registry import get_method_type
+from parallelbench.models.unmasking_registry import (
+    get_config_params,
+    get_method_type,
+)
 
 DEFAULT_THRESHOLDS = [90, 80, 70, 60]
 
@@ -52,26 +57,33 @@ def _make_config_key(row: dict) -> tuple | None:
     except (KeyError, ValueError, TypeError):
         tps = max_tokens / nfe
 
-    if method_type == "threshold":
-        threshold = row.get("alg_threshold", "")
-        config_key = (unmasking, f"threshold={threshold}")
-    elif method_type == "factor":
-        factor = row.get("alg_factor", "")
-        config_key = (unmasking, f"factor={factor}")
-    else:
-        # Top-k: use k from gen_kwargs, or derive from max_tokens / steps
-        try:
-            k = float(row["k"])
-        except (KeyError, ValueError, TypeError):
+    # Build config key from registry-defined config_params.
+    params = get_config_params(unmasking)
+    param_parts = []
+    for p in params:
+        val = row.get(p, "")
+        if val == "" and p == "k":
+            # Derive k from max_tokens / steps if not explicit
             try:
                 steps = int(row["steps"])
             except (KeyError, ValueError, TypeError):
                 return None
             if steps <= 0:
                 return None
-            k = max_tokens / steps
-        config_key = (unmasking, f"k={k}")
-        tps = k
+            val = max_tokens / steps
+        param_parts.append(f"{p}={val}")
+    config_key = (unmasking, ",".join(param_parts))
+
+    # Top-k methods have deterministic TPS = k
+    if method_type == "topk":
+        try:
+            tps = float(row.get("k", ""))
+        except (ValueError, TypeError):
+            try:
+                steps = int(row["steps"])
+                tps = max_tokens / steps
+            except (KeyError, ValueError, TypeError):
+                return None
 
     return config_key, tps
 
