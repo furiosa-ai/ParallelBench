@@ -1,8 +1,10 @@
 """Analyze ParallelBench evaluation results.
 
 Usage:
-    pb analyze results/                    Print summary table grouped by (model, unmasking)
-    pb analyze results/ --export summary.csv     Export to CSV
+    pb analyze leaderboard results/              PBx leaderboard ranked by PB80
+    pb analyze best results/                     Best method per model summary
+    pb analyze detail results/                   Per-(model, unmasking) detailed tables
+    pb analyze detail results/ --export out.csv  Export detailed results to CSV
 """
 
 from __future__ import annotations
@@ -68,6 +70,36 @@ CSV_COLUMNS = [
     "n_samples",
     "results_file",
 ]
+
+# ---------------------------------------------------------------------------
+# Display name mappings
+# ---------------------------------------------------------------------------
+
+MODEL_DISPLAY_NAMES = {
+    "GSAI-ML/LLaDA-1.5": "LLaDA 1.5",
+    "GSAI-ML/LLaDA-8B-Instruct": "LLaDA 8B Instruct",
+    "Dream-org/Dream-v0-Instruct-7B": "Dream 7B",
+    "apple/DiffuCoder-7B-Instruct": "DiffuCoder 7B",
+    "Gen-Verse/TraDo-4B-Instruct": "TraDo 4B",
+    "Gen-Verse/TraDo-8B-Instruct": "TraDo 8B",
+}
+
+METHOD_DISPLAY_NAMES = {
+    "confidence_topk": "Confidence Top-K",
+    "confidence_threshold": "Confidence Threshold",
+    "confidence_factor": "Confidence Factor",
+    "entropy_topk": "Entropy Top-K",
+    "topk_margin": "Top-K Margin",
+    "random": "Random",
+    "left_to_right": "Left-to-Right",
+    "origin": "Origin",
+    "klass": "KLASS",
+}
+
+
+# ---------------------------------------------------------------------------
+# Data loading (shared across subcommands)
+# ---------------------------------------------------------------------------
 
 
 def _extract_rows_from_results(results_file: Path) -> list[dict]:
@@ -209,6 +241,57 @@ def _collect_rows(results_dir: Path, sort_keys: list[str] | None = None) -> list
     return all_rows
 
 
+def _load_rows(args: argparse.Namespace) -> list[dict]:
+    """Load rows from results directory based on --all-runs flag."""
+    results_dir = args.results_dir
+    sort_keys = None
+    if hasattr(args, "sort") and args.sort:
+        sort_keys = [k.strip() for k in args.sort.split(",")]
+
+    if args.all_runs:
+        rows = _collect_rows(results_dir, sort_keys=sort_keys)
+    else:
+        latest_files = _find_latest_result_files(results_dir)
+        if latest_files:
+            console_err.print(
+                f"[dim]Using {len(latest_files)} latest result file(s)[/dim]"
+            )
+            rows = []
+            for results_file in latest_files:
+                try:
+                    rows.extend(_extract_rows_from_results(results_file))
+                except (json.JSONDecodeError, KeyError) as e:
+                    console.print(
+                        f"[yellow]Warning:[/yellow] skipping {results_file}: {e}",
+                    )
+            if sort_keys:
+
+                def sort_key(row):
+                    values = []
+                    for key in sort_keys:
+                        val = row.get(key, "")
+                        try:
+                            values.append((0, float(val)))
+                        except (ValueError, TypeError):
+                            values.append((1, str(val)))
+                        return values
+
+                rows.sort(key=sort_key)
+        else:
+            rows = _collect_rows(results_dir, sort_keys=sort_keys)
+
+    if not rows:
+        console_err.print("[bold red]No results found[/bold red]")
+        sys.exit(1)
+
+    return rows
+
+
+# ---------------------------------------------------------------------------
+# Display helpers
+# ---------------------------------------------------------------------------
+
+
 def _format_value(key: str, value) -> str:
     """Format a value for Rich table display."""
     if value == "" or value is None:
@@ -247,6 +330,28 @@ def _format_value(key: str, value) -> str:
         except (ValueError, TypeError):
             return str(value)
     return str(value)
+
+
+def _format_pbx(value: float | None) -> str:
+    """Format a PBx score for Rich table display."""
+    if value is None:
+        return "[dim]-[/dim]"
+    return f"[cyan]{value:.1f}[/cyan]"
+
+
+def _display_name(model: str) -> str:
+    """Return display name for a model."""
+    return MODEL_DISPLAY_NAMES.get(model, model)
+
+
+def _method_name(method: str) -> str:
+    """Return display name for an unmasking method."""
+    return METHOD_DISPLAY_NAMES.get(method, method)
+
+
+# ---------------------------------------------------------------------------
+# Detail subcommand helpers (existing logic)
+# ---------------------------------------------------------------------------
 
 
 def _compute_average_rows(rows: list[dict], method_type: str) -> list[dict]:
@@ -451,79 +556,104 @@ def _export_csv(rows: list[dict], output: Path) -> None:
     console.print(f"\n[green]Exported {len(rows)} rows to {output}[/green]")
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Analyze ParallelBench evaluation results"
+# ---------------------------------------------------------------------------
+# Subcommand: leaderboard
+# ---------------------------------------------------------------------------
+
+
+def _build_leaderboard_records(rows: list[dict]) -> list[dict]:
+    """Build PBx leaderboard records from result rows.
+
+    Returns a list of dicts with: model, method, PB90, PB80, PB70, PB60.
+    Sorted by PB80 descending.
+    """
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for row in rows:
+        key = _get_group_key(row)
+        groups.setdefault(key, []).append(row)
+
+    records = []
+    for (model, unmasking), group_rows in sorted(groups.items()):
+        pb_scores = compute_pb_scores(group_rows, thresholds=DEFAULT_THRESHOLDS)
+        record = {"model": model, "method": unmasking}
+        record.update(pb_scores)
+        records.append(record)
+
+    records.sort(key=lambda r: r.get("PB80") or -1, reverse=True)
+    return records
+
+
+def _print_leaderboard_table(records: list[dict], title: str) -> None:
+    """Print a PBx leaderboard as a Rich table."""
+    table = Table(
+        title=title,
+        show_header=True,
+        header_style="bold cyan",
+        padding=(0, 1),
     )
-    parser.add_argument(
-        "results_dir",
-        type=Path,
-        help="Root directory containing results_*.json files",
+    table.add_column("#", justify="right", style="dim", min_width=3)
+    table.add_column("Model", min_width=20)
+    table.add_column("Method", min_width=18)
+    for t in DEFAULT_THRESHOLDS:
+        table.add_column(f"PB{t}", justify="right", min_width=6)
+
+    for rank, record in enumerate(records, 1):
+        table.add_row(
+            str(rank),
+            _display_name(record["model"]),
+            _method_name(record["method"]),
+            *[_format_pbx(record.get(f"PB{t}")) for t in DEFAULT_THRESHOLDS],
+        )
+
+    console.print()
+    console.print(table)
+    console.print()
+
+
+def _cmd_leaderboard(args: argparse.Namespace) -> None:
+    """Show PBx leaderboard ranked by PB80."""
+    rows = _load_rows(args)
+    records = _build_leaderboard_records(rows)
+    _print_leaderboard_table(
+        records,
+        title="PBx Leaderboard (max TPS achieving >= x% avg score)",
     )
-    parser.add_argument(
-        "--sort",
-        type=str,
-        default="task,tokens_per_step,alg_threshold",
-        help="Comma-separated column names to sort by (default: task,tokens_per_step,alg_threshold)",
+
+
+# ---------------------------------------------------------------------------
+# Subcommand: best
+# ---------------------------------------------------------------------------
+
+
+def _cmd_best(args: argparse.Namespace) -> None:
+    """Show best method per model."""
+    rows = _load_rows(args)
+    records = _build_leaderboard_records(rows)
+
+    # Keep only the best method per model (by PB80)
+    seen_models: set[str] = set()
+    best_records = []
+    for record in records:
+        if record["model"] not in seen_models:
+            seen_models.add(record["model"])
+            best_records.append(record)
+
+    _print_leaderboard_table(
+        best_records,
+        title="PBx Best Method per Model (ranked by PB80)",
     )
-    parser.add_argument(
-        "--export",
-        type=Path,
-        default=None,
-        help="Export results to CSV file",
-    )
-    parser.add_argument(
-        "--all-runs",
-        action="store_true",
-        default=False,
-        help=(
-            "Scan every run directory instead of only the latest. "
-            "By default, the latest run per repr_param group is selected "
-            "by sorting timestamp-prefixed directories (YYYYMMDD_HHMMSS). "
-            "Directories without a timestamp prefix are used as fallback."
-        ),
-    )
-    args = parser.parse_args()
 
-    results_dir = args.results_dir
-    sort_keys = [k.strip() for k in args.sort.split(",")] if args.sort else None
 
-    if args.all_runs:
-        rows = _collect_rows(results_dir, sort_keys=sort_keys)
-    else:
-        latest_files = _find_latest_result_files(results_dir)
-        if latest_files:
-            console_err.print(
-                f"[dim]Using {len(latest_files)} latest result file(s)[/dim]"
-            )
-            rows = []
-            for results_file in latest_files:
-                try:
-                    rows.extend(_extract_rows_from_results(results_file))
-                except (json.JSONDecodeError, KeyError) as e:
-                    console.print(
-                        f"[yellow]Warning:[/yellow] skipping {results_file}: {e}",
-                    )
-            if sort_keys:
+# ---------------------------------------------------------------------------
+# Subcommand: detail
+# ---------------------------------------------------------------------------
 
-                def sort_key(row):
-                    values = []
-                    for key in sort_keys:
-                        val = row.get(key, "")
-                        try:
-                            values.append((0, float(val)))
-                        except (ValueError, TypeError):
-                            values.append((1, str(val)))
-                    return values
 
-                rows.sort(key=sort_key)
-        else:
-            rows = _collect_rows(results_dir, sort_keys=sort_keys)
+def _cmd_detail(args: argparse.Namespace) -> None:
+    """Show detailed per-(model, unmasking) results tables."""
+    rows = _load_rows(args)
 
-    if not rows:
-        sys.exit(1)
-
-    if args.export:
+    if hasattr(args, "export") and args.export:
         _export_csv(rows, args.export)
         return
 
@@ -551,6 +681,82 @@ def main():
         _print_pb_scores(group_rows)
 
     console.print()
+
+
+# ---------------------------------------------------------------------------
+# CLI entry point
+# ---------------------------------------------------------------------------
+
+
+def _add_common_args(parser: argparse.ArgumentParser) -> None:
+    """Add arguments shared by all subcommands."""
+    parser.add_argument(
+        "results_dir",
+        type=Path,
+        help="Root directory containing results_*.json files",
+    )
+    parser.add_argument(
+        "--all-runs",
+        action="store_true",
+        default=False,
+        help=(
+            "Scan every run directory instead of only the latest. "
+            "By default, the latest run per repr_param group is selected "
+            "by sorting timestamp-prefixed directories (YYYYMMDD_HHMMSS). "
+            "Directories without a timestamp prefix are used as fallback."
+        ),
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Analyze ParallelBench evaluation results",
+    )
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    # leaderboard
+    parser_leaderboard = subparsers.add_parser(
+        "leaderboard",
+        help="PBx leaderboard ranked by PB80",
+    )
+    _add_common_args(parser_leaderboard)
+    parser_leaderboard.set_defaults(func=_cmd_leaderboard)
+
+    # best
+    parser_best = subparsers.add_parser(
+        "best",
+        help="Best method per model summary",
+    )
+    _add_common_args(parser_best)
+    parser_best.set_defaults(func=_cmd_best)
+
+    # detail
+    parser_detail = subparsers.add_parser(
+        "detail",
+        help="Per-(model, unmasking) detailed tables with PBx scores",
+    )
+    _add_common_args(parser_detail)
+    parser_detail.add_argument(
+        "--sort",
+        type=str,
+        default="task,tokens_per_step,alg_threshold",
+        help="Comma-separated column names to sort by (default: task,tokens_per_step,alg_threshold)",
+    )
+    parser_detail.add_argument(
+        "--export",
+        type=Path,
+        default=None,
+        help="Export results to CSV file",
+    )
+    parser_detail.set_defaults(func=_cmd_detail)
+
+    args = parser.parse_args()
+
+    if not args.subcommand:
+        parser.print_help()
+        sys.exit(1)
+
+    args.func(args)
 
 
 if __name__ == "__main__":

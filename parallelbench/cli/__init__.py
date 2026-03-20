@@ -26,7 +26,7 @@ COMMANDS = {
         "pb data --push --repo_id org/parallelbench",
     ),
     "browse": ("Browse benchmark tasks and samples", "pb browse waiting_line/copy"),
-    "analyze": ("Analyze evaluation results", "pb analyze results/"),
+    "analyze": ("Analyze evaluation results", "pb analyze leaderboard results/"),
 }
 
 

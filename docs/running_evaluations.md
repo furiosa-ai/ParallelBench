@@ -103,23 +103,29 @@ bash scripts/quick_start.sh --num_processes 2  # multi GPU
 
 Evaluation results are saved locally to `results/` as JSON files.
 
-Use `pb analyze` to view results as a summary table with **PBx scores** — the maximum tokens-per-step achieving at least x% average score across all tasks:
+Use `pb analyze` to view results with **PBx scores** — the maximum tokens-per-step achieving at least x% average score across all tasks:
 
 ```bash
-# Summary table with PBx scores
-pb analyze results/
+# PBx leaderboard ranked by PB80 (default view)
+pb analyze leaderboard results/
 
-# Group by unmasking method for comparison
-pb analyze results/ --compare unmasking
+# Best method per model summary
+pb analyze best results/
 
-# Export to CSV
-pb analyze results/ --export summary.csv
+# Per-(model, unmasking) detailed tables with PBx panels
+pb analyze detail results/
+
+# Export detailed results to CSV
+pb analyze detail results/ --export summary.csv
 ```
 
-Example PBx output:
+Example leaderboard output:
 
 ```text
-PB90: 2.0  |  PB80: 8.0  |  PB70: 16.0  |  PB60: 32.0
+  #  Model          Method                PB90   PB80   PB70   PB60
+  1  Dream 7B       Confidence Threshold     -    6.3    8.1   10.0
+  2  LLaDA 1.5      Confidence Threshold   1.9    5.4    6.6    7.7
+  3  LLaDA 8B       Confidence Threshold     -    5.2    6.4    7.8
 ```
 
-This means TPS=8 still yields >= 80% average score (PB80), while TPS=32 only maintains >= 60% (PB60).
+PB80 = 6.3 means this combination achieves >= 80% average score at TPS ≈ 6.3. For top-k methods, PBx is the measured TPS value (integer). For adaptive methods (threshold, factor), PBx is computed via linear interpolation between adjacent measurement points.

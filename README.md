@@ -82,6 +82,8 @@ ParallelBench evaluates **model + unmasking method** combinations. The same mode
 
 The benchmark score is **PBx** — the maximum TPS at which a given combination still achieves at least **x%** average accuracy across all tasks. For example, PB80 = 8 means the combination can decode up to 8 tokens in parallel while maintaining ≥ 80% accuracy. Higher PBx values indicate better quality preservation under parallel decoding.
 
+For methods with deterministic TPS (top-k family), PBx is the measured TPS value. For methods with variable TPS (threshold, factor, etc.), PBx is computed via **linear interpolation** between adjacent (TPS, accuracy) points to find the exact TPS where accuracy crosses the threshold.
+
 ## ⚙️ Setup
 
 ### 1. Prerequisites
