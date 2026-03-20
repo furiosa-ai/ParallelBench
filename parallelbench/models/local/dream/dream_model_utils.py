@@ -304,6 +304,15 @@ def sample_block(
                         mask_logits, temperature, top_p=top_p, top_k=top_k
                     )
                     confidence = torch.rand_like(confidence)
+                elif alg == "left_to_right":
+                    confidence, x0 = sample_tokens(
+                        mask_logits, temperature=temperature, top_p=top_p, top_k=top_k
+                    )
+                    # Override confidence with negative position indices
+                    positions = torch.arange(
+                        x.shape[1], device=self.device, dtype=confidence.dtype
+                    )
+                    confidence = -positions[mask_index[0]]
                 else:
                     raise RuntimeError(f"Unknown alg: {alg}")
 

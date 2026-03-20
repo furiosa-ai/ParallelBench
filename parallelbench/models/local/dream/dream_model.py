@@ -13,6 +13,8 @@ from parallelbench.models.model_utils import (
 )
 from parallelbench.models.registry import ModelRegistry
 
+from parallelbench.models.unmasking_registry import get_method_type
+
 from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_METHODS
 from .dream_model_utils import sample_block
 
@@ -84,7 +86,28 @@ class DreamModel(LocalModel):
 
         gen_kwargs = gen_config.to_generation_kwargs()
 
-        if (
+        # Dispatch to KLASS if adaptive method
+        if get_method_type(gen_config.unmasking) == "adaptive":
+            from parallelbench.models.local.dream.klass_sample import (
+                klass_sample_dream,
+            )
+
+            self.model._sample = types.MethodType(
+                functools.partial(
+                    klass_sample_dream,
+                    conf_threshold=gen_config.conf_threshold
+                    if gen_config.conf_threshold is not None
+                    else 0.9,
+                    kl_threshold=gen_config.kl_threshold
+                    if gen_config.kl_threshold is not None
+                    else 0.01,
+                    kl_history_length=gen_config.kl_history_length
+                    if gen_config.kl_history_length is not None
+                    else 2,
+                ),
+                self.model,
+            )
+        elif (
             gen_kwargs.get("block_length") is not None
             or gen_kwargs.get("threshold") is not None
         ):

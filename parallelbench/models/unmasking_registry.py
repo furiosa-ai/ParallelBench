@@ -11,6 +11,7 @@ and derives generation kwargs (steps, block_length) from high-level parameters.
 from collections import namedtuple
 
 from parallelbench.models.confidence_scorers import (
+    left_to_right,
     margin,
     max_probability,
     negative_entropy,
@@ -78,6 +79,24 @@ def derive_factor(alg_factor: float, max_tokens: int) -> dict:
     return {"steps": max_tokens, "block_length": max_tokens}
 
 
+def derive_adaptive(k: float, max_tokens: int) -> dict:
+    """
+    Derive generation kwargs for adaptive unmasking methods.
+
+    Adaptive methods use steps=max_tokens (one forward pass per step)
+    and block_length=max_tokens (single block). The actual number of
+    tokens unmasked per step is determined dynamically by the method.
+
+    Args:
+        k: Ignored for adaptive methods (kept for API consistency).
+        max_tokens: Maximum number of tokens to generate.
+
+    Returns:
+        dict with keys "steps" and "block_length".
+    """
+    return {"steps": max_tokens, "block_length": max_tokens}
+
+
 UNMASKING_REGISTRY: dict[str, MethodInfo] = {
     "random": MethodInfo("topk", "k", derive_topk, random_confidence),
     "origin": MethodInfo("topk", "k", derive_topk),
@@ -90,6 +109,8 @@ UNMASKING_REGISTRY: dict[str, MethodInfo] = {
     "confidence_factor": MethodInfo(
         "factor", "alg_factor", derive_factor, max_probability
     ),
+    "left_to_right": MethodInfo("topk", "k", derive_topk, left_to_right),
+    "klass": MethodInfo("adaptive", "k", derive_adaptive, max_probability),
 }
 
 

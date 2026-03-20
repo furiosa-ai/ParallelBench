@@ -7,6 +7,8 @@ DREAM_VALID_METHODS = {
     "topk_margin",
     "entropy_topk",
     "random",
+    "left_to_right",
+    "klass",
 }
 DIFFUCODER_EPS = 1e-12
 

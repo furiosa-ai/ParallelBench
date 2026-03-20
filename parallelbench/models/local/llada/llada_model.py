@@ -13,6 +13,7 @@ from parallelbench.models.local.llada.constants import (
     LLADA_MASK_TOKEN_ID,
     LLADA_VALID_METHODS,
 )
+from parallelbench.models.unmasking_registry import get_method_type
 from parallelbench.models.model_utils import (
     compute_decoding_order_correlation_from_history,
     decode_history,
@@ -86,6 +87,21 @@ class LladaModel(LocalModel):
         Returns:
             Tuple[torch.Tensor, int, Optional[dict]]: A tuple containing the generated token IDs, the number of forward evaluations (NFE), and optionally the generation history if output_history is True.
         """
+        # Dispatch to KLASS if adaptive method
+        if get_method_type(gen_config.unmasking) == "adaptive":
+            from parallelbench.models.local.llada.klass_generate import (
+                klass_generate_llada,
+            )
+
+            return klass_generate_llada(
+                model=self.model,
+                prompt=input_ids,
+                gen_config=gen_config,
+                mask_id=self.mask_id,
+                output_history=output_history,
+                output0_ids=output0_ids,
+            )
+
         gen_kwargs = gen_config.to_generation_kwargs()
 
         gen_kwargs.update(

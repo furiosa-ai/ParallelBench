@@ -37,3 +37,14 @@ def random_confidence(
 ) -> torch.Tensor:
     """Uniform random confidence (baseline)."""
     return torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
+
+
+def left_to_right(
+    p: torch.Tensor, x0: torch.Tensor, x0_p: torch.Tensor
+) -> torch.Tensor:
+    """Confidence = negative position index. Leftmost masked tokens get highest confidence."""
+    return (
+        -torch.arange(x0.shape[1], dtype=torch.float, device=x0.device)
+        .unsqueeze(0)
+        .expand(x0.shape[0], -1)
+    )

@@ -161,3 +161,60 @@ def test_max_tokens_not_divisible_by_block_length_raises():
             block_length=64,
             max_tokens=100,
         )
+
+
+# -- Adaptive unmasking (KLASS) --
+
+
+def test_klass_config_valid():
+    """KLASS config with valid params should work."""
+    config = DllmGenerationConfig(
+        unmasking="klass",
+        max_tokens=128,
+        steps=128,
+        block_length=128,
+        conf_threshold=0.9,
+        kl_threshold=0.01,
+        kl_history_length=2,
+    )
+    assert config.is_adaptive_unmasking is True
+    assert config.is_default_unmasking is False
+    assert config.conf_threshold == 0.9
+    assert config.kl_threshold == 0.01
+    assert config.kl_history_length == 2
+
+
+def test_klass_config_rejects_alg_threshold():
+    """KLASS should reject alg_threshold."""
+    with pytest.raises(ValueError, match="alg_threshold must be None or 0.0"):
+        DllmGenerationConfig(
+            unmasking="klass",
+            max_tokens=128,
+            steps=128,
+            block_length=128,
+            alg_threshold=0.5,
+        )
+
+
+def test_klass_config_rejects_alg_factor():
+    """KLASS should reject alg_factor."""
+    with pytest.raises(ValueError, match="alg_factor must be None or 1.0"):
+        DllmGenerationConfig(
+            unmasking="klass",
+            max_tokens=128,
+            steps=128,
+            block_length=128,
+            alg_factor=2.0,
+        )
+
+
+def test_left_to_right_config_valid():
+    """left_to_right config should work as topk type."""
+    config = DllmGenerationConfig(
+        unmasking="left_to_right",
+        max_tokens=128,
+        steps=128,
+        block_length=128,
+    )
+    assert config.is_default_unmasking is True
+    assert config.is_adaptive_unmasking is False

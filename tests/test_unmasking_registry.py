@@ -11,6 +11,7 @@ from parallelbench.models.unmasking_registry import (
     UNMASKING_REGISTRY,
     MethodInfo,
     StrategyInfo,
+    derive_adaptive,
     derive_factor,
     derive_threshold,
     derive_topk,
@@ -30,8 +31,8 @@ from parallelbench.models.local.trado.constants import TRADO_VALID_METHODS
 # ============================================================
 
 
-def test_all_seven_methods_are_registered():
-    """All 7 expected method names are present in the registry."""
+def test_all_nine_methods_are_registered():
+    """All 9 expected method names are present in the registry."""
     expected = {
         "random",
         "origin",
@@ -40,6 +41,8 @@ def test_all_seven_methods_are_registered():
         "entropy_topk",
         "confidence_threshold",
         "confidence_factor",
+        "left_to_right",
+        "klass",
     }
     assert expected == set(UNMASKING_REGISTRY.keys())
 
@@ -71,6 +74,8 @@ def test_registry_is_superset_of_per_model_valid_methods():
         ("entropy_topk", "topk"),
         ("confidence_threshold", "threshold"),
         ("confidence_factor", "factor"),
+        ("left_to_right", "topk"),
+        ("klass", "adaptive"),
     ],
 )
 def test_get_method_type(name, expected_type):
@@ -195,3 +200,54 @@ def test_register_method_appears_in_get_all_methods():
 
 def test_strategy_info_is_alias_for_method_info():
     assert StrategyInfo is MethodInfo
+
+
+# ============================================================
+# derive_adaptive
+# ============================================================
+
+
+def test_derive_adaptive_returns_max_tokens_for_steps_and_block_length():
+    result = derive_adaptive(1.0, 128)
+    assert result == {"steps": 128, "block_length": 128}
+
+
+def test_derive_adaptive_ignores_k_value():
+    result_a = derive_adaptive(1.0, 64)
+    result_b = derive_adaptive(8.0, 64)
+    assert result_a == result_b
+
+
+# ============================================================
+# left_to_right and klass entries
+# ============================================================
+
+
+def test_left_to_right_has_confidence_fn():
+    info = get_method_info("left_to_right")
+    assert info.confidence_fn is not None
+    assert info.representative_param == "k"
+
+
+def test_klass_is_adaptive_type():
+    info = get_method_info("klass")
+    assert info.method_type == "adaptive"
+    assert info.representative_param == "k"
+    assert info.confidence_fn is not None  # max_probability for fallback
+
+
+def test_left_to_right_confidence_fn_returns_correct_ordering():
+    import torch
+
+    from parallelbench.models.confidence_scorers import left_to_right
+
+    p = torch.zeros(2, 5, 10)  # (batch=2, seq_len=5, vocab=10)
+    x0 = torch.zeros(2, 5, dtype=torch.long)
+    x0_p = torch.zeros(2, 5)
+
+    confidence = left_to_right(p, x0, x0_p)
+    assert confidence.shape == (2, 5)
+    # Earlier positions should have higher confidence
+    for b in range(2):
+        for i in range(4):
+            assert confidence[b, i] > confidence[b, i + 1]

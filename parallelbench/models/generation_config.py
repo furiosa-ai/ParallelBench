@@ -13,6 +13,8 @@ DEFAULT_VALID_METHODS = {
     "entropy_topk",
     "confidence_threshold",
     "confidence_factor",
+    "left_to_right",
+    "klass",
 }
 
 # Backward-compatible alias
@@ -37,6 +39,10 @@ class DllmGenerationConfig(BaseGenerationConfig):
     alg_temp: float = 0.0
     alg_threshold: Optional[float] = None
     alg_factor: Optional[float] = None
+    # KLASS-specific parameters (adaptive methods)
+    conf_threshold: Optional[float] = None
+    kl_threshold: Optional[float] = None
+    kl_history_length: Optional[int] = None
     valid_methods: set = field(default_factory=lambda: set(DEFAULT_VALID_METHODS))
 
     def __post_init__(self):
@@ -71,6 +77,18 @@ class DllmGenerationConfig(BaseGenerationConfig):
         self.is_threshold_unmasking = get_method_type(self.unmasking) == "threshold"
         self.is_factor_unmasking = get_method_type(self.unmasking) == "factor"
         self.is_default_unmasking = get_method_type(self.unmasking) == "topk"
+        self.is_adaptive_unmasking = get_method_type(self.unmasking) == "adaptive"
+
+        # Validate adaptive unmasking (KLASS and future adaptive methods)
+        if self.is_adaptive_unmasking:
+            if self.alg_threshold is not None and self.alg_threshold != 0.0:
+                raise ValueError(
+                    "alg_threshold must be None or 0.0 for adaptive unmasking methods"
+                )
+            if self.alg_factor is not None and self.alg_factor != 1.0:
+                raise ValueError(
+                    "alg_factor must be None or 1.0 for adaptive unmasking methods"
+                )
 
         # Validate default unmasking
         if self.is_default_unmasking:

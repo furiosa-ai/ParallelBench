@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Run LLaDA 1.5 with left-to-right.
+# Run LLaDA 1.5 with left-to-right sequential decoding.
 #
-# TODO: Define sweep parameters for left_to_right.
+# Left-to-right always uses k=1 (one token per step, leftmost first).
 #
 # Usage:
 #   bash scripts/llada/llada-1.5/left_to_right.sh                    # single GPU
@@ -13,6 +13,19 @@ EXTRA_ARGS="${*}"
 OUTPUT_DIR="results"
 export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_all}"
 
-# TODO: Define sweep parameter and values for left_to_right
-echo "ERROR: Sweep parameters not yet defined for left_to_right. Please update this script."
-exit 1
+echo ""
+echo "============================================"
+echo "Running left-to-right (k=1)"
+echo "============================================"
+
+uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
+    --model parallelbench_llada \
+    --model_args model_path=GSAI-ML/LLaDA-1.5 \
+    --gen_kwargs k=1,unmasking=left_to_right \
+    --tasks parallelbench_all \
+    --include_path parallelbench/tasks \
+    --batch_size 8 \
+    --apply_chat_template \
+    --fewshot_as_multiturn \
+    --log_samples \
+    --output_path "$OUTPUT_DIR"

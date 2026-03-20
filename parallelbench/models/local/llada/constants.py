@@ -6,6 +6,8 @@ LLADA_VALID_METHODS = {
     "confidence_factor",
     "topk_margin",
     "entropy_topk",
+    "left_to_right",
+    "klass",
 }
 
 # Backward-compatible alias
