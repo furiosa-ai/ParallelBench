@@ -385,18 +385,22 @@ def create_parallelbench_task(split, task, output_file, rng=None, no_save=False)
     data = _create_task(rng, task)
 
     if task.get("icl_example_count", 0) > 0:
-        icl_example = task.get("icl_example")
-        if icl_example is None:
-            raise ValueError(
-                f"Task '{task['name']}' has icl_example_count > 0 but no "
-                f"icl_example defined in task config. Add an explicit "
-                f"icl_example to the task YAML."
-            )
-
-        _validate_icl_not_in_data(icl_example, data, task["name"])
-
-        for sample in data:
-            sample["input"]["icl_examples"] = [icl_example]
+        icl_examples = task.get("icl_examples")
+        if icl_examples is not None:
+            for icl_example in icl_examples:
+                _validate_icl_not_in_data(icl_example, data, task["name"])
+            for sample in data:
+                sample["input"]["icl_examples"] = icl_examples
+        else:
+            icl_example = task.get("icl_example")
+            if icl_example is None:
+                raise ValueError(
+                    f"Task '{task['name']}' has icl_example_count > 0 but no "
+                    f"icl_example or icl_examples defined in task config."
+                )
+            _validate_icl_not_in_data(icl_example, data, task["name"])
+            for sample in data:
+                sample["input"]["icl_examples"] = [icl_example]
 
     if not no_save:
         if not isinstance(data, pd.DataFrame):
