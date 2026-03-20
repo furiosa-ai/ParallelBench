@@ -39,12 +39,19 @@ def _make_config_key(row: dict) -> tuple | None:
     try:
         unmasking = str(row.get("unmasking", ""))
         nfe = float(row["nfe"])
-        max_tokens = int(row["max_tokens"])
     except (KeyError, ValueError, TypeError):
         return None
 
-    if nfe <= 0 or max_tokens <= 0:
+    if nfe <= 0:
         return None
+
+    # max_tokens is optional — adaptive methods may not have it in gen_kwargs
+    try:
+        max_tokens: int | None = int(row["max_tokens"])
+        if max_tokens <= 0:
+            return None
+    except (KeyError, ValueError, TypeError):
+        max_tokens = None
 
     try:
         method_type = get_method_type(unmasking)
@@ -55,7 +62,10 @@ def _make_config_key(row: dict) -> tuple | None:
     try:
         tps = float(row["tokens_per_step"])
     except (KeyError, ValueError, TypeError):
-        tps = max_tokens / nfe
+        if max_tokens is not None:
+            tps = max_tokens / nfe
+        else:
+            return None
 
     # Build config key from registry-defined config_params.
     params = get_config_params(unmasking)
@@ -64,6 +74,8 @@ def _make_config_key(row: dict) -> tuple | None:
         val = row.get(p, "")
         if val == "" and p == "k":
             # Derive k from max_tokens / steps if not explicit
+            if max_tokens is None:
+                return None
             try:
                 steps = int(row["steps"])
             except (KeyError, ValueError, TypeError):
@@ -79,6 +91,8 @@ def _make_config_key(row: dict) -> tuple | None:
         try:
             tps = float(row.get("k", ""))
         except (ValueError, TypeError):
+            if max_tokens is None:
+                return None
             try:
                 steps = int(row["steps"])
                 tps = max_tokens / steps

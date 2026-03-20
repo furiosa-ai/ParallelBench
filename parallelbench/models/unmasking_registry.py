@@ -125,28 +125,28 @@ UNMASKING_REGISTRY: dict[str, MethodInfo] = {
         "k",
         derive_adaptive,
         max_probability,
-        ("conf_threshold", "kl_threshold", "kl_history_length"),
+        ("block_length", "conf_threshold", "kl_threshold", "kl_history_length"),
     ),
     "slowfast": MethodInfo(
         "adaptive",
         "k",
         derive_adaptive,
         max_probability,
-        ("sf_high_confidence_threshold",),
+        ("block_length", "sf_high_confidence_threshold"),
     ),
     "dus": MethodInfo(
         "adaptive",
         "k",
         derive_adaptive,
         max_probability,
-        ("dus_base", "dus_remasking_threshold"),
+        ("block_length", "dus_base", "dus_remasking_threshold"),
     ),
     "wino_dllm": MethodInfo(
         "adaptive",
         "k",
         derive_adaptive,
         max_probability,
-        ("wino_threshold", "wino_threshold_back"),
+        ("block_length", "wino_threshold", "wino_threshold_back"),
     ),
 }
 

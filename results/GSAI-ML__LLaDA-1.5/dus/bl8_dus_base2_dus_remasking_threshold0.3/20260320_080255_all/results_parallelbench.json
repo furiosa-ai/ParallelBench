@@ -1,0 +1,1503 @@
+{
+  "results": {
+    "parallelbench_all": {
+      "score,none": 49.294117647058826,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666687,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 16.941176470588236,
+      "nfe_stderr,none": "N/A",
+      "alias": "ParallelBench"
+    },
+    "parallelbench_puzzles": {
+      "score,none": 23.5,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Puzzles"
+    },
+    "parallelbench_puzzles_latin_square_n4": {
+      "alias": "  - parallelbench_puzzles_latin_square_n4",
+      "score,none": 2.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 2.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 105.99,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 25.78,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8926812365171696,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9375987393868779,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7555548522317728,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8528803558417635,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "alias": "  - parallelbench_puzzles_sudoku_n4",
+      "score,none": 45.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 45.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 212.35,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 20.01,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.9147484953791143,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9726221037192164,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.739448562387881,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8511723853086575,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing": {
+      "score,none": 33.0,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Text Writing"
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "alias": "  - parallelbench_text_writing_paraphrasing",
+      "inv_bleu_score,none": 89.40071880727076,
+      "inv_bleu_score_stderr,none": "N/A",
+      "bertscore_score,none": 92.87903046607971,
+      "bertscore_score_stderr,none": "N/A",
+      "grammar_score,none": 75.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 75.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 54.1,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 20.66,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8094613967313486,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.8263539362947134,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.5854155183096512,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.6669559595729977,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_summarization": {
+      "alias": "  - parallelbench_text_writing_summarization",
+      "rouge1_score,none": 45.08867045389297,
+      "rouge1_score_stderr,none": "N/A",
+      "rouge2_score,none": 19.087174425370662,
+      "rouge2_score_stderr,none": "N/A",
+      "rougeL_score,none": 37.5206592648525,
+      "rougeL_score_stderr,none": "N/A",
+      "grammar_score,none": 42.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 42.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 111.32,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 36.97,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.6881169204870596,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.7113015589521988,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.6202083225978134,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.6914300801297465,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "alias": "  - parallelbench_text_writing_words_to_sentence_easy",
+      "inclusion_score,none": 41.0,
+      "inclusion_score_stderr,none": "N/A",
+      "grammar_score,none": 34.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 34.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 31.04,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 22.29,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.6069298104712422,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.5735173788102033,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.4525252772958158,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.511279958319476,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "alias": "  - parallelbench_text_writing_words_to_sentence_hard",
+      "inclusion_score,none": 8.0,
+      "inclusion_score_stderr,none": "N/A",
+      "grammar_score,none": 5.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 5.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 32.02,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 41.45,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.39476575206992726,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.3653539102069244,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.4029511513541356,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.43394409114582333,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "alias": "  - parallelbench_text_writing_words_to_sentence_medium",
+      "inclusion_score,none": 28.000000000000004,
+      "inclusion_score_stderr,none": "N/A",
+      "grammar_score,none": 9.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 9.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 31.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 27.29,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.4895373365987642,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.44314538033436285,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.44098055623331084,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.49309214022212366,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line": {
+      "score,none": 62.6,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.666666666666668,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Waiting Line"
+    },
+    "parallelbench_waiting_line_copy": {
+      "alias": "  - parallelbench_waiting_line_copy",
+      "score,none": 99.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 99.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 154.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 19.04,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8362068965517244,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9497041420118347,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7108131926683718,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8510220123879843,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "alias": "  - parallelbench_waiting_line_insert_index",
+      "score,none": 66.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 66.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 178.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 23.11,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8361028921023361,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9495849892957281,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7672218803056028,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.89836866838562,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "alias": "  - parallelbench_waiting_line_insert_random",
+      "score,none": 75.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 75.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 174.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 23.32,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8343715239154618,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9458535248615888,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7697240525254528,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8986521540488228,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "alias": "  - parallelbench_waiting_line_remove_index",
+      "score,none": 55.00000000000001,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 55.00000000000001,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 154.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 14.2,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8357588060808309,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9489915339435374,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.5742479497997545,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.6953782822527738,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "alias": "  - parallelbench_waiting_line_remove_random",
+      "score,none": 46.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 46.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 140.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 12.88,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8357588060808309,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9489915339435374,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.5359723389355742,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.6526378467317699,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "alias": "  - parallelbench_waiting_line_replace_index",
+      "score,none": 93.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 93.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 172.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 19.0,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8362068965517244,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9497041420118347,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7100423593350383,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8503220137223317,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "alias": "  - parallelbench_waiting_line_replace_random",
+      "score,none": 70.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 70.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 166.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 18.92,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8362068965517244,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9497041420118347,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7085006926683717,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8489220163910267,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_reverse": {
+      "alias": "  - parallelbench_waiting_line_reverse",
+      "score,none": 92.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 92.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 194.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 19.04,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8362068965517244,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9497041420118347,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7103970504105535,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8505656813506879,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "alias": "  - parallelbench_waiting_line_shuffle",
+      "score,none": 17.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 17.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 178.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 20.24,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8246373244089306,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9307315907759214,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7089391844370507,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8396665060309269,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_sort": {
+      "alias": "  - parallelbench_waiting_line_sort",
+      "score,none": 13.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 13.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 162.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 21.49,
+      "output_length_stderr,none": "N/A",
+      "dec_order_kendall,none": 0.8342675194660736,
+      "dec_order_kendall_stderr,none": "N/A",
+      "dec_order_spearman,none": 0.9457343721454822,
+      "dec_order_spearman_stderr,none": "N/A",
+      "dec_order_kendall_ignore_pad,none": 0.7334184312096445,
+      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
+      "dec_order_spearman_ignore_pad,none": 0.8660818301348603,
+      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+    }
+  },
+  "groups": {
+    "parallelbench_all": {
+      "score,none": 49.294117647058826,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666687,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 16.941176470588236,
+      "nfe_stderr,none": "N/A",
+      "alias": "ParallelBench"
+    },
+    "parallelbench_puzzles": {
+      "score,none": 23.5,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Puzzles"
+    },
+    "parallelbench_text_writing": {
+      "score,none": 33.0,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.6666666666666674,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 24.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Text Writing"
+    },
+    "parallelbench_waiting_line": {
+      "score,none": 62.6,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 2.666666666666668,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 12.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Waiting Line"
+    }
+  },
+  "group_subtasks": {
+    "parallelbench_puzzles": [
+      "parallelbench_puzzles_sudoku_n4",
+      "parallelbench_puzzles_latin_square_n4"
+    ],
+    "parallelbench_text_writing": [
+      "parallelbench_text_writing_paraphrasing",
+      "parallelbench_text_writing_summarization",
+      "parallelbench_text_writing_words_to_sentence_easy",
+      "parallelbench_text_writing_words_to_sentence_medium",
+      "parallelbench_text_writing_words_to_sentence_hard"
+    ],
+    "parallelbench_waiting_line": [
+      "parallelbench_waiting_line_copy",
+      "parallelbench_waiting_line_reverse",
+      "parallelbench_waiting_line_sort",
+      "parallelbench_waiting_line_shuffle",
+      "parallelbench_waiting_line_insert_index",
+      "parallelbench_waiting_line_insert_random",
+      "parallelbench_waiting_line_remove_index",
+      "parallelbench_waiting_line_remove_random",
+      "parallelbench_waiting_line_replace_index",
+      "parallelbench_waiting_line_replace_random"
+    ],
+    "parallelbench_all": [
+      "parallelbench_waiting_line",
+      "parallelbench_text_writing",
+      "parallelbench_puzzles"
+    ]
+  },
+  "configs": {
+    "parallelbench_puzzles_latin_square_n4": {
+      "task": "parallelbench_puzzles_latin_square_n4",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "puzzles/latin_square_n4",
+        "flex_config": {
+          "size": 4,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "task": "parallelbench_puzzles_sudoku_n4",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "puzzles/sudoku_n4",
+        "flex_config": {
+          "size": 4,
+          "num_holes": 8,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "task": "parallelbench_text_writing_paraphrasing",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/paraphrasing"
+      }
+    },
+    "parallelbench_text_writing_summarization": {
+      "task": "parallelbench_text_writing_summarization",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/summarization"
+      }
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "task": "parallelbench_text_writing_words_to_sentence_easy",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/words_to_sentence_easy",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 5,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "task": "parallelbench_text_writing_words_to_sentence_hard",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/words_to_sentence_hard",
+        "flex_config": {
+          "min_length": 8,
+          "max_length": 12,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "task": "parallelbench_text_writing_words_to_sentence_medium",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/words_to_sentence_medium",
+        "flex_config": {
+          "min_length": 5,
+          "max_length": 8,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_copy": {
+      "task": "parallelbench_waiting_line_copy",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/copy",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "task": "parallelbench_waiting_line_insert_index",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/insert_index",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "task": "parallelbench_waiting_line_insert_random",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/insert_random",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "task": "parallelbench_waiting_line_remove_index",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/remove_index",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "task": "parallelbench_waiting_line_remove_random",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/remove_random",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "task": "parallelbench_waiting_line_replace_index",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/replace_index",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "task": "parallelbench_waiting_line_replace_random",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/replace_random",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_reverse": {
+      "task": "parallelbench_waiting_line_reverse",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/reverse",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "task": "parallelbench_waiting_line_shuffle",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/shuffle",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_sort": {
+      "task": "parallelbench_waiting_line_sort",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "unmasking": "dus",
+        "block_length": 8,
+        "dus_base": 2,
+        "dus_remasking_threshold": 0.3
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/sort",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    }
+  },
+  "versions": {
+    "parallelbench_puzzles_latin_square_n4": 0.1,
+    "parallelbench_puzzles_sudoku_n4": 0.1,
+    "parallelbench_text_writing_paraphrasing": 0.1,
+    "parallelbench_text_writing_summarization": 0.1,
+    "parallelbench_text_writing_words_to_sentence_easy": 0.1,
+    "parallelbench_text_writing_words_to_sentence_hard": 0.1,
+    "parallelbench_text_writing_words_to_sentence_medium": 0.1,
+    "parallelbench_waiting_line_copy": 0.1,
+    "parallelbench_waiting_line_insert_index": 0.1,
+    "parallelbench_waiting_line_insert_random": 0.1,
+    "parallelbench_waiting_line_remove_index": 0.1,
+    "parallelbench_waiting_line_remove_random": 0.1,
+    "parallelbench_waiting_line_replace_index": 0.1,
+    "parallelbench_waiting_line_replace_random": 0.1,
+    "parallelbench_waiting_line_reverse": 0.1,
+    "parallelbench_waiting_line_shuffle": 0.1,
+    "parallelbench_waiting_line_sort": 0.1
+  },
+  "n-shot": {
+    "parallelbench_puzzles_latin_square_n4": 1,
+    "parallelbench_puzzles_sudoku_n4": 1,
+    "parallelbench_text_writing_paraphrasing": 0,
+    "parallelbench_text_writing_summarization": 0,
+    "parallelbench_text_writing_words_to_sentence_easy": 0,
+    "parallelbench_text_writing_words_to_sentence_hard": 0,
+    "parallelbench_text_writing_words_to_sentence_medium": 0,
+    "parallelbench_waiting_line_copy": 1,
+    "parallelbench_waiting_line_insert_index": 1,
+    "parallelbench_waiting_line_insert_random": 1,
+    "parallelbench_waiting_line_remove_index": 1,
+    "parallelbench_waiting_line_remove_random": 1,
+    "parallelbench_waiting_line_replace_index": 1,
+    "parallelbench_waiting_line_replace_random": 1,
+    "parallelbench_waiting_line_reverse": 1,
+    "parallelbench_waiting_line_shuffle": 1,
+    "parallelbench_waiting_line_sort": 1
+  },
+  "higher_is_better": {
+    "parallelbench_all": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_puzzles": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_puzzles_latin_square_n4": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_text_writing": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_text_writing_summarization": {
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "inclusion_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "inclusion_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "inclusion_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_waiting_line_copy": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_reverse": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    },
+    "parallelbench_waiting_line_sort": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "dec_order_kendall": null,
+      "dec_order_spearman": null,
+      "dec_order_kendall_ignore_pad": null,
+      "dec_order_spearman_ignore_pad": null
+    }
+  },
+  "n-samples": {
+    "parallelbench_waiting_line_copy": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_reverse": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_sort": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_summarization": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_puzzles_latin_square_n4": {
+      "original": 100,
+      "effective": 100
+    }
+  },
+  "config": {
+    "model": "parallelbench_llada",
+    "model_args": "model_path=GSAI-ML/LLaDA-1.5",
+    "batch_size": "1",
+    "batch_sizes": [],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {
+      "unmasking": "dus",
+      "block_length": 8,
+      "dus_base": 2,
+      "dus_remasking_threshold": 0.3
+    },
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "938478d",
+  "date": 1773995075.5404797,
+  "pretty_env_info": "PyTorch version: 2.8.0+cu128\nIs debug build: False\nCUDA used to build PyTorch: 12.8\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 22.04.4 LTS (x86_64)\nGCC version: (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0\nClang version: Could not collect\nCMake version: version 3.29.0\nLibc version: glibc-2.35\n\nPython version: 3.12.12 (main, Dec  2 2025, 19:47:35) [Clang 21.1.4 ] (64-bit runtime)\nPython platform: Linux-5.15.0-72-generic-x86_64-with-glibc2.35\nIs CUDA available: True\nCUDA runtime version: Could not collect\nCUDA_MODULE_LOADING set to: LAZY\nGPU models and configuration: \nGPU 0: NVIDIA A100-SXM4-80GB\nGPU 1: NVIDIA A100-SXM4-80GB\nGPU 2: NVIDIA A100-SXM4-80GB\nGPU 3: NVIDIA A100-SXM4-80GB\nGPU 4: NVIDIA A100-SXM4-80GB\nGPU 5: NVIDIA A100-SXM4-80GB\nGPU 6: NVIDIA A100-SXM4-80GB\nGPU 7: NVIDIA A100-SXM4-80GB\n\nNvidia driver version: 535.183.01\ncuDNN version: Probably one of the following:\n/usr/lib/x86_64-linux-gnu/libcudnn.so.9.1.0\n/usr/lib/x86_64-linux-gnu/libcudnn_adv.so.9.1.0\n/usr/lib/x86_64-linux-gnu/libcudnn_cnn.so.9.1.0\n/usr/lib/x86_64-linux-gnu/libcudnn_engines_precompiled.so.9.1.0\n/usr/lib/x86_64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.1.0\n/usr/lib/x86_64-linux-gnu/libcudnn_graph.so.9.1.0\n/usr/lib/x86_64-linux-gnu/libcudnn_heuristic.so.9.1.0\n/usr/lib/x86_64-linux-gnu/libcudnn_ops.so.9.1.0\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                    x86_64\nCPU op-mode(s):                  32-bit, 64-bit\nAddress sizes:                   46 bits physical, 57 bits virtual\nByte Order:                      Little Endian\nCPU(s):                          128\nOn-line CPU(s) list:             0-127\nVendor ID:                       GenuineIntel\nModel name:                      Intel(R) Xeon(R) Platinum 8358 CPU @ 2.60GHz\nCPU family:                      6\nModel:                           106\nThread(s) per core:              2\nCore(s) per socket:              32\nSocket(s):                       2\nStepping:                        6\nCPU max MHz:                     3400.0000\nCPU min MHz:                     800.0000\nBogoMIPS:                        5200.00\nFlags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 invpcid_single intel_ppin ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect wbnoinvd dtherm ida arat pln pts avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg tme avx512_vpopcntdq la57 rdpid fsrm md_clear pconfig flush_l1d arch_capabilities\nVirtualization:                  VT-x\nL1d cache:                       3 MiB (64 instances)\nL1i cache:                       2 MiB (64 instances)\nL2 cache:                        80 MiB (64 instances)\nL3 cache:                        96 MiB (2 instances)\nNUMA node(s):                    2\nNUMA node0 CPU(s):               0-31,64-95\nNUMA node1 CPU(s):               32-63,96-127\nVulnerability Itlb multihit:     Not affected\nVulnerability L1tf:              Not affected\nVulnerability Mds:               Not affected\nVulnerability Meltdown:          Not affected\nVulnerability Mmio stale data:   Mitigation; Clear CPU buffers; SMT vulnerable\nVulnerability Retbleed:          Not affected\nVulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl and seccomp\nVulnerability Spectre v1:        Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:        Mitigation; Enhanced IBRS, IBPB conditional, RSB filling, PBRSB-eIBRS SW sequence\nVulnerability Srbds:             Not affected\nVulnerability Tsx async abort:   Not affected\n\nVersions of relevant libraries:\n[pip3] Could not collect\n[conda] Could not collect",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "task_hashes": {
+    "parallelbench_waiting_line_copy": "059cca572d1a14a751c0466c9c7253bd34233fecd7412515779f73b04fcc089a",
+    "parallelbench_waiting_line_reverse": "75d7f47f0a42cf221a26c5f94b84238b70ebcd2ea40cf9ffa3fac918a83a0150",
+    "parallelbench_waiting_line_sort": "e0fb40cf9bde813b500ca02a3e8d433235ff8b3da5c2f9c8e36b7b6706750861",
+    "parallelbench_waiting_line_shuffle": "af76e47412e5aa2c9b1bc04d50f0326433a6c1042fe6b9be71d8be5693298f06",
+    "parallelbench_waiting_line_insert_index": "6c9cb1fd8abb8ac47cd1b0423b87eedaa1a549139529f49bebde036d7321fed6",
+    "parallelbench_waiting_line_insert_random": "bd64428a0e2003e1fe1fe361e0cb8956c8faa02128c1a4ff5952eca260ad1e1a",
+    "parallelbench_waiting_line_remove_index": "1bd87bc238f28a3cc3a9416c1f2a2ccfff461397728d03f66f7a96ec5cfaeba1",
+    "parallelbench_waiting_line_remove_random": "20a7e41583a3cbd97bc37a463823655e578fe3059d33411dd3e78b855d1916c9",
+    "parallelbench_waiting_line_replace_index": "191f60e2901e4875dbe9e98fe6116cd6c2eeefe0d9eef674c5fd2b7c08a9292b",
+    "parallelbench_waiting_line_replace_random": "b29c2b4f1249401f26f7405b677bf6503e83fad763275bd6c73558b64a13f401",
+    "parallelbench_text_writing_paraphrasing": "e8f09ff840a2fd827572d75889d362ffa85bdba51b9b65f9732cae97bd7ccd1c",
+    "parallelbench_text_writing_summarization": "cd1785961621356a89676dacd85148e73a68a1f45a8da89ce2c0fb105bb8075d",
+    "parallelbench_text_writing_words_to_sentence_easy": "1bf00ba02985aa3c3b358ed3784fb383289e104e3ec24e9521b94313beee87fc",
+    "parallelbench_text_writing_words_to_sentence_medium": "bbf571abf8b0058de2516523b1cebe3ff643bc921a62bff0f3319c6c70e16033",
+    "parallelbench_text_writing_words_to_sentence_hard": "3c844c4077b1175a7bcbcaa2a34525ea2df53c739280dd749598d1074e01ee60",
+    "parallelbench_puzzles_sudoku_n4": "a6691a1b3d5a041aec4d241ea706bd3b37291a06ca5433a646c2d459dce1f681",
+    "parallelbench_puzzles_latin_square_n4": "20b6bcc41712cde8353b19a5d18dad54909d81e1205b0b67778b44c729cdf1dd"
+  },
+  "model_source": "parallelbench_llada",
+  "model_name": "GSAI-ML/LLaDA-1.5",
+  "model_name_sanitized": "GSAI-ML__LLaDA-1.5",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": true,
+  "chat_template": "",
+  "chat_template_sha": null,
+  "start_time": 683254.947011109,
+  "end_time": 683544.757023217,
+  "total_evaluation_time_seconds": "289.81001210806426"
+}
