@@ -164,8 +164,12 @@ def merge_sudoku_results(original_dir: Path, new_results_dir: Path) -> bool:
     original_results_file = original_dir / "results_parallelbench.json"
     original_samples_file = original_dir / f"samples_{SUDOKU_TASK}.jsonl"
 
-    # Find new results
-    new_results_files = list(new_results_dir.rglob("results_parallelbench.json"))
+    # Find new results — single-task eval produces results_<task_name>.json,
+    # not results_parallelbench.json
+    new_results_files = list(new_results_dir.rglob(f"results_{SUDOKU_TASK}.json"))
+    if not new_results_files:
+        # Fallback: full benchmark results file
+        new_results_files = list(new_results_dir.rglob("results_parallelbench.json"))
     if not new_results_files:
         print(f"  WARNING: No new results found in {new_results_dir}")
         return False
