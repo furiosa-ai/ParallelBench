@@ -87,20 +87,64 @@ class LladaModel(LocalModel):
         Returns:
             Tuple[torch.Tensor, int, Optional[dict]]: A tuple containing the generated token IDs, the number of forward evaluations (NFE), and optionally the generation history if output_history is True.
         """
-        # Dispatch to KLASS if adaptive method
+        # Dispatch adaptive methods to their dedicated generate functions
         if get_method_type(gen_config.unmasking) == "adaptive":
-            from parallelbench.models.local.llada.klass_generate import (
-                klass_generate_llada,
-            )
+            if gen_config.unmasking == "klass":
+                from parallelbench.models.local.llada.klass_generate import (
+                    klass_generate_llada,
+                )
 
-            return klass_generate_llada(
-                model=self.model,
-                prompt=input_ids,
-                gen_config=gen_config,
-                mask_id=self.mask_id,
-                output_history=output_history,
-                output0_ids=output0_ids,
-            )
+                return klass_generate_llada(
+                    model=self.model,
+                    prompt=input_ids,
+                    gen_config=gen_config,
+                    mask_id=self.mask_id,
+                    output_history=output_history,
+                    output0_ids=output0_ids,
+                )
+            elif gen_config.unmasking == "slowfast":
+                from parallelbench.models.local.llada.slowfast_generate import (
+                    slowfast_generate_llada,
+                )
+
+                return slowfast_generate_llada(
+                    model=self.model,
+                    prompt=input_ids,
+                    gen_config=gen_config,
+                    mask_id=self.mask_id,
+                    output_history=output_history,
+                    output0_ids=output0_ids,
+                )
+            elif gen_config.unmasking == "dus":
+                from parallelbench.models.local.llada.dus_generate import (
+                    dus_generate_llada,
+                )
+
+                return dus_generate_llada(
+                    model=self.model,
+                    prompt=input_ids,
+                    gen_config=gen_config,
+                    mask_id=self.mask_id,
+                    output_history=output_history,
+                    output0_ids=output0_ids,
+                )
+            elif gen_config.unmasking == "wino_dllm":
+                from parallelbench.models.local.llada.wino_generate import (
+                    wino_generate_llada,
+                )
+
+                return wino_generate_llada(
+                    model=self.model,
+                    prompt=input_ids,
+                    gen_config=gen_config,
+                    mask_id=self.mask_id,
+                    output_history=output_history,
+                    output0_ids=output0_ids,
+                )
+            else:
+                raise ValueError(
+                    f"Unknown adaptive unmasking method: {gen_config.unmasking}"
+                )
 
         gen_kwargs = gen_config.to_generation_kwargs()
 

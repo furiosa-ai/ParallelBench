@@ -7,8 +7,8 @@ Last updated: 2026-03-20
 ## Summary
 
 - **Models:** 4 (LLaDA × 2, Dream × 2)
-- **Methods:** 8 implemented
-- **Total runnable combinations:** 32
+- **Methods:** 11 implemented
+- **Total runnable combinations:** 35
 - **Disabled:** TraDo (block_length config issue under investigation), SDAR (runtime error)
 - **Blocked:** TODO methods (not yet implemented)
 
@@ -16,10 +16,10 @@ Last updated: 2026-03-20
 
 ### LLaDA Family (`parallelbench_llada`)
 
-| Model | HF Path | random | confidence_topk | confidence_threshold | confidence_factor | entropy_topk | topk_margin | left_to_right | klass |
-|-------|---------|--------|-----------------|----------------------|-------------------|--------------|-------------|---------------|-------|
-| LLaDA 1.5 | `GSAI-ML/LLaDA-1.5` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| LLaDA 8B Instruct | `GSAI-ML/LLaDA-8B-Instruct` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — |
+| Model | HF Path | random | confidence_topk | confidence_threshold | confidence_factor | entropy_topk | topk_margin | left_to_right | klass | slowfast | dus | wino_dllm |
+|-------|---------|--------|-----------------|----------------------|-------------------|--------------|-------------|---------------|-------|----------|-----|-----------|
+| LLaDA 1.5 | `GSAI-ML/LLaDA-1.5` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| LLaDA 8B Instruct | `GSAI-ML/LLaDA-8B-Instruct` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — | — |
 
 ### Dream Family (`parallelbench_dream`)
 
@@ -56,6 +56,9 @@ See [`parallelbench/models/local/sdar/README.md`](../parallelbench/models/local/
 | threshold (confidence_threshold) | `alg_threshold` | `0.5 0.6 0.7 0.8 0.9 1.0` |
 | factor (confidence_factor) | `alg_factor` | `0.7 1.0 1.3 1.6 1.9` |
 | adaptive (klass) | `conf_threshold` | `0.7 0.8 0.9 0.95` (with `kl_threshold=0.01`, `kl_history_length=2`) |
+| adaptive (slowfast) | `sf_high_confidence_threshold` | `0.5 0.6 0.7 0.8 0.9 1.0` (with `sf_cycle_confidence_threshold=0.3`) |
+| adaptive (dus) | `block_length` | `1 2 4 8 16 32` (with `dus_base=2`, `dus_remasking_threshold=0.3`) |
+| adaptive (wino_dllm) | `wino_threshold` | `0.5 0.6 0.7 0.8 0.9 1.0` (with `wino_threshold_back=0.9`) |
 
 ## TODO Methods (Not Yet Implemented)
 
@@ -66,9 +69,6 @@ These methods have placeholder scripts that exit with an error message. Sweep pa
 | eb_sampler | Entropy Bounded Sampler | LLaDA 1.5, Dream 7B | [EB-Sampler](https://arxiv.org/abs/2505.24857) | — |
 | pc_sampler_confidence | Position-aware Calibration Sampler (Confidence) | LLaDA 1.5 | [PC-Sampler](https://arxiv.org/abs/2508.13021) | — |
 | pc_sampler_random | Position-aware Calibration Sampler (Random) | LLaDA 1.5 | [PC-Sampler](https://arxiv.org/abs/2508.13021) | — |
-| slowfast | SlowFast Sampling | LLaDA 1.5 | [SlowFast Sampling](https://arxiv.org/abs/2506.10848) | [github.com/LiangrunFlora/Slow-Fast-Sampling](https://github.com/LiangrunFlora/Slow-Fast-Sampling) |
-| dus | Dilated Unmasking Scheduler | LLaDA 1.5 | [DUS](https://arxiv.org/abs/2506.19037) | [Project Page](https://omerlux.github.io/DUS-for-MDLMs/) |
-| wino_dllm | Wide-In, Narrow-Out Revokable Decoding | LLaDA 1.5 | [WINO-DLLM](https://arxiv.org/abs/2507.18578) | [github.com/Feng-Hong/WINO-DLLM](https://github.com/Feng-Hong/WINO-DLLM) |
 | apd | Adaptive Parallel Decoding | Dream 7B | [APD](https://arxiv.org/abs/2506.00413) | [github.com/danielmisrael/apd](https://github.com/danielmisrael/apd) |
 
 ## Scripts
@@ -78,7 +78,7 @@ All evaluation scripts are located in `scripts/`:
 ```text
 scripts/
   llada/
-    llada-1.5/{method}.sh          # 14 scripts (8 runnable + 6 TODO)
+    llada-1.5/{method}.sh          # 14 scripts (11 runnable + 3 TODO)
     llada-8b-instruct/{method}.sh  # 7 scripts (7 runnable)
   dream/
     dream-7b/{method}.sh           # 10 scripts (8 runnable + 2 TODO)

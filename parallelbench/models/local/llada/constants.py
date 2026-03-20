@@ -8,6 +8,9 @@ LLADA_VALID_METHODS = {
     "entropy_topk",
     "left_to_right",
     "klass",
+    "slowfast",
+    "dus",
+    "wino_dllm",
 }
 
 # Backward-compatible alias

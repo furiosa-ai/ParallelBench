@@ -32,7 +32,7 @@ from parallelbench.models.local.trado.constants import TRADO_VALID_METHODS
 
 
 def test_all_nine_methods_are_registered():
-    """All 9 expected method names are present in the registry."""
+    """All 12 expected method names are present in the registry."""
     expected = {
         "random",
         "origin",
@@ -43,6 +43,9 @@ def test_all_nine_methods_are_registered():
         "confidence_factor",
         "left_to_right",
         "klass",
+        "slowfast",
+        "dus",
+        "wino_dllm",
     }
     assert expected == set(UNMASKING_REGISTRY.keys())
 

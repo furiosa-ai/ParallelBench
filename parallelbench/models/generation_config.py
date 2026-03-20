@@ -15,6 +15,9 @@ DEFAULT_VALID_METHODS = {
     "confidence_factor",
     "left_to_right",
     "klass",
+    "slowfast",
+    "dus",
+    "wino_dllm",
 }
 
 # Backward-compatible alias
@@ -43,6 +46,16 @@ class DllmGenerationConfig(BaseGenerationConfig):
     conf_threshold: Optional[float] = None
     kl_threshold: Optional[float] = None
     kl_history_length: Optional[int] = None
+    # SlowFast-specific parameters
+    sf_exploration_steps: Optional[int] = None
+    sf_cycle_confidence_threshold: Optional[float] = None
+    sf_high_confidence_threshold: Optional[float] = None
+    # DUS-specific parameters
+    dus_base: Optional[int] = None
+    dus_remasking_threshold: Optional[float] = None
+    # WINO-DLLM-specific parameters
+    wino_threshold: Optional[float] = None
+    wino_threshold_back: Optional[float] = None
     valid_methods: set = field(default_factory=lambda: set(DEFAULT_VALID_METHODS))
 
     def __post_init__(self):
