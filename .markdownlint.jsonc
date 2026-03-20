@@ -156,13 +156,10 @@
   },
 
   // MD031/blanks-around-fences : Fenced code blocks should be surrounded by blank lines : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md031.md
-  "MD031": {
-    // Include list items
-    "list_items": true
-  },
+  "MD031": false,
 
   // MD032/blanks-around-lists : Lists should be surrounded by blank lines : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md032.md
-  "MD032": true,
+  "MD032": false,
 
   // MD033/no-inline-html : Inline HTML : https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/md033.md
   "MD033": {
