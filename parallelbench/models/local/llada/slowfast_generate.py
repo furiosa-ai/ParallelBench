@@ -210,9 +210,12 @@ def _slow_phase(
                 elif k_step == exploration_steps - 1:
                     actual_sub_cycle_end = int(np.mean(hist_arr))
             elif k_step == exploration_steps - 1:
-                actual_sub_cycle_end = max(
-                    1, min(int(np.mean(list(length_history))), block_length)
-                )
+                if len(length_history) > 0:
+                    actual_sub_cycle_end = max(
+                        1, min(int(np.mean(list(length_history))), block_length)
+                    )
+                else:
+                    actual_sub_cycle_end = block_length // 2
 
         # Fill 1 token: the most confident masked token in the exploration scope
         fill_start = block_start + last_sub_cycle_end
