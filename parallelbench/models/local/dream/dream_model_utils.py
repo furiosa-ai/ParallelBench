@@ -328,6 +328,8 @@ def sample_block(
                     )
 
                     for j in range(full_confidence.shape[0]):
+                        if current_transfer_tokens[j] == 0:
+                            continue
                         ns = list(range(1, current_transfer_tokens[j] + 1))
                         es = [factor / (n + 1) for n in ns]
                         threshs = [1 - e for e in es]
