@@ -363,6 +363,10 @@ def latin_square_to_str(square):
     return "\n".join(",".join(str(cell) for cell in row) for row in square)
 
 
+def latin_square_to_str_concat(square):
+    return "\n".join("".join(str(cell) for cell in row) for row in square)
+
+
 def str_to_latin_square(text, symbols):
     size = len(symbols)
     rows = text.strip().split("\n")

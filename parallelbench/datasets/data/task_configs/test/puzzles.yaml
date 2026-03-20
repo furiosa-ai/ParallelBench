@@ -26,6 +26,28 @@ tasks:
           H,T,6,P
 
           T,6,P,H'
+  latin_square_n4_concat:
+    type: latin_square_concat
+    metric: latin_square_concat_score
+    size: 4
+    prompt: Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result. Write each row by concatenating the symbols without any separator.
+    icl_example:
+      input:
+        size: 4
+        symbols: '[H, T, 6, P]'
+      answer:
+        symbols:
+        - H
+        - T
+        - '6'
+        - P
+        example: '6PHT
+
+          PHT6
+
+          HT6P
+
+          T6PH'
   sudoku_n4:
     type: sudoku
     metric: sudoku_score

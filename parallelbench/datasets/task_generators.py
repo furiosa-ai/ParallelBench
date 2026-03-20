@@ -17,6 +17,7 @@ from parallelbench.datasets.task_utils import (
     generate_sudoku_grid,
     generate_word_lists,
     latin_square_to_str,
+    latin_square_to_str_concat,
     list_difference,
     list_to_str,
     repeat_list,
@@ -292,6 +293,30 @@ def generate_latin_square_task(rng, task_config):
             "answer": {
                 "symbols": symbols,
                 "example": latin_square_to_str(latin_square),
+            },
+            "metadata": {
+                "length": size,
+            },
+        }
+
+
+@register_task_generator("latin_square_concat")
+def generate_latin_square_concat_task(rng, task_config):
+    size = task_config["size"]
+    num_samples = task_config["num_samples"]
+
+    all_symbols = ALPHABET_CHARS + [str(i) for i in (range(0, 10))]
+
+    for _ in range(num_samples):
+        symbols = rng.sample(all_symbols, size)
+
+        latin_square = generate_latin_square(rng, symbols)
+
+        yield {
+            "input": {"size": size, "symbols": list_to_str(symbols).replace('"', "")},
+            "answer": {
+                "symbols": symbols,
+                "example": latin_square_to_str_concat(latin_square),
             },
             "metadata": {
                 "length": size,

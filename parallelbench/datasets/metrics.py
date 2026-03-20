@@ -439,6 +439,38 @@ def latin_square_score(prediction, ground_truth) -> dict[str, float]:
     }
 
 
+def _latin_square_concat_score(prediction, ground_truth):
+    symbols = set(ground_truth["symbols"])
+    size = len(symbols)
+
+    pred_rows = [line.strip() for line in prediction.split("\n") if line.strip()]
+    pred_rows = [
+        line for line in pred_rows if set(line) == symbols and len(line) == size
+    ]
+
+    if len(pred_rows) < size:
+        return 0.0
+
+    pred_rows = pred_rows[:size]
+    rows = [list(row) for row in pred_rows]
+    cols = list(zip(*rows))
+
+    if any(set(row) != symbols for row in rows) or any(
+        set(col) != symbols for col in cols
+    ):
+        return 0.0
+
+    return 1.0
+
+
+def latin_square_concat_score(prediction, ground_truth) -> dict[str, float]:
+    score = _latin_square_concat_score(prediction, ground_truth)
+    return {
+        "score": score,
+        "score_strict": score,
+    }
+
+
 def sentence_to_words_score(prediction, ground_truth) -> dict[str, float]:
     words = ground_truth["words"]
 
@@ -694,6 +726,7 @@ parallelbench_metric_func_map = {
     "sentence_random_insert_score": sentence_random_insert_score,
     "sentence_replace_all_with_unique_random_score": sentence_replace_all_with_unique_random_score,
     "latin_square_score": latin_square_score,
+    "latin_square_concat_score": latin_square_concat_score,
     "math_op_score": math_op_score,
     "domino_score": domino_score,
     "sentence_to_words_score": sentence_to_words_score,
