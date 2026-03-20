@@ -1,20 +1,20 @@
 {
   "results": {
     "parallelbench_all": {
-      "score,none": 88.76470588235294,
+      "score,none": 84.58823529411765,
       "score_stderr,none": "N/A",
-      "tokens_per_step,none": 5.275300356017491,
+      "tokens_per_step,none": 5.009689979587228,
       "tokens_per_step_stderr,none": "N/A",
-      "nfe,none": 15.597058823529412,
+      "nfe,none": 16.186470588235295,
       "nfe_stderr,none": "N/A",
       "alias": "ParallelBench"
     },
     "parallelbench_puzzles": {
-      "score,none": 72.0,
+      "score,none": 36.5,
       "score_stderr,none": "N/A",
-      "tokens_per_step,none": 5.165258598192676,
+      "tokens_per_step,none": 2.9075703985354364,
       "tokens_per_step_stderr,none": "N/A",
-      "nfe,none": 18.585,
+      "nfe,none": 23.595,
       "nfe_stderr,none": "N/A",
       "alias": " - ParallelBench - Puzzles"
     },
@@ -42,27 +42,19 @@
       "dec_order_spearman_ignore_pad_stderr,none": "N/A"
     },
     "parallelbench_puzzles_sudoku_n4": {
-      "alias": "  - parallelbench_puzzles_sudoku_n4",
-      "score,none": 98.0,
+      "alias": "parallelbench_puzzles_sudoku_n4",
+      "score,none": 27.0,
       "score_stderr,none": "N/A",
-      "score_strict,none": 98.0,
+      "score_strict,none": 27.0,
       "score_strict_stderr,none": "N/A",
-      "nfe,none": 8.25,
+      "nfe,none": 18.27,
       "nfe_stderr,none": "N/A",
-      "tokens_per_step,none": 8.059266955266954,
+      "tokens_per_step,none": 3.543890555952475,
       "tokens_per_step_stderr,none": "N/A",
-      "input_length,none": 212.35,
+      "input_length,none": 215.0,
       "input_length_stderr,none": "N/A",
       "output_length,none": 20.0,
-      "output_length_stderr,none": "N/A",
-      "dec_order_kendall,none": -0.5860474993920373,
-      "dec_order_kendall_stderr,none": "N/A",
-      "dec_order_spearman,none": -0.6870043044223836,
-      "dec_order_spearman_stderr,none": "N/A",
-      "dec_order_kendall_ignore_pad,none": -0.055203263581783235,
-      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
-      "dec_order_spearman_ignore_pad,none": -0.06241038063708947,
-      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+      "output_length_stderr,none": "N/A"
     },
     "parallelbench_text_writing": {
       "score,none": 98.0,

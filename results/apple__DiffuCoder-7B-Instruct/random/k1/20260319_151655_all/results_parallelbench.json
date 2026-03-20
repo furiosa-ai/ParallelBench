@@ -3,7 +3,7 @@
     "parallelbench_all": {
       "tokens_per_step,none": 1.0,
       "tokens_per_step_stderr,none": "N/A",
-      "score,none": 58.23529411764706,
+      "score,none": 58.1764705882353,
       "score_stderr,none": "N/A",
       "nfe,none": 45.1764705882353,
       "nfe_stderr,none": "N/A",
@@ -12,7 +12,7 @@
     "parallelbench_puzzles": {
       "tokens_per_step,none": 1.0,
       "tokens_per_step_stderr,none": "N/A",
-      "score,none": 5.0,
+      "score,none": 4.5,
       "score_stderr,none": "N/A",
       "nfe,none": 64.0,
       "nfe_stderr,none": "N/A",
@@ -42,27 +42,19 @@
       "dec_order_spearman_ignore_pad_stderr,none": "N/A"
     },
     "parallelbench_puzzles_sudoku_n4": {
-      "alias": "  - parallelbench_puzzles_sudoku_n4",
-      "score,none": 8.0,
+      "alias": "parallelbench_puzzles_sudoku_n4",
+      "score,none": 7.000000000000001,
       "score_stderr,none": "N/A",
-      "score_strict,none": 7.000000000000001,
+      "score_strict,none": 6.0,
       "score_strict_stderr,none": "N/A",
       "nfe,none": 64.0,
       "nfe_stderr,none": "N/A",
       "tokens_per_step,none": 1.0,
       "tokens_per_step_stderr,none": "N/A",
-      "input_length,none": 208.45,
+      "input_length,none": 212.0,
       "input_length_stderr,none": "N/A",
-      "output_length,none": 22.84,
-      "output_length_stderr,none": "N/A",
-      "dec_order_kendall,none": 0.04133002481389579,
-      "dec_order_kendall_stderr,none": "N/A",
-      "dec_order_spearman,none": 0.05890611048787747,
-      "dec_order_spearman_stderr,none": "N/A",
-      "dec_order_kendall_ignore_pad,none": NaN,
-      "dec_order_kendall_ignore_pad_stderr,none": "N/A",
-      "dec_order_spearman_ignore_pad,none": NaN,
-      "dec_order_spearman_ignore_pad_stderr,none": "N/A"
+      "output_length,none": 26.83,
+      "output_length_stderr,none": "N/A"
     },
     "parallelbench_text_writing": {
       "score,none": 90.2,
