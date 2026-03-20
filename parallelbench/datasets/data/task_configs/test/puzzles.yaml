@@ -48,6 +48,67 @@ tasks:
           HT6P
 
           T6PH'
+  latin_square_n4_rules_1shot:
+    type: latin_square
+    metric: latin_square_score
+    size: 4
+    prompt: 'Generate a Latin square of size {size} with the symbols {symbols}. A Latin square is a grid where each row and each column contains every symbol exactly once. Only output the final result as CSV.'
+    icl_example:
+      input:
+        size: 4
+        symbols: '[H, T, 6, P]'
+      answer:
+        symbols: [H, T, '6', P]
+        example: '6,P,H,T
+
+          P,H,T,6
+
+          H,T,6,P
+
+          T,6,P,H'
+  latin_square_n4_rules_3shot_cyclic:
+    type: latin_square
+    metric: latin_square_score
+    size: 4
+    icl_example_count: 3
+    prompt: 'Generate a Latin square of size {size} with the symbols {symbols}. A Latin square is a grid where each row and each column contains every symbol exactly once. Only output the final result as CSV.'
+    icl_examples:
+      - input:
+          size: 4
+          symbols: '[H, T, 6, P]'
+        answer:
+          symbols: [H, T, '6', P]
+          example: '6,P,H,T
+
+            P,H,T,6
+
+            H,T,6,P
+
+            T,6,P,H'
+      - input:
+          size: 4
+          symbols: '[W, 3, K, R]'
+        answer:
+          symbols: [W, '3', K, R]
+          example: 'K,R,W,3
+
+            R,W,3,K
+
+            W,3,K,R
+
+            3,K,R,W'
+      - input:
+          size: 4
+          symbols: '[5, M, D, J]'
+        answer:
+          symbols: ['5', M, D, J]
+          example: 'D,J,5,M
+
+            J,5,M,D
+
+            5,M,D,J
+
+            M,D,J,5'
   latin_square_n4_3shot_cyclic:
     type: latin_square
     metric: latin_square_score
