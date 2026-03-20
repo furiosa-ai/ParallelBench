@@ -110,6 +110,11 @@ class DLLMBase(LM):
                 derived = info.derive_fn(float(gen_kwargs[param]), max_tokens)
                 steps = derived["steps"]
                 block_length = derived["block_length"]
+            elif info.method_type == "adaptive":
+                # Adaptive methods derive steps/block_length from max_tokens
+                derived = info.derive_fn(0, max_tokens)
+                steps = derived["steps"]
+                block_length = derived["block_length"]
             else:
                 steps = int(gen_kwargs.get("steps", 128))
                 block_length = int(gen_kwargs.get("block_length", 128))
