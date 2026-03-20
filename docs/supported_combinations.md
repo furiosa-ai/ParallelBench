@@ -6,10 +6,11 @@ Last updated: 2026-03-20
 
 ## Summary
 
-- **Models:** 6 (LLaDA × 2, Dream × 2, TraDo × 2)
+- **Models:** 4 (LLaDA × 2, Dream × 2)
 - **Methods:** 6 implemented
-- **Total runnable combinations:** 28
-- **Blocked:** SDAR (runtime error), TODO methods (not yet implemented)
+- **Total runnable combinations:** 24
+- **Disabled:** TraDo (block_length config issue under investigation), SDAR (runtime error)
+- **Blocked:** TODO methods (not yet implemented)
 
 ## Combination Matrix
 
@@ -27,14 +28,16 @@ Last updated: 2026-03-20
 | Dream 7B | `Dream-org/Dream-v0-Instruct-7B` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | DiffuCoder | `apple/DiffuCoder-7B-Instruct` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-### TraDo Family (`parallelbench_trado`)
+### TraDo Family (`parallelbench_trado`) — Disabled
 
-| Model | HF Path | confidence_topk | confidence_threshold |
-|-------|---------|-----------------|----------------------|
-| TraDo 4B | `Gen-Verse/TraDo-4B-Instruct` | ✅ | ✅ |
-| TraDo 8B | `Gen-Verse/TraDo-8B-Instruct` | ✅ | ✅ |
+| Model | HF Path | Status |
+|-------|---------|--------|
+| TraDo 4B | `Gen-Verse/TraDo-4B-Instruct` | ⚠️ Disabled — `block_length` config issue under investigation |
+| TraDo 8B | `Gen-Verse/TraDo-8B-Instruct` | ⚠️ Disabled — `block_length` config issue under investigation |
 
-### SDAR Family (`parallelbench_sdar`) — Blocked
+The unmasking registry's `derive_topk` sets `block_length=max_tokens`, which may conflict with TraDo's block attention mask requirements. Model and wrapper code are commented out in `pyproject.toml` and `parallelbench/models/`.
+
+### SDAR Family (`parallelbench_sdar`) — Disabled
 
 | Model | HF Path | Status |
 |-------|---------|--------|
@@ -72,7 +75,7 @@ These methods have placeholder scripts that exit with an error message. Sweep pa
 
 All evaluation scripts are located in `scripts/`:
 
-```
+```text
 scripts/
   llada/
     llada-1.5/{method}.sh          # 14 scripts (6 runnable + 8 TODO)
@@ -81,6 +84,6 @@ scripts/
     dream-7b/{method}.sh           # 10 scripts (6 runnable + 4 TODO)
     diffucoder/{method}.sh         # 7 scripts (6 runnable + 1 TODO)
   sdar/
-    sdar-{1.7b,4b,8b}/{method}.sh  # 9 scripts (blocked)
-    trado-{4b,8b}/{method}.sh      # 6 scripts (4 runnable + 2 random blocked)
+    sdar-{1.7b,4b,8b}/{method}.sh  # 9 scripts (disabled)
+    trado-{4b,8b}/{method}.sh      # 6 scripts (disabled)
 ```

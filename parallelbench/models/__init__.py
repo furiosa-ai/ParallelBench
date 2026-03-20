@@ -1,7 +1,7 @@
 from parallelbench.models.base_model import ApiModel, BaseModel, LocalModel
 
 # Local models
-from parallelbench.models.local import DreamModel, LladaModel, TradoModel, SdarModel, SeddModel
+from parallelbench.models.local import DreamModel, LladaModel, SeddModel
 
 # API models
 from parallelbench.models.api import AnthropicModel, MercuryModel
@@ -33,8 +33,8 @@ __all__ = [
     "ModelRegistry",
     "DreamModel",
     "LladaModel",
-    "TradoModel",
-    "SdarModel",
+    # "TradoModel",
+    # "SdarModel",
     "SeddModel",
     "AnthropicModel",
     "MercuryModel",

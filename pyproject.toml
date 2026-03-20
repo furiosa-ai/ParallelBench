@@ -49,8 +49,8 @@ flash-attn = [
 parallelbench_llada = "parallelbench.lm_eval_wrappers.llada_wrapper:LLaDAWrapper"
 parallelbench_dream = "parallelbench.lm_eval_wrappers.dream_wrapper:DreamWrapper"
 parallelbench_sedd = "parallelbench.lm_eval_wrappers.sedd_wrapper:SEDDWrapper"
-parallelbench_trado = "parallelbench.lm_eval_wrappers.trado_wrapper:TradoWrapper"
-parallelbench_sdar = "parallelbench.lm_eval_wrappers.sdar_wrapper:SdarWrapper"
+# parallelbench_trado = "parallelbench.lm_eval_wrappers.trado_wrapper:TradoWrapper"
+# parallelbench_sdar = "parallelbench.lm_eval_wrappers.sdar_wrapper:SdarWrapper"
 parallelbench_ar = "parallelbench.lm_eval_wrappers.ar_wrapper:ARWrapper"
 parallelbench_api = "parallelbench.lm_eval_wrappers.api_wrapper:ApiWrapper"
 

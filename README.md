@@ -149,7 +149,7 @@ For additional models and unmasking methods, please refer to the [Roadmap](https
 | --- | --- | --- |
 | LLaDA | `parallelbench_llada` | `GSAI-ML/LLaDA-1.5` |
 | Dream, DiffuCoder | `parallelbench_dream` | `Dream-org/Dream-v0-Instruct-7B` |
-| SDAR, TraDo | `parallelbench_trado` | `JetAstra/SDAR-1.5-8B` |
+| ~~SDAR, TraDo~~ | ~~`parallelbench_trado`~~ | Disabled (under investigation) |
 | SEDD | `parallelbench_sedd` | `louaaron/sedd-medium` |
 | AR baselines (vLLM) | `parallelbench_ar` | `meta-llama/Llama-3.1-8B-Instruct` |
 | API models | `parallelbench_api` | Haiku, Mercury (requires `.env` keys) |
