@@ -129,6 +129,13 @@ class DLLMBase(LM):
             config["alg_threshold"] = float(gen_kwargs["alg_threshold"])
         if "alg_factor" in gen_kwargs:
             config["alg_factor"] = float(gen_kwargs["alg_factor"])
+        # KLASS-specific parameters (adaptive methods)
+        if "conf_threshold" in gen_kwargs:
+            config["conf_threshold"] = float(gen_kwargs["conf_threshold"])
+        if "kl_threshold" in gen_kwargs:
+            config["kl_threshold"] = float(gen_kwargs["kl_threshold"])
+        if "kl_history_length" in gen_kwargs:
+            config["kl_history_length"] = int(gen_kwargs["kl_history_length"])
         return config
 
     # ─── lm-eval LM interface ────────────────────────────────────────────
