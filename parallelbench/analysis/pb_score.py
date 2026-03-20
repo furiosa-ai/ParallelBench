@@ -137,11 +137,52 @@ def compute_pb_scores(
         avg_tps = sum(task_avg_tps) / len(task_avg_tps)
         config_summaries.append((avg_tps, avg_score))
 
-    # For each threshold, find the maximum average TPS that meets it
-    # Scores are on a 0-100 scale, so thresholds are compared directly
+    # Decide scoring strategy based on method type.
+    # Top-k methods have deterministic TPS (= k), so use discrete scoring.
+    # All other methods (threshold, factor, klass, etc.) have measured TPS,
+    # so use linear interpolation between adjacent (TPS, score) points.
+    method_types = set()
+    for config_key in config_data:
+        try:
+            method_types.add(get_method_type(config_key[0]))
+        except KeyError:
+            pass
+    use_interpolation = bool(method_types) and "topk" not in method_types
+
+    # Sort by TPS ascending; deduplicate same-TPS configs (keep highest score).
+    sorted_configs = sorted(config_summaries, key=lambda x: x[0])
+    deduped: list[tuple[float, float]] = []
+    for tps, score in sorted_configs:
+        if deduped and deduped[-1][0] == tps:
+            if score > deduped[-1][1]:
+                deduped[-1] = (tps, score)
+        else:
+            deduped.append((tps, score))
+    sorted_configs = deduped
+
     pb_scores: dict[str, float | None] = {}
     for threshold in sorted(thresholds, reverse=True):
-        qualifying = [tps for tps, avg in config_summaries if avg >= threshold]
-        pb_scores[f"PB{threshold}"] = max(qualifying) if qualifying else None
+        result: float | None = None
+
+        if use_interpolation:
+            # Linear interpolation: find the rightmost crossing point
+            # where score transitions from at-or-above to below threshold.
+            if sorted_configs and sorted_configs[-1][1] >= threshold:
+                result = sorted_configs[-1][0]
+            else:
+                for i in range(len(sorted_configs) - 1, 0, -1):
+                    tps_hi, score_hi = sorted_configs[i]
+                    tps_lo, score_lo = sorted_configs[i - 1]
+                    if score_lo >= threshold > score_hi and score_lo != score_hi:
+                        result = tps_lo + (score_lo - threshold) / (
+                            score_lo - score_hi
+                        ) * (tps_hi - tps_lo)
+                        break
+        else:
+            # Discrete: max TPS among configs that meet the threshold
+            qualifying = [tps for tps, avg in sorted_configs if avg >= threshold]
+            result = max(qualifying) if qualifying else None
+
+        pb_scores[f"PB{threshold}"] = result
 
     return pb_scores
