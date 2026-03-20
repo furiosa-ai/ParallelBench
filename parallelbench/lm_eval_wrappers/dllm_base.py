@@ -119,7 +119,13 @@ class DLLMBase(LM):
                 steps = int(gen_kwargs.get("steps", 128))
                 block_length = int(gen_kwargs.get("block_length", 128))
         else:
-            steps = int(gen_kwargs.get("steps", 128))
+            info = get_method_info(unmasking)
+            if not steps_explicit and info.method_type == "adaptive":
+                # Adaptive methods use max_tokens as steps (step count is
+                # determined dynamically by the method, not by a fixed budget)
+                steps = max_tokens
+            else:
+                steps = int(gen_kwargs.get("steps", 128))
             block_length = int(gen_kwargs.get("block_length", 128))
 
         config = {
@@ -141,6 +147,29 @@ class DLLMBase(LM):
             config["kl_threshold"] = float(gen_kwargs["kl_threshold"])
         if "kl_history_length" in gen_kwargs:
             config["kl_history_length"] = int(gen_kwargs["kl_history_length"])
+        # SlowFast-specific parameters
+        if "sf_exploration_steps" in gen_kwargs:
+            config["sf_exploration_steps"] = int(gen_kwargs["sf_exploration_steps"])
+        if "sf_cycle_confidence_threshold" in gen_kwargs:
+            config["sf_cycle_confidence_threshold"] = float(
+                gen_kwargs["sf_cycle_confidence_threshold"]
+            )
+        if "sf_high_confidence_threshold" in gen_kwargs:
+            config["sf_high_confidence_threshold"] = float(
+                gen_kwargs["sf_high_confidence_threshold"]
+            )
+        # DUS-specific parameters
+        if "dus_base" in gen_kwargs:
+            config["dus_base"] = int(gen_kwargs["dus_base"])
+        if "dus_remasking_threshold" in gen_kwargs:
+            config["dus_remasking_threshold"] = float(
+                gen_kwargs["dus_remasking_threshold"]
+            )
+        # WINO-DLLM-specific parameters
+        if "wino_threshold" in gen_kwargs:
+            config["wino_threshold"] = float(gen_kwargs["wino_threshold"])
+        if "wino_threshold_back" in gen_kwargs:
+            config["wino_threshold_back"] = float(gen_kwargs["wino_threshold_back"])
         return config
 
     # ─── lm-eval LM interface ────────────────────────────────────────────
