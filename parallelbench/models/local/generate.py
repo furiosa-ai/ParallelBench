@@ -291,6 +291,8 @@ def get_transfer_index_dynamic(
     num_transfer_tokens = mask_index.sum(dim=1, keepdim=True)
 
     for j in range(confidence.shape[0]):
+        if num_transfer_tokens[j] == 0:
+            continue
         ns = list(range(1, num_transfer_tokens[j] + 1))
         es = [factor / (n + 1) for n in ns]
         threshs = [1 - e for e in es]
