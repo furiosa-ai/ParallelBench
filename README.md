@@ -89,7 +89,14 @@ For methods with deterministic TPS (top-k family), PBx is the measured TPS value
 ### 1. Prerequisites
 - **NVIDIA GPU**: CUDA >= 11.8.
 
-### 2. Install
+### 2. Clone
+
+```bash
+git clone --recurse-submodules https://github.com/furiosa-ai/ParallelBench.git
+cd ParallelBench
+```
+
+### 3. Install
 
 We use `uv` for faster package installation. The following command will install all dependencies including Python packages, PyTorch, `vLLM`, and JDK 17 (for grammar-based evaluation metrics).
 
