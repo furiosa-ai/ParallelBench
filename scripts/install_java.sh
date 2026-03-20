@@ -13,6 +13,9 @@ fi
 
 echo "[install_java] Java not found. Installing JDK ${JAVA_VERSION} via install-jdk..."
 
+# Ensure parent directory exists (install-jdk uses os.mkdir, not os.makedirs)
+mkdir -p "$(dirname "${INSTALL_DIR}")"
+
 # Use the install-jdk Python package (included in project dependencies)
 JAVA_PATH=$(python -c "
 import jdk
