@@ -582,7 +582,10 @@ def _build_leaderboard_records(rows: list[dict]) -> list[dict]:
         record.update(pb_scores)
         records.append(record)
 
-    records.sort(key=lambda r: r.get("PB80") or -1, reverse=True)
+    records.sort(
+        key=lambda r: tuple(r.get(f"PB{t}") or -1 for t in (80, 70, 60, 90)),
+        reverse=True,
+    )
     return records
 
 
@@ -597,7 +600,8 @@ def _print_leaderboard_table(records: list[dict], title: str) -> None:
     table.add_column("#", justify="right", style="dim", min_width=3)
     table.add_column("Model", min_width=20)
     table.add_column("Method", min_width=18)
-    for t in DEFAULT_THRESHOLDS:
+    display_thresholds = [t for t in DEFAULT_THRESHOLDS if t != 90]
+    for t in display_thresholds:
         table.add_column(f"PB{t}", justify="right", min_width=6)
 
     for rank, record in enumerate(records, 1):
@@ -605,7 +609,7 @@ def _print_leaderboard_table(records: list[dict], title: str) -> None:
             str(rank),
             _display_name(record["model"]),
             _method_name(record["method"]),
-            *[_format_pbx(record.get(f"PB{t}")) for t in DEFAULT_THRESHOLDS],
+            *[_format_pbx(record.get(f"PB{t}")) for t in display_thresholds],
         )
 
     console.print()
