@@ -110,16 +110,29 @@ make install
 
 > **Note**: JDK 17 is installed locally via the `install-jdk` Python package — no `sudo` required. If you already have Java installed, the script will skip the installation.
 
+### 4. Running `pb` CLI
+
+The `pb` command is available through the virtual environment. Use either method:
+
+```bash
+# Option 1: Run directly via uv (no activation needed)
+uv run pb <command>
+
+# Option 2: Activate the virtual environment first
+source .venv/bin/activate
+pb <command>
+```
+
 ## ⚡ Quickstart
 
 ```bash
 # Browse tasks (no GPU required)
-pb browse                              # List all available tasks
-pb browse waiting_line/copy            # View samples from a specific task
-pb browse waiting_line/copy --index 3  # View a specific sample by index
+uv run pb browse                              # List all available tasks
+uv run pb browse waiting_line/copy            # View samples from a specific task
+uv run pb browse waiting_line/copy --index 3  # View a specific sample by index
 
 # Run evaluation on a single task
-pb eval --model parallelbench_llada \
+uv run pb eval --model parallelbench_llada \
   --model_args model_path=GSAI-ML/LLaDA-1.5 \
   --gen_kwargs k=32,unmasking=random \
   --tasks parallelbench_waiting_line_copy \
