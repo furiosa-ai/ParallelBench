@@ -52,7 +52,7 @@ See [`parallelbench/models/local/sdar/README.md`](../parallelbench/models/local/
 | Method Type | Parameter | Sweep Values |
 |-------------|-----------|-------------|
 | topk (random, confidence_topk, topk_margin, entropy_topk) | `k` | `1 2 4 8 16 32` |
-| topk (left_to_right) | `k` | `1` (fixed — one token per step, leftmost first) |
+| topk (left_to_right) | `k` | `1 2 4 8 16 32` |
 | threshold (confidence_threshold) | `alg_threshold` | `0.5 0.6 0.7 0.8 0.9 1.0` |
 | factor (confidence_factor) | `alg_factor` | `0.7 1.0 1.3 1.6 1.9` |
 | adaptive (klass) | `conf_threshold` | `0.7 0.8 0.9 0.95` (with `kl_threshold=0.01`, `kl_history_length=2`) |

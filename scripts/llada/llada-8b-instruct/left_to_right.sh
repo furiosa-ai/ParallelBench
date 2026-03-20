@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Run LLaDA 8B Instruct with left-to-right sequential decoding.
+# Run LLaDA 8B Instruct with left-to-right decoding across k values.
 #
-# Left-to-right always uses k=1 (one token per step, leftmost first).
+# Sweeps k = 1, 2, 4, 8, 16, 32 with unmasking=left_to_right.
 #
 # Usage:
 #   bash scripts/llada/llada-8b-instruct/left_to_right.sh                    # single GPU
@@ -13,19 +13,21 @@ EXTRA_ARGS="${*}"
 OUTPUT_DIR="results"
 export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_all}"
 
-echo ""
-echo "============================================"
-echo "Running left-to-right (k=1)"
-echo "============================================"
+for K in 1 2 4 8 16 32; do
+    echo ""
+    echo "============================================"
+    echo "Running k=${K} with left-to-right"
+    echo "============================================"
 
-uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
-    --model parallelbench_llada \
-    --model_args model_path=GSAI-ML/LLaDA-8B-Instruct \
-    --gen_kwargs k=1,unmasking=left_to_right \
-    --tasks parallelbench_all \
-    --include_path parallelbench/tasks \
-    --batch_size 8 \
-    --apply_chat_template \
-    --fewshot_as_multiturn \
-    --log_samples \
-    --output_path "$OUTPUT_DIR"
+    uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
+        --model parallelbench_llada \
+        --model_args model_path=GSAI-ML/LLaDA-8B-Instruct \
+        --gen_kwargs k=${K},unmasking=left_to_right \
+        --tasks parallelbench_all \
+        --include_path parallelbench/tasks \
+        --batch_size 8 \
+        --apply_chat_template \
+        --fewshot_as_multiturn \
+        --log_samples \
+        --output_path "$OUTPUT_DIR"
+done
