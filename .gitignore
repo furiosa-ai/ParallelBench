@@ -223,8 +223,7 @@ __marimo__/
 /logs/
 /hub/
 /artifacts/
-parallelbench/datasets/data/output/
-/figures/
+output/
 
 .env
 *.local
