@@ -3,7 +3,7 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
-from transformers import AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
 from parallelbench.models.base_model import DLLMOutput, LocalModel
@@ -53,18 +53,9 @@ class SdarGenerationConfig(DllmGenerationConfig):
 @ModelRegistry.register(lambda name: "sdar" in name.lower())
 class SdarModel(LocalModel):
     def __init__(self, model_name):
-        # Load SDAR using local patched modeling file to avoid
-        # missing fused_linear_diffusion_cross_entropy.py in HF repo
-        from .modeling_sdar_patched import SDARForCausalLM
-        from .configuration_sdar import SDARConfig
-
-        config = SDARConfig.from_pretrained(model_name)
-        # Use SDPA attention: flex_attention expects BlockMask objects
-        # but block_diffusion_utils passes regular 4D tensors as attention_mask
-        config._attn_implementation = "sdpa"
-        self.model = SDARForCausalLM.from_pretrained(
+        self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            config=config,
+            trust_remote_code=True,
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
