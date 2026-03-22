@@ -12,13 +12,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Install dependencies
-        run: uv sync --no-dev
+      - name: Install export dependencies
+        run: pip install -e . --no-deps && pip install rich
 
       - name: Export results to site data
-        run: uv run pb export --output /tmp/site-data
+        run: python -m parallelbench.cli.export --output /tmp/site-data
 
       - uses: actions/checkout@v4
         with:

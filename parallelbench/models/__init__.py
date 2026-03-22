@@ -1,21 +1,23 @@
-from parallelbench.models.base_model import ApiModel, BaseModel, LocalModel
+"""ParallelBench model system.
 
-# Local models
-from parallelbench.models.local import DreamModel, LladaModel, SeddModel
+Heavy imports (torch, transformers, vllm) are deferred to first access
+so that lightweight consumers (analysis, export CLI) can import from
+this package without GPU dependencies.
+"""
 
-# API models
-from parallelbench.models.api import AnthropicModel, MercuryModel
-from parallelbench.models.registry import ModelRegistry
-from parallelbench.models.local.transformers_model import TransformersModel
-from parallelbench.models.local.vllm_model import vllmModel
+from __future__ import annotations
 
-# Unmasking registry
+import importlib
+from typing import TYPE_CHECKING
+
+# Unmasking registry — no heavy dependencies
 from parallelbench.models.unmasking_registry import (
     UNMASKING_REGISTRY,
     MethodInfo,
     StrategyInfo,
     get_all_methods,
     get_all_strategies,
+    get_confidence_fn,
     get_representative_param,
     get_method_info,
     get_method_type,
@@ -25,6 +27,14 @@ from parallelbench.models.unmasking_registry import (
     register_strategy,
 )
 
+if TYPE_CHECKING:
+    from parallelbench.models.base_model import ApiModel, BaseModel, LocalModel
+    from parallelbench.models.registry import ModelRegistry
+    from parallelbench.models.local import DreamModel, LladaModel, SeddModel
+    from parallelbench.models.api import AnthropicModel, MercuryModel
+    from parallelbench.models.local.transformers_model import TransformersModel
+    from parallelbench.models.local.vllm_model import vllmModel
+
 
 __all__ = [
     "BaseModel",
@@ -33,8 +43,6 @@ __all__ = [
     "ModelRegistry",
     "DreamModel",
     "LladaModel",
-    # "TradoModel",
-    # "SdarModel",
     "SeddModel",
     "AnthropicModel",
     "MercuryModel",
@@ -45,6 +53,7 @@ __all__ = [
     "StrategyInfo",
     "get_all_methods",
     "get_all_strategies",
+    "get_confidence_fn",
     "get_representative_param",
     "get_method_info",
     "get_method_type",
@@ -52,12 +61,36 @@ __all__ = [
     "get_strategy_type",
     "register_method",
     "register_strategy",
+    "load_model",
 ]
+
+# Lazy-loaded modules for heavy dependencies
+_LAZY_IMPORTS = {
+    "BaseModel": "parallelbench.models.base_model",
+    "ApiModel": "parallelbench.models.base_model",
+    "LocalModel": "parallelbench.models.base_model",
+    "ModelRegistry": "parallelbench.models.registry",
+    "DreamModel": "parallelbench.models.local",
+    "LladaModel": "parallelbench.models.local",
+    "SeddModel": "parallelbench.models.local",
+    "AnthropicModel": "parallelbench.models.api",
+    "MercuryModel": "parallelbench.models.api",
+    "TransformersModel": "parallelbench.models.local.transformers_model",
+    "vllmModel": "parallelbench.models.local.vllm_model",
+}
+
+
+def __getattr__(name: str):
+    if name in _LAZY_IMPORTS:
+        module = importlib.import_module(_LAZY_IMPORTS[name])
+        return getattr(module, name)
+    if name == "load_model":
+        return load_model
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def load_model(model_name: str, **kwargs) -> "BaseModel":
-    """
-    Load a model from the specified model name with given model arguments.
+    """Load a model from the specified model name with given model arguments.
 
     Dispatch order:
     1. Try ModelRegistry (name-based lookup)
@@ -65,18 +98,21 @@ def load_model(model_name: str, **kwargs) -> "BaseModel":
     3. Raise ValueError if no match
 
     Args:
-        model_name (str): Name or path of the model.
+        model_name: Name or path of the model.
         **kwargs: Additional arguments. May include 'accel_framework' for dispatch.
 
     Returns:
-        BaseModel: An instance of the loaded model.
+        An instance of the loaded model.
 
     Raises:
         ValueError: If model_name is not supported.
     """
+    from parallelbench.models.registry import ModelRegistry
+    from parallelbench.models.local.transformers_model import TransformersModel
+    from parallelbench.models.local.vllm_model import vllmModel
+
     accel_framework = kwargs.pop("accel_framework", None)
 
-    # Try registry first
     try:
         model_class = ModelRegistry.get_model_class(model_name)
     except ValueError:
