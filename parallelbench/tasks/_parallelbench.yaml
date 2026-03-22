@@ -1,0 +1,16 @@
+group: parallelbench_all
+group_alias: ParallelBench
+aggregate_metric_list:
+  - metric: score
+    aggregation: mean
+    weight_by_size: true
+  - metric: nfe
+    aggregation: mean
+    weight_by_size: true
+  - metric: tokens_per_step
+    aggregation: mean
+    weight_by_size: true
+task:
+  - parallelbench_waiting_line
+  - parallelbench_text_writing
+  - parallelbench_puzzles

@@ -1,0 +1,8 @@
+include: _base.yml
+task: parallelbench_puzzles_sudoku_n4
+metadata:
+  parallelbench_task: "puzzles/sudoku_n4"
+  flex_config:
+    size: 4
+    num_holes: 8
+    num_samples: 100

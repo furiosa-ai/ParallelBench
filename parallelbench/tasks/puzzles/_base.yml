@@ -1,0 +1,10 @@
+class: !function ../parallelbench_task.ParallelBenchTask
+dataset_path: furiosa-ai/ParallelBench
+num_fewshot: 1
+output_type: generate_until
+generation_kwargs:
+  until:
+    - "\n\n\n"
+  do_sample: false
+  max_tokens: 64
+test_split: test

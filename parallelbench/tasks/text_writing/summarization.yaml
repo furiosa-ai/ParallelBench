@@ -1,0 +1,4 @@
+include: _base.yml
+task: parallelbench_text_writing_summarization
+metadata:
+  parallelbench_task: "text_writing/summarization"

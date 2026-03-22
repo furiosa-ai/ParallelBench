@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "parallelbench"
 version = "0.1.0"
@@ -6,15 +10,23 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "sedd",
-    "fast-dllm",
     "flash-attn",
     "torch==2.8.*",
     "transformers==4.*",
+    "datasets>=2.14.0",
     "evaluate>=0.4.6",
     "scipy>=1.17.0",
     "anthropic>=0.71.0",
     "python-dotenv>=1.2.1",
     "vllm==0.11.*",
+    "lm-eval>=0.4.8",
+    "language-tool-python>=3.2.2",
+    "bert-score>=0.3.13",
+    "rich>=13.0.0",
+    "install-jdk>=1.1.0",
+    "jupyter>=1.1.1",
+    "notebook>=7.5.5",
+    "ipywidgets>=8.1.8",
 ]
 
 
@@ -27,7 +39,6 @@ members = [
 
 [tool.uv.sources]
 sedd = { workspace = true, editable = true }
-fast-dllm = { workspace = true, editable = true }
 
 
 [tool.uv.extra-build-dependencies]
@@ -37,8 +48,23 @@ flash-attn = [
     "packaging",
 ]
 
+[project.entry-points."lm_eval.models"]
+parallelbench_llada = "parallelbench.lm_eval_wrappers.llada_wrapper:LLaDAWrapper"
+parallelbench_dream = "parallelbench.lm_eval_wrappers.dream_wrapper:DreamWrapper"
+parallelbench_sedd = "parallelbench.lm_eval_wrappers.sedd_wrapper:SEDDWrapper"
+# parallelbench_trado = "parallelbench.lm_eval_wrappers.trado_wrapper:TradoWrapper"
+# parallelbench_sdar = "parallelbench.lm_eval_wrappers.sdar_wrapper:SdarWrapper"
+parallelbench_ar = "parallelbench.lm_eval_wrappers.ar_wrapper:ARWrapper"
+parallelbench_api = "parallelbench.lm_eval_wrappers.api_wrapper:ApiWrapper"
+
+[project.scripts]
+pb = "parallelbench.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["parallelbench*"]
+
 [dependency-groups]
 dev = [
+    "pre-commit>=4.5.1",
     "pytest>=9.0.2",
 ]
-

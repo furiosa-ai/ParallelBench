@@ -1,7 +1,7 @@
 # ParallelBench: Understanding the Tradeoffs of Parallel Decoding in Diffusion LLMs
 
 <p align="center">
-<img src = "docs/banner.png" width="70%" height="auto">
+<img src = "docs/img/banner.png" width="70%" height="auto">
 </p>
 
 <p align="center">
@@ -12,9 +12,9 @@
       <a href="https://yzeng58.github.io/zyc_cv/" target="_blank">Yuchen Zeng</a><sup>2,3</sup>, 
       <a href="https://scholar.google.com/citations?user=jkXzD7YAAAAJ&hl=en" target="_blank">Shuibai Zhang</a><sup>2</sup>,<br>
       <a href="https://scholar.google.com/citations?user=si-368wAAAAJ&hl=en" target="_blank">Coleman Hooper</a><sup>4</sup>,
-      <a href="https://yuezhouhu.github.io/" target="_blank">Yuezhou Hu</a><sup>4</sup>, 
-      <a href="https://scholar.google.com/citations?user=Oyy8aDMAAAAJ&hl=en" target="_blank">Hyung Il Koo</a><sup>1</sup>, 
-      <a href="https://ece.snu.ac.kr/en/research-faculty/faculty/fulltime?md=view&profid=p041" target="_blank">Nam Ik Cho</a><sup>5</sup>, 
+      <a href="https://yuezhouhu.github.io/" target="_blank">Yuezhou Hu</a><sup>4</sup>,
+      <a href="https://scholar.google.com/citations?user=Oyy8aDMAAAAJ&hl=en" target="_blank">Hyung Il Koo</a><sup>1</sup>,
+      <a href="https://ece.snu.ac.kr/en/research-faculty/faculty/fulltime?md=view&profid=p041" target="_blank">Nam Ik Cho</a><sup>5</sup>,
       <a href="https://kangwooklee.com/aboutme/" target="_blank">Kangwook Lee</a><sup>2,6,7</sup>
   </p>
   <p  align="center">
@@ -44,7 +44,7 @@ We are currently working to support **new models** and implement **advanced unma
 - [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
 - [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
 
-**Advanced Unmasking Strategies**
+**Advanced Unmasking Methods**
 
 - [WINO](https://github.com/Feng-Hong/WINO-DLLM?tab=readme-ov-file)
 - [DUS](https://github.com/omerlux/DUS)
@@ -56,289 +56,157 @@ We are currently working to support **new models** and implement **advanced unma
 
 ## 🔎 Overview
 <p align="center">
-<img src = "docs/teaser.png" width="100%" height="auto">
+<img src = "docs/img/teaser.png" width="100%" height="auto">
 </p>
 
 Diffusion LLMs (dLLMs) promise faster generation via parallel decoding. However, this speed often comes at the cost of quality, as they ignore token dependencies, an issue that existing benchmarks do not sufficiently capture. To address this issue, we introduce **ParallelBench**, the first benchmark designed to rigorously test this trade-off through realistic tasks that humans and autoregressive (AR) LLMs can easily solve, but which cause dLLMs to collapse as parallelism grows. We release **ParallelBench** to drive research towards truly efficient dLLMs that can overcome this challenge.
 
 ### Features
 
-- **Information-Theoretic Analysis:**
-We derive error bounds on parallel decoding for tasks with inter-token dependencies. Even an optimal model sees accuracy degrade as parallelism grows.
+- **Information-Theoretic Analysis**: Error bounds on parallel decoding for tasks with inter-token dependencies, showing accuracy degradation as parallelism grows.
+- **Quantitative Case Studies**: Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas that pin down where parallel decoding breaks.
+- **17 Benchmark Tasks**: Three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily but expose quality drops in dLLMs under parallel decoding.
 
-- **Quantitative Case Studies:**
-Synthetic list operations (Copy, Replace, Shuffle) with closed-form accuracy formulas pin down exactly where and how parallel decoding breaks.
 
-- **Realistic Benchmark Tasks:**
-17 tasks across three categories (Waiting Line, Text Writing, Puzzles) that humans and AR LLMs solve easily, but expose clear quality drops in dLLMs under parallel decoding.
+## 📐 Key Concepts
 
+ParallelBench measures how **quality degrades as parallelism increases** in dLLMs. The key variable is **tokens per step (TPS)** — the number of tokens generated in parallel at each denoising step.
+
+| Tokens per step | Meaning |
+| :-: | --- |
+| **1** | One-by-one decoding (equivalent to AR) |
+| **k** | k tokens decoded in parallel per step |
+| **max_tokens** | Fully parallel (one-step generation) |
+
+ParallelBench evaluates **model + unmasking method** combinations. The same model can yield very different quality-speed trade-offs depending on which unmasking method is used.
+
+The benchmark score is **PBx** — the maximum TPS at which a given combination still achieves at least **x%** average accuracy across all tasks. For example, PB80 = 8 means the combination can decode up to 8 tokens in parallel while maintaining ≥ 80% accuracy. Higher PBx values indicate better quality preservation under parallel decoding.
+
+For methods with deterministic TPS (top-k family), PBx is the measured TPS value. For methods with variable TPS (threshold, factor, etc.), PBx is computed via **linear interpolation** between adjacent (TPS, accuracy) points to find the exact TPS where accuracy crosses the threshold.
 
 ## ⚙️ Setup
 
-These steps will guide you through setting up the necessary environment and dependencies.
-
 ### 1. Prerequisites
-- **Conda**: For managing the environment.
 - **NVIDIA GPU**: CUDA >= 11.8.
-- **Java Development Kit (JDK)**: Required only for grammar-based evaluation metrics.
 
-### 2. Set Python Environment
-
-We use `uv` for faster package installation. The following commands will install PyTorch, `vLLM` for the LLM baselines, and all other required packages from `requirements.txt`.
+### 2. Clone
 
 ```bash
-# Use curl to download the script and execute it with sh:
-curl -LsSf https://astral.sh/uv/install.sh | sh
-# Install core dependencies
-uv sync
+git clone --recurse-submodules https://github.com/furiosa-ai/ParallelBench.git
+cd ParallelBench
 ```
 
-### 3. Install Java (Optional)
+### 3. Install
 
-If you need to run the **grammar-based** evaluations, install the JDK:
+We use `uv` for faster package installation. The following command will install all dependencies including Python packages, PyTorch, `vLLM`, and JDK 17 (for grammar-based evaluation metrics).
 
 ```bash
-apt-get install openjdk-17-jdk -y
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env  # Reload PATH to use uv
+# Install all dependencies (Python + Java)
+make install
+```
+
+> **Note**: JDK 17 is installed locally via the `install-jdk` Python package — no `sudo` required. If you already have Java installed, the script will skip the installation.
+
+### 4. Running `pb` CLI
+
+The `pb` command is available through the virtual environment. Use either method:
+
+```bash
+# Option 1: Run directly via uv (no activation needed)
+uv run pb <command>
+
+# Option 2: Activate the virtual environment first
+source .venv/bin/activate
+pb <command>
 ```
 
 ## ⚡ Quickstart
 
-Here's a simple example of how to load a model and run it on a **ParallelBench** task. For a more in-depth example, see the [`demo.py`](demo.py) script.
+```bash
+# Browse tasks (no GPU required)
+uv run pb browse                              # List all available tasks
+uv run pb browse waiting_line/copy            # View samples from a specific task
+uv run pb browse waiting_line/copy --index 3  # View a specific sample by index
 
-```python
-import torch
-from transformers import AutoModel, AutoTokenizer
-from dataset.parallel_bench import ParallelBench
-
-# 1. Load the model and tokenizer
-model = AutoModel.from_pretrained(
-    "Dream-org/Dream-v0-Instruct-7B",
-    trust_remote_code=True,
-    torch_dtype=torch.bfloat16
-).cuda()
-
-tokenizer = AutoTokenizer.from_pretrained(
-    "Dream-org/Dream-v0-Instruct-7B",
-    trust_remote_code=True
-)
-
-# 2. Load a benchmark task and get a sample
-task_name = "waiting_line/copy"
-dataset = ParallelBench(task_name)
-sample = dataset[0] # Get the first sample from the task
-
-# 3. Prepare input from the benchmark sample
-messages = sample["input"]["messages"]
-input_ids = tokenizer.apply_chat_template(
-    messages,
-    add_generation_prompt=True,
-    return_tensors="pt"
-).to(model.device)
-
-# 4. Generate the model's output
-generated_ids = model.diffusion_generate(input_ids, max_tokens=32)
-response = tokenizer.decode(generated_ids[0][len(input_ids[0]):], skip_special_tokens=True)
-
-# 5. Compare the model's output with the reference label
-print(f"Task: {task_name}")
-print(f"Prompt: {messages[-1]['content']}")
-print(f"Reference Label: {sample['label']}")
-print(f"Model Output:    {response}")
-
-# To get the final score, run compute_metrics
-metrics = dataset.compute_metrics([response], [sample["label"]])
-print(f"Metrics: {metrics}")
+# Run evaluation on a single task
+uv run pb eval --model parallelbench_llada \
+  --model_args model_path=GSAI-ML/LLaDA-1.5 \
+  --gen_kwargs k=32,unmasking=random \
+  --tasks parallelbench_waiting_line_copy \
+  --include_path parallelbench/tasks \
+  --batch_size 1
 ```
 
 ## 🎯 Evaluation Coverage
 
 ### Tasks
 
-* **Waiting Line**
-    * `waiting_line/copy`
-    * `waiting_line/insert_index`
-    * `waiting_line/insert_random`
-    * `waiting_line/remove_index`
-    * `waiting_line/remove_random`
-    * `waiting_line/replace_index`
-    * `waiting_line/replace_random`
-    * `waiting_line/reverse`
-    * `waiting_line/shuffle`
-    * `waiting_line/sort`
-* **Text Writing**
-    * `paraphrase_summarize/chatgpt-paraphrases`
-    * `paraphrase_summarize/samsum`
-    * `words_to_sentence/easy`
-    * `words_to_sentence/medium`
-    * `words_to_sentence/hard`
-* **Puzzle**
-    * `puzzle/latin_square_n4`
-    * `puzzle/sudoku_n4_12`
- 
+| Category | Task | CLI task name |
+| --- | --- | --- |
+| Waiting Line (10) | Copy | `parallelbench_waiting_line_copy` |
+| | Insert (index) | `parallelbench_waiting_line_insert_index` |
+| | Insert (random) | `parallelbench_waiting_line_insert_random` |
+| | Remove (index) | `parallelbench_waiting_line_remove_index` |
+| | Remove (random) | `parallelbench_waiting_line_remove_random` |
+| | Replace (index) | `parallelbench_waiting_line_replace_index` |
+| | Replace (random) | `parallelbench_waiting_line_replace_random` |
+| | Reverse | `parallelbench_waiting_line_reverse` |
+| | Shuffle | `parallelbench_waiting_line_shuffle` |
+| | Sort | `parallelbench_waiting_line_sort` |
+| Text Writing (5) | Paraphrasing | `parallelbench_text_writing_paraphrasing` |
+| | Summarization | `parallelbench_text_writing_summarization` |
+| | Words to Sentence (easy) | `parallelbench_text_writing_words_to_sentence_easy` |
+| | Words to Sentence (medium) | `parallelbench_text_writing_words_to_sentence_medium` |
+| | Words to Sentence (hard) | `parallelbench_text_writing_words_to_sentence_hard` |
+| Puzzles (2) | Latin Square (4x4) | `parallelbench_puzzles_latin_square_n4` |
+| | Sudoku (4x4) | `parallelbench_puzzles_sudoku_n4` |
+
 ### Models
 
 For additional models and unmasking methods, please refer to the [Roadmap](https://github.com/furiosa-ai/ParallelBench/#%EF%B8%8F-roadmap) section.
 
-* LLaDA Family ([LLaDA 1.x](https://github.com/ML-GSAI/LLaDA))
-* Dream Family ([Dream](https://github.com/DreamLM/Dream), [DiffuCoder](https://github.com/apple/ml-diffucoder))
-* SDAR Family ([SDAR](https://github.com/JetAstra/SDAR), [TraDo](https://github.com/Gen-Verse/dLLM-RL))
+| Model family | CLI wrapper (`--model`) | Example `model_path` |
+| --- | --- | --- |
+| LLaDA | `parallelbench_llada` | `GSAI-ML/LLaDA-1.5` |
+| Dream, DiffuCoder | `parallelbench_dream` | `Dream-org/Dream-v0-Instruct-7B` |
+| ~~SDAR, TraDo~~ | ~~`parallelbench_trado`~~ | Disabled (under investigation) |
+| SEDD | `parallelbench_sedd` | `louaaron/sedd-medium` |
+| AR baselines (vLLM) | `parallelbench_ar` | `meta-llama/Llama-3.1-8B-Instruct` |
+| API models | `parallelbench_api` | Haiku, Mercury (requires `.env` keys) |
+
+> **Adding your own model?** See the [step-by-step guide](docs/adding_custom_models.md) and the example in `parallelbench/models/local/example/`.
 
 ### Unmasking Methods
 
-* Top-k methods:
-    * Random
-    * Confidence
-    * Entropy
-    * Margin
-* Advanced methods:
-    * Threshold-based
-    * Factor-based
-    * [RCR](https://github.com/Gen-Verse/dLLM-RL)
-    * [ReMDM](https://github.com/kuleshov-group/remdm)
+| Strategy | Type | CLI value | Description |
+| -------- | ---- | --------- | ----------- |
+| Random | Top-k (static) | `random` | Randomly selects which masked tokens to unmask |
+| Origin | Top-k (static) | `origin` | Dream's native timestep-based unmasking (default for Dream models) |
+| Confidence | Top-k (static) | `confidence_topk` | Unmasks tokens with highest model confidence |
+| Margin | Top-k (static) | `topk_margin` | Unmasks tokens with largest margin between top-2 predictions |
+| Entropy | Top-k (static) | `entropy_topk` | Unmasks tokens with lowest prediction entropy |
+| Confidence Threshold | Adaptive | `confidence_threshold` | Unmasks all tokens above a confidence threshold (`alg_threshold`) |
+| Confidence Factor | Adaptive | `confidence_factor` | Scales unmask count by a factor (`alg_factor`) |
 
+**Top-k (static)** methods unmask a fixed number of tokens per step — tokens per step is constant.
+**Adaptive** methods unmask a variable number of tokens per step — tokens per step varies, and the actual NFE (number of forward passes) is measured after generation.
 
-## 🛠️ Create Your Own Tasks
-
-You can easily generate custom tasks from YAML configuration files. For example, to create new `copy` and `reverse` tasks:
-
-```bash
-PYTHONPATH=. python dataset/parallel_bench/data/task.py --task test/copy_reverse/all
-```
-
-This command uses the configurations specified in `dataset/parallel_bench/data/task_configs/`.
-
-***
-
-## 🧩 Adding Custom Models
-
-You can integrate your own diffusion LLM by following the example in `model/local/example/`. This directory contains:
-
-- **`example_model.py`**: Template for implementing a custom model class that inherits from `LocalModel`
-- **`constants.py`**: Example constants such as mask token IDs and valid remasking strategies
-
-### Implementation Steps
-
-1. **Define Generation Config**: Extend `DllmGenerationConfig` to include model-specific parameters
-2. **Implement Model Class**: Create a class that inherits from `LocalModel` and implements the `generate()` method
-3. **Register Your Model**: Use the `@ModelRegistry.register()` decorator with a name pattern matcher
-
-Example structure:
-
-```python
-from model.base_model import DLLMOutput, LocalModel
-from model.generation_config import DllmGenerationConfig
-from model.registry import ModelRegistry
-
-@dataclass
-class CustomGenerationConfig(DllmGenerationConfig):
-    custom_param: str = "default_value"
-    
-    def to_generation_kwargs(self):
-        gen_kwargs = super().to_generation_kwargs()
-        gen_kwargs.update({"custom_param": self.custom_param})
-        return gen_kwargs
-
-@ModelRegistry.register(
-    lambda name: name.startswith("your-model-prefix")
-)
-class CustomModel(LocalModel):
-    def generate(self, messages, output_prefix=None, gen_config=None, output_history=False):
-        # Your generation logic here
-        return DLLMOutput(...)
-```
-
-See `model/local/example/` for a working example.
+> **Adding your own method?** See the [step-by-step guide](docs/adding_custom_unmasking_methods.md).
 
 ## 🚀 Running Evaluations
 
-
-### Configuration
-
-Before running the evaluations, copy the example environment file and fill in your API keys:
-
-```bash
-cp .env.example .env
-```
-
-Then edit `.env` with your actual keys. The keys will be loaded automatically via `python-dotenv`.
-
-For logging results, log in to Weights & Biases:
-
-```bash
-uv run wandb login
-```
-
-All experiments are launched using the `run_all.py` script. The general command structure is:
-```bash
-python run_all.py eval.py --device <gpu_ids> --cfg <path_to_config_file>
-```
-
-### Main Benchmark Reproduction
-This section covers the commands to reproduce the main benchmark results from our paper. The following commands run evaluation on **two GPUs**.
-
-- **LLaDA 1.5**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/llada_1_5_all_tasks_list.yaml
-  ```
-- **Dream**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/dream_all_tasks_list.yaml
-  ```
-- **Diffucoder**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/diffucoder_all_tasks_list.yaml
-  ```
-- **LLaDA 1.0**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/benchmark/llada_1_0_all_tasks_list.yaml
-  ```
-
-### dLLM vs. Autoregressive LLM Comparison
-This section includes the commands for the comparative analysis between our models and other strong LLM baselines.
-
-- **LLaDA 1.5**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/llada_1_5_all_tasks_list.yaml
-  ```
-- **Dream**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/dream_all_tasks_list.yaml
-  ```
-- **Diffucoder**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/diffucoder_all_tasks_list.yaml
-  ```
-- **LLaDA 1.0**:
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/llada_1_0_all_tasks_list.yaml
-  ```
-- **Mercury** (requires single GPU):
-  ```bash
-  python run_all.py eval.py --device 0 --cfg cfg/paper/dllm_vs_llm/mercury_all_tasks_list.yaml
-  ```
-- **Haiku** (requires single GPU):
-  ```bash
-  python run_all.py eval.py --device 0 --cfg cfg/paper/dllm_vs_llm/haiku_all_tasks_list.yaml
-  ```
-- **LLM Baselines** (via vLLM):
-  ```bash
-  python run_all.py eval.py --device 0 1 --cfg cfg/paper/dllm_vs_llm/llm_all_tasks_list.yaml
-  ```
-
-
-### Results
-
-All evaluation metrics and generated outputs are logged to **Weights & Biases (wandb)**. Please ensure you have configured your API key and project settings.
+For the full CLI reference, generation parameters, and examples, see the [Running Evaluations guide](docs/running_evaluations.md).
 
 
 ## 🙏 Acknowledgements
-This project builds upon the work of several fantastic open-source repositories. We extend our sincere thanks to the original authors for their contributions to the community.
+Built on these open-source projects:
 
 - [LLaDA](https://github.com/ML-GSAI/LLaDA)
 - [Dream](https://github.com/DreamLM/Dream)
 - [Fast-dLLM](https://github.com/NVlabs/Fast-dLLM)
-- [ReMDM](https://github.com/guanghanwang/ReMDM-LLaDA)
-- [RCR](https://github.com/autonomousvision/mdpo)
 - [Score-Entropy-Discrete-Diffusion](https://github.com/louaaron/Score-Entropy-Discrete-Diffusion)
 
 ## 📖 Citation
@@ -350,4 +218,3 @@ This project builds upon the work of several fantastic open-source repositories.
   year={2025}
 }
 ```
- 

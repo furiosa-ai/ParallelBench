@@ -1,0 +1,241 @@
+import functools
+import types
+from dataclasses import dataclass, field
+from typing import Optional
+
+from transformers import AutoModel
+
+from parallelbench.models.base_model import DLLMOutput, LocalModel
+from parallelbench.models.generation_config import DllmGenerationConfig
+
+from parallelbench.models.registry import ModelRegistry
+
+from parallelbench.models.unmasking_registry import get_method_type
+
+from .constants import DIFFUCODER_EPS, DREAM_MASK_TOKEN_ID, DREAM_VALID_METHODS
+from .dream_model_utils import sample_block
+
+
+@dataclass
+class DreamGenerationConfig(DllmGenerationConfig):
+    unmasking: str = (
+        "origin"  # Set the default unmasking method to "origin" for Dream models
+    )
+    block_length: int = 128  # Set the default block length for Dream models
+
+    top_p: Optional[float] = None
+    top_k: Optional[float] = None
+
+    valid_methods: set = field(default_factory=lambda: set(DREAM_VALID_METHODS))
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        assert self.steps is None or self.steps <= self.max_tokens, (
+            f"Steps must be less than or equal to max tokens. Got steps={self.steps}, max_tokens={self.max_tokens}"
+        )
+
+        if self.temperature is None or self.temperature == 0.0:
+            self.top_p = None
+            self.top_k = None
+
+    def to_generation_kwargs(self):
+        gen_kwargs = super().to_generation_kwargs()
+        gen_length = gen_kwargs.pop("gen_length")
+        unmasking = gen_kwargs.pop("unmasking", None)
+        return {
+            **gen_kwargs,
+            "alg": unmasking,
+            "max_new_tokens": gen_length,
+            "return_dict_in_generate": True,
+            "attention_mask": None,
+            "top_p": self.top_p,
+            "top_k": self.top_k,
+        }
+
+
+@ModelRegistry.register(
+    lambda name: (
+        name
+        in (
+            "Dream-org/Dream-v0-Instruct-7B",
+            "Dream-org/Dream-Coder-v0-Instruct-7B",
+            "apple/DiffuCoder-7B-Instruct",
+            "apple/DiffuCoder-7B-cpGRPO",
+        )
+        or "dream" in name.lower()
+    )
+)
+class DreamModel(LocalModel):
+    def __init__(self, model_name, eps=0):
+        super().__init__(model_name, model_class=AutoModel)
+
+        self.eps = eps
+        self.mask_id = DREAM_MASK_TOKEN_ID
+
+    def patch_model(self, gen_config):
+        # reset the model methods to the original ones
+        self.model.diffusion_generate = types.MethodType(
+            self.model.__class__.diffusion_generate, self.model
+        )
+        self.model._sample = types.MethodType(self.model.__class__._sample, self.model)
+        self.model.forward = types.MethodType(self.model.__class__.forward, self.model)
+
+        gen_kwargs = gen_config.to_generation_kwargs()
+
+        # Dispatch to KLASS if adaptive method
+        if get_method_type(gen_config.unmasking) == "adaptive":
+            from parallelbench.models.local.dream.klass_sample import (
+                klass_sample_dream,
+            )
+
+            self.model._sample = types.MethodType(
+                functools.partial(
+                    klass_sample_dream,
+                    conf_threshold=gen_config.conf_threshold
+                    if gen_config.conf_threshold is not None
+                    else 0.9,
+                    kl_threshold=gen_config.kl_threshold
+                    if gen_config.kl_threshold is not None
+                    else 0.01,
+                    kl_history_length=gen_config.kl_history_length
+                    if gen_config.kl_history_length is not None
+                    else 2,
+                ),
+                self.model,
+            )
+        elif (
+            gen_kwargs.get("block_length") is not None
+            or gen_kwargs.get("threshold") is not None
+        ):
+            # if block length is specified, we need to patch the model to use the block length
+            self.model._sample = types.MethodType(
+                functools.partial(
+                    sample_block,
+                    block_length=gen_kwargs["block_length"],
+                    threshold=gen_kwargs.get("threshold"),
+                    factor=gen_kwargs.get("factor"),
+                ),
+                self.model,
+            )
+
+        self.model.nfe = 0
+
+        def forward_hook(self, *args, **kwargs):
+            self.nfe += 1
+            model_output = self.__class__.forward(self, *args, **kwargs)
+            return model_output
+
+        self.model.forward = types.MethodType(forward_hook, self.model)
+
+    @property
+    def _is_diffucoder(self):
+        return self.model.name_or_path.lower() in (
+            "apple/diffucoder-7b-instruct",
+            "apple/diffucoder-7b-cpgrpo",
+        )
+
+    @property
+    def supports_batch(self) -> bool:
+        return True
+
+    def _generate(self, input_ids, gen_config, output_history, attention_mask=None):
+        self.patch_model(gen_config)
+
+        gen_kwargs = dict(
+            **gen_config.to_generation_kwargs(),
+            output_history=output_history,
+        )
+
+        if attention_mask is not None:
+            gen_kwargs["attention_mask"] = attention_mask
+
+        if self.eps is not None:
+            gen_kwargs["eps"] = self.eps
+        elif self._is_diffucoder:
+            gen_kwargs["eps"] = DIFFUCODER_EPS
+
+        return self.model.diffusion_generate(input_ids, **gen_kwargs), self.model.nfe
+
+    def generate_batch(
+        self,
+        messages_list,
+        gen_config=None,
+        output_prefix_list=None,
+        output_history=False,
+    ):
+        prompts = []
+        for messages in messages_list:
+            if isinstance(messages, list):
+                prompt = self.tokenizer.apply_chat_template(
+                    messages, add_generation_prompt=True, tokenize=False
+                )
+            else:
+                prompt = messages
+            prompts.append(prompt)
+
+        self.tokenizer.padding_side = "left"
+        encoded = self.tokenizer(prompts, return_tensors="pt", padding=True).to(
+            self.model.device
+        )
+        input_ids = encoded.input_ids
+        attention_mask = encoded.attention_mask
+
+        gen_config_obj = DreamGenerationConfig(**gen_config)
+        model_output, nfe = self._generate(
+            input_ids,
+            gen_config_obj,
+            output_history=output_history,
+            attention_mask=attention_mask,
+        )
+
+        input_len = input_ids.shape[1]
+        results = []
+        for i in range(len(messages_list)):
+            sample_input_ids = input_ids[i : i + 1]
+            sample_output_ids = model_output.sequences[i : i + 1, input_len:]
+            output_text = self.tokenizer.decode(
+                sample_output_ids[0], skip_special_tokens=True
+            )
+
+            results.append(
+                DLLMOutput(
+                    output=output_text,
+                    input_ids=sample_input_ids,
+                    output_ids=sample_output_ids,
+                    pad_token_id=self.tokenizer.pad_token_id,
+                    nfe=nfe,
+                )
+            )
+
+        return results
+
+    def generate(
+        self, messages, output_prefix=None, gen_config=None, output_history=False
+    ):
+        if isinstance(messages, list):
+            prompt = self.tokenizer.apply_chat_template(
+                messages, add_generation_prompt=True, tokenize=False
+            )
+        else:
+            prompt = messages
+
+        input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
+            self.model.device
+        )
+        gen_config = DreamGenerationConfig(**gen_config)
+
+        model_output, nfe = self._generate(
+            input_ids, gen_config, output_history=output_history
+        )
+        output_ids = model_output.sequences[:, input_ids.shape[1] :]
+
+        output = self.tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
+
+        return DLLMOutput(
+            output=output,
+            input_ids=input_ids,
+            output_ids=output_ids,
+            pad_token_id=self.tokenizer.pad_token_id,
+            nfe=nfe,
+        )

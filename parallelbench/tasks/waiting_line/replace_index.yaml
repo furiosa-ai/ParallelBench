@@ -1,0 +1,8 @@
+include: _base.yml
+task: parallelbench_waiting_line_replace_index
+metadata:
+  parallelbench_task: "waiting_line/replace_index"
+  flex_config:
+    min_length: 3
+    max_length: 6
+    num_samples: 100

@@ -1,0 +1,18 @@
+group: parallelbench_text_writing
+group_alias: "ParallelBench - Text Writing"
+aggregate_metric_list:
+  - metric: score
+    aggregation: mean
+    weight_by_size: true
+  - metric: nfe
+    aggregation: mean
+    weight_by_size: true
+  - metric: tokens_per_step
+    aggregation: mean
+    weight_by_size: true
+task:
+  - parallelbench_text_writing_paraphrasing
+  - parallelbench_text_writing_summarization
+  - parallelbench_text_writing_words_to_sentence_easy
+  - parallelbench_text_writing_words_to_sentence_medium
+  - parallelbench_text_writing_words_to_sentence_hard

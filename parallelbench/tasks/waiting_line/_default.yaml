@@ -1,0 +1,23 @@
+group: parallelbench_waiting_line
+group_alias: "ParallelBench - Waiting Line"
+aggregate_metric_list:
+  - metric: score
+    aggregation: mean
+    weight_by_size: true
+  - metric: nfe
+    aggregation: mean
+    weight_by_size: true
+  - metric: tokens_per_step
+    aggregation: mean
+    weight_by_size: true
+task:
+  - parallelbench_waiting_line_copy
+  - parallelbench_waiting_line_reverse
+  - parallelbench_waiting_line_sort
+  - parallelbench_waiting_line_shuffle
+  - parallelbench_waiting_line_insert_index
+  - parallelbench_waiting_line_insert_random
+  - parallelbench_waiting_line_remove_index
+  - parallelbench_waiting_line_remove_random
+  - parallelbench_waiting_line_replace_index
+  - parallelbench_waiting_line_replace_random

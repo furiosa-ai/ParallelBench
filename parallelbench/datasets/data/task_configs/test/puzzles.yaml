@@ -1,0 +1,60 @@
+global_config:
+  num_samples: 100
+  samples_per_length:
+    default: 100
+  icl_example_count: 1
+tasks:
+  latin_square_n4:
+    type: latin_square
+    metric: latin_square_score
+    size: 4
+    prompt: Generate a Latin square of size {size} with the symbols {symbols}. Only output the final result as CSV.
+    icl_example:
+      input:
+        size: 4
+        symbols: '[H, T, 6, P]'
+      answer:
+        symbols:
+        - H
+        - T
+        - '6'
+        - P
+        example: '6,P,H,T
+
+          P,H,T,6
+
+          H,T,6,P
+
+          T,6,P,H'
+  sudoku_n4:
+    type: sudoku
+    metric: sudoku_score
+    size: 4
+    num_holes: 4
+    prompt: 'Fill the positions where the values are 0 in a {size}x{size} grid with digits 1-{size} so that each column, each row, and each of the four 2x2 subgrids that compose the grid contains all of the digits from 1 to {size}.
+
+
+      Input:
+
+      {puzzle}
+
+      Output:
+
+      '
+    icl_example:
+      input:
+        size: 4
+        puzzle: '0143
+
+          4301
+
+          1034
+
+          3410'
+      answer: '2143
+
+        4321
+
+        1234
+
+        3412'

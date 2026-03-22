@@ -195,9 +195,9 @@ cython_debug/
 .abstra/
 
 # Visual Studio Code
-#   Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#   Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore
 #   that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#   and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#   and can be added to the global gitignore or merged into this file. However, if you prefer,
 #   you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
@@ -218,16 +218,24 @@ __marimo__/
 .vscode
 /wandb/
 /untracked/
-/results/
 /temp/
 /src/
 /logs/
 /hub/
 /artifacts/
+output/
 
 .env
 *.local
 *.local.*
 
-CLAUDE.*
-.mcp.json
+CLAUDE.md
+AGENTS.md
+/.mcp.json
+/.claude/
+/.codex/
+/.agents/
+.omx/
+.omc/
+docker*
+Dockerfile*

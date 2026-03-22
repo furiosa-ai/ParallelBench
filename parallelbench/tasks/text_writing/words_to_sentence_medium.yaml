@@ -1,0 +1,8 @@
+include: _base.yml
+task: parallelbench_text_writing_words_to_sentence_medium
+metadata:
+  parallelbench_task: "text_writing/words_to_sentence_medium"
+  flex_config:
+    min_length: 5
+    max_length: 8
+    num_samples: 100

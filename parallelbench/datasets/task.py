@@ -1,0 +1,465 @@
+"""Task loading, creation, and CLI for ParallelBench benchmark.
+
+This module provides:
+- load_task(): Load pre-generated task data from JSONL files
+- create_parallelbench_task(): Generate and save task data
+- CLI entry point for batch task creation
+"""
+
+from pathlib import Path
+import argparse
+from collections import Counter
+import hashlib
+import json
+import random
+
+import pandas as pd
+from tqdm import tqdm
+import yaml
+
+from datasets import Dataset, load_dataset
+
+from parallelbench.datasets.task_utils import (
+    _get_task_file,
+    load_task_configs,
+    load_words_from_file,
+    str_to_seed,
+)
+from parallelbench.datasets.task_generators import TASK_GENERATORS
+
+# Ensure all generators are registered by importing the module
+
+
+DEFAULT_SEED = 42
+
+
+PARALLEL_BENCH_MASK_TOKEN = "[MASK]"
+
+
+def _try_json_loads(value):
+    """JSON 파싱을 시도하고, 실패하면 원본 string을 반환합니다."""
+    if not isinstance(value, str):
+        return value
+    try:
+        return json.loads(value)
+    except (json.JSONDecodeError, ValueError):
+        return value
+
+
+def task_name_to_config_name(task_name: str) -> str:
+    """task_name의 "/" → "-"로 변환합니다 (Hub config naming convention)."""
+    return task_name.replace("/", "-")
+
+
+def config_name_to_task_name(config_name: str) -> str:
+    """config_name의 첫 번째 "-" → "/"로 변환합니다 (e.g., "waiting_line-copy" → "waiting_line/copy").
+
+    Convention: category names use underscores (e.g., "waiting_line", "text_writing"),
+    and the first hyphen is always the category/task separator. Task names within a
+    category must not contain hyphens to ensure correct roundtrip conversion.
+    """
+    return config_name.replace("-", "/", 1)
+
+
+def _load_task_from_hub(repo_id, split, task_name):
+    """HuggingFace Hub에서 task를 로드합니다."""
+    config_name = task_name_to_config_name(task_name)
+    hub_dataset = load_dataset(repo_id, config_name, split=split)
+
+    # 첫 row에서 prompt/metric 추출하여 task_config 구성
+    first_row = hub_dataset[0]
+    for required_key in ("prompt", "metric"):
+        if required_key not in first_row:
+            raise ValueError(
+                f"Hub dataset '{repo_id}' (config='{config_name}') is missing "
+                f"required column '{required_key}'. "
+                f"Available columns: {list(first_row.keys())}"
+            )
+    task_config = {
+        "prompt": first_row["prompt"],
+        "metric": first_row["metric"],
+    }
+
+    # JSON string 컬럼 deserialize, config 컬럼 제거
+    records = []
+    for row in hub_dataset:
+        records.append(
+            {
+                "input": _try_json_loads(row["input"]),
+                "answer": _try_json_loads(row["answer"]),
+                "output_format": row.get("output_format"),
+                "metadata": _try_json_loads(row["metadata"]),
+            }
+        )
+
+    task = Dataset.from_list(records)
+    return task, task_config
+
+
+def load_task(split, task_name, from_hub=None):
+    if from_hub is not None:
+        return _load_task_from_hub(from_hub, split, task_name)
+
+    task_file = _get_task_file(split, task_name)
+    task_config_file = task_file.parent / "task_config.yaml"
+
+    with open(task_config_file, "r") as f:
+        task_config = yaml.safe_load(f)
+
+    task_config = task_config[task_name]
+    task = Dataset.from_pandas(pd.read_json(path_or_buf=task_file, lines=True))
+
+    return task, task_config
+
+
+ICL_SEED_OFFSET = 99999
+
+
+def _validate_icl_not_in_data(icl_example, data, task_name):
+    """ICL example이 test data에 포함되어 있지 않은지 검증합니다."""
+    icl_input = icl_example["input"]
+    for i, sample in enumerate(data):
+        if sample["input"] == icl_input:
+            raise ValueError(
+                f"ICL example overlaps with test sample {i} in task '{task_name}'. "
+                f"Use a different icl_example in the task config."
+            )
+
+
+def _generate_icl_example_on_the_fly(rng, task_config, data):
+    """Flex 모드에서 ICL example을 on-the-fly로 생성하고 overlap을 검증합니다.
+
+    별도의 ICL seed로 샘플 하나를 생성한 뒤, test data와 겹치지 않는지 확인합니다.
+    겹치면 최대 100번까지 재시도합니다.
+    """
+    icl_config = {
+        **task_config,
+        "num_samples": 1,
+        "samples_per_length": 0,
+        "icl_example_count": 0,
+    }
+
+    test_inputs = {json.dumps(s["input"], sort_keys=True) for s in data}
+
+    max_attempts = 100
+    for attempt in range(max_attempts):
+        icl_seed = ICL_SEED_OFFSET + attempt
+        icl_rng = random.Random(icl_seed)
+        samples = create_parallelbench_task_random(rng=icl_rng, task=icl_config)
+        if not samples:
+            continue
+
+        icl_example = {"input": samples[0]["input"], "answer": samples[0]["answer"]}
+        icl_input_key = json.dumps(icl_example["input"], sort_keys=True)
+
+        if icl_input_key not in test_inputs:
+            return icl_example
+
+    raise RuntimeError(
+        f"Failed to generate a non-overlapping ICL example for task "
+        f"'{task_config['name']}' after {max_attempts} attempts."
+    )
+
+
+def load_task_flex(split, task_name, flex_config):
+    """Generate task data on-the-fly with custom difficulty overrides.
+
+    Unlike load_task() which loads pre-generated JSONL data, this function
+    generates data dynamically using the base task config merged with
+    flex_config overrides (e.g., min_length, max_length, num_samples).
+
+    Args:
+        split: Dataset split ("test" or "train").
+        task_name: Task identifier (e.g., "waiting_line/copy").
+        flex_config: Dict of config overrides for difficulty control.
+
+    Returns:
+        Tuple of (Dataset, task_config dict).
+    """
+    category = task_name.split("/")[0]
+    all_configs = load_task_configs(f"{split}/{category}")
+    if task_name not in all_configs:
+        available = sorted(all_configs.keys())
+        raise ValueError(
+            f"Unknown task for flex mode: '{task_name}'. "
+            f"Available tasks in '{category}': {available}"
+        )
+
+    task_config = {**all_configs[task_name], **flex_config}
+
+    # Disable samples_per_length bucketing unless explicitly set in flex_config,
+    # because flex num_samples is unlikely to be divisible by the default value.
+    if "samples_per_length" not in flex_config:
+        task_config["samples_per_length"] = 0
+
+    # Inject seed — _create_task reads task['seed'] at line 237
+    seed = _flex_seed(task_name, flex_config)
+    task_config["seed"] = seed
+    rng = random.Random(seed)
+
+    # Load words from file if needed — create_parallelbench_task does this at lines 258-260
+    if "words" in task_config and isinstance(task_config["words"], str):
+        task_config["words"] = load_words_from_file(task_config["words"])
+
+    data = _create_task(rng, task_config)
+
+    # Handle ICL examples: generate on-the-fly for flex mode
+    if task_config.get("icl_example_count", 0) > 0:
+        icl_example = _generate_icl_example_on_the_fly(rng, task_config, data)
+        for sample in data:
+            sample["input"]["icl_examples"] = [icl_example]
+
+    ds = Dataset.from_list(data)
+    return ds, task_config
+
+
+def _flex_seed(task_name, flex_config):
+    """Compute a deterministic seed from task name + flex config.
+
+    Incorporates the flex_config hash so that different difficulty
+    parameters produce different (but reproducible) data.
+
+    Args:
+        task_name: Task identifier (e.g., "waiting_line/copy").
+        flex_config: Dict of config overrides.
+
+    Returns:
+        Integer seed in range [0, 2**16 - 1).
+    """
+    config_str = json.dumps(flex_config, sort_keys=True)
+    combined = task_name + ":" + config_str
+    seed = int(hashlib.sha256(combined.encode()).hexdigest(), 16)
+    return seed % (2**16 - 1)
+
+
+def generate_parallelbench_task_random(rng, task_config, infinite=False):
+    task_config = {**task_config}
+
+    if infinite:
+        task_config["num_samples"] = int(1e10)
+
+    task_type = task_config["type"]
+    generator = TASK_GENERATORS.get(task_type)
+    if generator is None:
+        raise ValueError(f"Unknown task type: {task_type}")
+    yield from generator(rng, task_config)
+
+
+def create_parallelbench_task_random(rng, task):
+    return list(generate_parallelbench_task_random(rng, task))
+
+
+def create_parallelbench_task_random_samples_per_length(rng, task):
+    samples_per_length = task["samples_per_length"]
+    num_samples = task["num_samples"]
+    if num_samples % samples_per_length != 0:
+        raise ValueError("num_samples must be divisible by samples_per_length")
+    num_buckets = num_samples // samples_per_length
+
+    bucket_values = None
+    if task["type"] == "repeat" and "repeat_counts" in task:
+        bucket_values = list(task["repeat_counts"])
+    elif "lengths" in task and task["lengths"]:
+        bucket_values = list(task["lengths"])
+    elif "min_length" in task and "max_length" in task:
+        bucket_values = list(range(task["min_length"], task["max_length"] + 1))
+    elif "size" in task:
+        bucket_values = [task["size"]]
+
+    target_counts = None
+    if bucket_values is not None:
+        target_counts = {
+            k: v * samples_per_length for k, v in Counter(bucket_values).items()
+        }
+        if sum(target_counts.values()) != num_samples:
+            # 고정 길이/고정 카운트 task의 경우 전체 샘플 수를 그대로 생성하도록 보정
+            if len(target_counts) == 1:
+                only_key = next(iter(target_counts.keys()))
+                target_counts = {only_key: num_samples}
+            else:
+                raise ValueError(
+                    f"Inconsistent samples_per_length config for task={task['name']}: "
+                    f"expected {num_samples}, got {sum(target_counts.values())} from inferred buckets."
+                )
+
+    data_per_length = {}
+    max_steps = max(100000, num_samples * 500)
+
+    finished = False
+    for i, sample in enumerate(
+        tqdm(generate_parallelbench_task_random(rng, task, infinite=True)), start=1
+    ):
+        length = (
+            sample["metadata"]["length"]
+            if task["type"] != "repeat"
+            else sample["metadata"]["count"]
+        )
+        if length not in data_per_length:
+            data_per_length[length] = []
+
+        target_count = (
+            target_counts.get(length, 0)
+            if target_counts is not None
+            else samples_per_length
+        )
+        if len(data_per_length[length]) < target_count:
+            data_per_length[length].append(sample)
+
+        if target_counts is not None:
+            if all(
+                len(data_per_length.get(k, [])) >= v for k, v in target_counts.items()
+            ):
+                finished = True
+                break
+        else:
+            if (
+                sum(
+                    len(data) == samples_per_length for data in data_per_length.values()
+                )
+                == num_buckets
+            ):
+                data_per_length = {
+                    k: v
+                    for k, v in data_per_length.items()
+                    if len(v) == samples_per_length
+                }
+                finished = True
+                break
+
+        if i >= max_steps:
+            raise RuntimeError(
+                f"Task generation timed out for task={task['name']} with samples_per_length={samples_per_length}. "
+                "Please check task config (length buckets may be unreachable)."
+            )
+
+    if not finished:
+        raise RuntimeError(
+            f"Task generation did not finish for task={task['name']}. "
+            "Check task config for unreachable constraints."
+        )
+    if target_counts is not None:
+        lengths = sorted(target_counts.keys())
+        data = sum(
+            [data_per_length[length][: target_counts[length]] for length in lengths], []
+        )
+    else:
+        lengths = sorted(data_per_length.keys())
+        data = sum([data_per_length[length] for length in lengths], [])
+    if len(data) != num_samples:
+        raise RuntimeError(f"Expected {num_samples} samples, got {len(data)}")
+
+    return data
+
+
+def _create_task(rng, task):
+    import logging
+
+    logging.getLogger(__name__).info(
+        f"Creating task {task['name']} with seed {task['seed']}..."
+    )
+    if task.get("samples_per_length", 0) > 0:
+        data = create_parallelbench_task_random_samples_per_length(rng, task)
+    else:
+        data = create_parallelbench_task_random(rng, task)
+    return data
+
+
+def create_parallelbench_task(split, task, output_file, rng=None, no_save=False):
+    if not output_file:
+        output_file = _get_task_file(split, task_name=task["name"])
+
+    if "seed" not in task:
+        task["seed"] = str_to_seed(task["name"].split("/")[-1], DEFAULT_SEED)
+    else:
+        task["seed"] = str_to_seed(task["name"].split("/")[-1], task["seed"])
+
+    if rng is None:
+        rng = random.Random(task["seed"])
+
+    if "words" in task:
+        words_file = task["words"]
+        task["words"] = load_words_from_file(task["words"])
+    else:
+        words_file = None
+
+    data = _create_task(rng, task)
+
+    if task.get("icl_example_count", 0) > 0:
+        icl_examples = task.get("icl_examples")
+        if icl_examples is not None:
+            for icl_example in icl_examples:
+                _validate_icl_not_in_data(icl_example, data, task["name"])
+            for sample in data:
+                sample["input"]["icl_examples"] = icl_examples
+        else:
+            icl_example = task.get("icl_example")
+            if icl_example is None:
+                raise ValueError(
+                    f"Task '{task['name']}' has icl_example_count > 0 but no "
+                    f"icl_example or icl_examples defined in task config."
+                )
+            _validate_icl_not_in_data(icl_example, data, task["name"])
+            for sample in data:
+                sample["input"]["icl_examples"] = [icl_example]
+
+    if not no_save:
+        if not isinstance(data, pd.DataFrame):
+            data = pd.DataFrame(data)
+
+        Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+        data.to_json(output_file, orient="records", lines=True)
+
+        out_task_config_file = Path(output_file).parent / "task_config.yaml"
+
+        if out_task_config_file.exists():
+            with open(out_task_config_file, "r") as f:
+                out_task_config = yaml.safe_load(f)
+        else:
+            out_task_config = {}
+
+        out_task_config[task["name"]] = task
+
+        if words_file is not None:
+            task["words"] = words_file
+
+        with open(out_task_config_file, "w") as f:
+            yaml.dump(out_task_config, f)
+    else:
+        return data
+
+
+def main(task, **kwargs):
+    loaded_tasks = []
+
+    for t in task:
+        if t.endswith("/all"):
+            t = t[: -len("/all")]
+            split = t.split("/")[0]
+            tasks = list(load_task_configs(t).values())
+            loaded_tasks.extend(list(zip([split] * len(tasks), tasks)))
+        else:
+            raise ValueError(
+                f"Unsupported task format: '{t}'. Expected format: '<split>/all'"
+            )
+
+    for split, t in loaded_tasks:
+        create_parallelbench_task(split=split, task=t, **kwargs)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Create a DLLM task.")
+    parser.add_argument(
+        "--task", type=str, nargs="+", required=True, help="Name of the task to create."
+    )
+    parser.add_argument(
+        "--output_file",
+        type=str,
+        required=False,
+        help="Output file to save the task data.",
+    )
+    args = parser.parse_args()
+    return vars(args)
+
+
+if __name__ == "__main__":
+    main(**parse_args())

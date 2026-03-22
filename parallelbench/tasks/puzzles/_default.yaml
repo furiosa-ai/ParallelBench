@@ -1,0 +1,15 @@
+group: parallelbench_puzzles
+group_alias: "ParallelBench - Puzzles"
+aggregate_metric_list:
+  - metric: score
+    aggregation: mean
+    weight_by_size: true
+  - metric: nfe
+    aggregation: mean
+    weight_by_size: true
+  - metric: tokens_per_step
+    aggregation: mean
+    weight_by_size: true
+task:
+  - parallelbench_puzzles_sudoku_n4
+  - parallelbench_puzzles_latin_square_n4

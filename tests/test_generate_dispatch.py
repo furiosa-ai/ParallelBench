@@ -1,58 +1,47 @@
-"""Tests for generate() dispatch logic in model/local/generate.py."""
+"""Tests for generate() in model/local/generate.py."""
 
 from unittest import mock
 
-import pytest
+from parallelbench.models.local.generate import generate
 
 
-@mock.patch("model.local.generate.generate_with_no_cache")
-def test_generate_default_calls_no_cache(mock_no_cache):
-    from model.local.generate import generate
-
-    sentinel = object()
-    mock_no_cache.return_value = sentinel
-
-    result = generate("model", "prompt", steps=10)
-    mock_no_cache.assert_called_once_with("model", "prompt", steps=10)
-    assert result is sentinel
+def test_generate_is_callable():
+    """generate() should be a callable function."""
+    assert callable(generate)
 
 
-@mock.patch("model.local.generate.generate_with_prefix_cache")
-def test_generate_fast_dllm_cache_calls_prefix_cache(mock_prefix_cache):
-    from model.local.generate import generate
+@mock.patch("parallelbench.models.local.generate.get_num_transfer_tokens")
+def test_generate_accepts_expected_kwargs(mock_transfer):
+    """generate() should accept standard generation kwargs without error."""
+    # We just check the signature accepts these params (actual execution needs GPU)
+    import inspect
 
-    sentinel = object()
-    mock_prefix_cache.return_value = sentinel
-
-    result = generate("model", "prompt", use_fast_dllm_cache=True, steps=10)
-    mock_prefix_cache.assert_called_once_with("model", "prompt", steps=10)
-    assert result is sentinel
-
-
-@mock.patch("model.local.generate.generate_with_dual_cache")
-def test_generate_fast_dllm_dual_cache_calls_dual_cache(mock_dual_cache):
-    from model.local.generate import generate
-
-    sentinel = object()
-    mock_dual_cache.return_value = sentinel
-
-    result = generate("model", "prompt", use_fast_dllm_dual_cache=True, steps=10)
-    mock_dual_cache.assert_called_once_with("model", "prompt", steps=10)
-    assert result is sentinel
-
-
-@mock.patch("model.local.generate.generate_with_no_cache")
-def test_generate_passes_kwargs_to_no_cache(mock_no_cache):
-    from model.local.generate import generate
-
-    generate("m", "p", steps=5, temperature=0.8, remasking="random")
-    mock_no_cache.assert_called_once_with("m", "p", steps=5, temperature=0.8, remasking="random")
+    sig = inspect.signature(generate)
+    params = set(sig.parameters.keys())
+    expected = {
+        "model",
+        "prompt",
+        "steps",
+        "gen_length",
+        "block_length",
+        "temperature",
+        "unmasking",
+        "mask_id",
+        "threshold",
+        "factor",
+        "output_history",
+        "output0_ids",
+        "alg_temp",
+        "eb_sampler_gamma",
+    }
+    assert expected.issubset(params)
 
 
-@mock.patch("model.local.generate.generate_with_prefix_cache")
-def test_generate_passes_kwargs_to_prefix_cache(mock_prefix_cache):
-    from model.local.generate import generate
+def test_generate_does_not_accept_fast_dllm_cache_params():
+    """generate() should no longer accept use_fast_dllm_cache or use_fast_dllm_dual_cache."""
+    import inspect
 
-    # use_fast_dllm_cache should be consumed by generate(), not forwarded
-    generate("m", "p", use_fast_dllm_cache=True, steps=5, temperature=0.8)
-    mock_prefix_cache.assert_called_once_with("m", "p", steps=5, temperature=0.8)
+    sig = inspect.signature(generate)
+    params = set(sig.parameters.keys())
+    assert "use_fast_dllm_cache" not in params
+    assert "use_fast_dllm_dual_cache" not in params

@@ -1,0 +1,8 @@
+include: _base.yml
+task: parallelbench_waiting_line_copy
+metadata:
+  parallelbench_task: "waiting_line/copy"
+  flex_config:
+    min_length: 3
+    max_length: 6
+    num_samples: 100
