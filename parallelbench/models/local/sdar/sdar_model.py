@@ -3,7 +3,7 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoTokenizer
 
 from parallelbench.datasets.task import PARALLEL_BENCH_MASK_TOKEN
 from parallelbench.models.base_model import DLLMOutput, LocalModel
@@ -53,9 +53,17 @@ class SdarGenerationConfig(DllmGenerationConfig):
 @ModelRegistry.register(lambda name: "sdar" in name.lower())
 class SdarModel(LocalModel):
     def __init__(self, model_name):
-        self.model = AutoModelForCausalLM.from_pretrained(
+        # Load SDAR using local patched modeling file.
+        # The patched version replaces @torch.compile'd fused_flex_attention
+        # with a dual-path function that falls back to SDPA for regular tensor
+        # masks (block_diffusion_utils passes 4D tensors, not BlockMask objects).
+        from .modeling_sdar_patched import SDARForCausalLM
+        from .configuration_sdar import SDARConfig
+
+        config = SDARConfig.from_pretrained(model_name)
+        self.model = SDARForCausalLM.from_pretrained(
             model_name,
-            trust_remote_code=True,
+            config=config,
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
