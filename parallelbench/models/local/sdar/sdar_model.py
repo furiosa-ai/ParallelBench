@@ -19,12 +19,21 @@ from parallelbench.models.local.block_diffusion_utils import block_diffusion_gen
 class SdarGenerationConfig(DllmGenerationConfig):
     unmasking: str = "confidence_threshold"
     block_length: int = 128
-    alg_threshold: Optional[float] = 0.85
+    alg_threshold: Optional[float] = None
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
 
     valid_methods: set = field(default_factory=lambda: set(SDAR_VALID_METHODS))
+
+    def __post_init__(self):
+        # Auto-populate alg_threshold for threshold methods before parent validation
+        if self.alg_threshold is None and self.unmasking in self.valid_methods:
+            from parallelbench.models.unmasking_registry import get_method_type
+
+            if get_method_type(self.unmasking) == "threshold":
+                self.alg_threshold = 0.85
+        super().__post_init__()
 
     def to_generation_kwargs(self):
         gen_kwargs = {
