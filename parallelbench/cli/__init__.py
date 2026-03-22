@@ -27,6 +27,10 @@ COMMANDS = {
     ),
     "browse": ("Browse benchmark tasks and samples", "pb browse waiting_line/copy"),
     "analyze": ("Analyze evaluation results", "pb analyze leaderboard results/"),
+    "export": (
+        "Export results to GitHub Pages-compatible data files",
+        "pb export --output ./gh-pages-data",
+    ),
 }
 
 
@@ -82,6 +86,10 @@ def main():
         from parallelbench.cli.analyze import main as analyze_main
 
         analyze_main()
+    elif command == "export":
+        from parallelbench.cli.export import main as export_main
+
+        export_main()
     else:
         console.print(
             f"\n[bold red]Error:[/bold red] Unknown command [yellow]'{command}'[/yellow]"

@@ -10,14 +10,6 @@ and derives generation kwargs (steps, block_length) from high-level parameters.
 
 from collections import namedtuple
 
-from parallelbench.models.confidence_scorers import (
-    left_to_right,
-    margin,
-    max_probability,
-    negative_entropy,
-    random_confidence,
-)
-
 
 MethodInfo = namedtuple(
     "MethodInfo",
@@ -104,51 +96,89 @@ def derive_adaptive(k: float, max_tokens: int) -> dict:
 
 
 UNMASKING_REGISTRY: dict[str, MethodInfo] = {
-    "random": MethodInfo("topk", "k", derive_topk, random_confidence, ("k",)),
+    "random": MethodInfo("topk", "k", derive_topk, "random_confidence", ("k",)),
     "origin": MethodInfo("topk", "k", derive_topk, None, ("k",)),
-    "confidence_topk": MethodInfo("topk", "k", derive_topk, max_probability, ("k",)),
-    "topk_margin": MethodInfo("topk", "k", derive_topk, margin, ("k",)),
-    "entropy_topk": MethodInfo("topk", "k", derive_topk, negative_entropy, ("k",)),
+    "confidence_topk": MethodInfo("topk", "k", derive_topk, "max_probability", ("k",)),
+    "topk_margin": MethodInfo("topk", "k", derive_topk, "margin", ("k",)),
+    "entropy_topk": MethodInfo("topk", "k", derive_topk, "negative_entropy", ("k",)),
     "confidence_threshold": MethodInfo(
         "threshold",
         "alg_threshold",
         derive_threshold,
-        max_probability,
+        "max_probability",
         ("alg_threshold",),
     ),
     "confidence_factor": MethodInfo(
-        "factor", "alg_factor", derive_factor, max_probability, ("alg_factor",)
+        "factor", "alg_factor", derive_factor, "max_probability", ("alg_factor",)
     ),
-    "left_to_right": MethodInfo("topk", "k", derive_topk, left_to_right, ("k",)),
+    "left_to_right": MethodInfo("topk", "k", derive_topk, "left_to_right", ("k",)),
     "klass": MethodInfo(
         "adaptive",
         "k",
         derive_adaptive,
-        max_probability,
+        "max_probability",
         ("block_length", "conf_threshold", "kl_threshold", "kl_history_length"),
     ),
     "slowfast": MethodInfo(
         "adaptive",
         "k",
         derive_adaptive,
-        max_probability,
+        "max_probability",
         ("block_length", "sf_high_confidence_threshold"),
     ),
     "dus": MethodInfo(
         "adaptive",
         "k",
         derive_adaptive,
-        max_probability,
+        "max_probability",
         ("block_length", "dus_base", "dus_remasking_threshold"),
     ),
     "wino_dllm": MethodInfo(
         "adaptive",
         "k",
         derive_adaptive,
-        max_probability,
+        "max_probability",
         ("block_length", "wino_threshold", "wino_threshold_back"),
     ),
 }
+
+
+def get_confidence_fn(name: str):
+    """Resolve the confidence scoring function for the given unmasking method.
+
+    Uses lazy import to avoid loading torch at module level, allowing
+    metadata-only functions (get_method_type, get_config_params, etc.)
+    to work without torch installed.
+
+    Args:
+        name: The unmasking method name.
+
+    Returns:
+        The confidence scoring callable, or None if the method has no scorer.
+
+    Raises:
+        KeyError: If the method name is not registered.
+    """
+    info = get_method_info(name)
+    fn_name = info.confidence_fn
+    if fn_name is None:
+        return None
+    from parallelbench.models.confidence_scorers import (
+        left_to_right,
+        margin,
+        max_probability,
+        negative_entropy,
+        random_confidence,
+    )
+
+    _fn_map = {
+        "max_probability": max_probability,
+        "margin": margin,
+        "negative_entropy": negative_entropy,
+        "random_confidence": random_confidence,
+        "left_to_right": left_to_right,
+    }
+    return _fn_map[fn_name]
 
 
 def get_method_info(name: str) -> MethodInfo:

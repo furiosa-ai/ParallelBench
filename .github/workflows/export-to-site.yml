@@ -1,0 +1,45 @@
+name: Export results to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['results/**']
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync --no-dev
+
+      - name: Export results to site data
+        run: uv run pb export --output /tmp/site-data
+
+      - uses: actions/checkout@v4
+        with:
+          repository: parallelbench/parallelbench.github.io
+          token: ${{ secrets.PAGES_PAT }}
+          path: site-repo
+
+      - name: Update site data
+        run: |
+          cp -r /tmp/site-data/leaderboard/* site-repo/data/leaderboard/
+          cp -r /tmp/site-data/figures/* site-repo/data/figures/
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          path: site-repo
+          token: ${{ secrets.PAGES_PAT }}
+          commit-message: "update: experiment results from ParallelBench"
+          title: "update: experiment results"
+          body: |
+            Automated export from ParallelBench results.
+
+            Source commit: ${{ github.sha }}
+          branch: auto-export/update-results

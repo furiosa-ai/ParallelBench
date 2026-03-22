@@ -23,7 +23,7 @@ import torch
 import torch.distributions as dists
 import torch.nn.functional as F
 
-from parallelbench.models.unmasking_registry import get_method_info
+from parallelbench.models.unmasking_registry import get_confidence_fn
 
 
 def get_num_transfer_tokens(mask_index, steps):
@@ -205,7 +205,7 @@ def get_transfer_index(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    confidence_fn = get_method_info(unmasking).confidence_fn
+    confidence_fn = get_confidence_fn(unmasking)
     if confidence_fn is None:
         raise ValueError(
             f"Unmasking method '{unmasking}' has no confidence scorer registered."
@@ -277,7 +277,7 @@ def get_transfer_index_dynamic(
     else:
         x0_p, x0 = p.max(dim=-1)
 
-    confidence_fn = get_method_info(unmasking).confidence_fn
+    confidence_fn = get_confidence_fn(unmasking)
     if confidence_fn is None:
         raise ValueError(
             f"Unmasking method '{unmasking}' has no confidence scorer registered."
