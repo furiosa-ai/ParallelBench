@@ -98,7 +98,7 @@ def fused_flex_attention(query, key, value, attention_mask, **kwargs):
     else:
         scale = kwargs.get("scale", None)
         attn_output = torch.nn.functional.scaled_dot_product_attention(
-            query, key, value, attn_mask=attention_mask, scale=scale
+            query, key, value, attn_mask=attention_mask, scale=scale, enable_gqa=True
         )
         return attn_output, None
 
