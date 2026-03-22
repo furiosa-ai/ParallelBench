@@ -18,7 +18,7 @@ from parallelbench.analysis.data_loading import (
     collect_rows,
 )
 from parallelbench.analysis.pb_score import compute_pb_scores
-from parallelbench.models.unmasking_registry import get_method_type
+from parallelbench.models.unmasking_registry import get_config_params, get_method_type
 from parallelbench.export.mapping import (
     get_model_id,
     get_strategy_id,
@@ -199,8 +199,18 @@ def generate_figures_csv(
         except KeyError:
             method_type = "unknown"
 
+        # Determine config params for grouping avg rows
+        try:
+            config_params = get_config_params(unmasking)
+        except KeyError:
+            config_params = ("k",)
+
         # Build per-task data rows
         csv_rows: list[dict] = []
+        # Also collect per-config data for avg computation
+        # config_key -> list of (tps, accuracy) per task
+        config_tasks: dict[str, list[tuple[float, float]]] = {}
+
         for row in group_rows:
             task_name = row.get("task", "")
             task_id = get_task_id(task_name)
@@ -243,22 +253,25 @@ def generate_figures_csv(
 
             csv_rows.append({"task": task_id, "tps": tps, "accuracy": accuracy})
 
+            # Build config key for avg grouping
+            config_key = ",".join(f"{p}={row.get(p, '')}" for p in config_params)
+            config_tasks.setdefault(config_key, []).append((tps, accuracy))
+
         if not csv_rows:
             continue
 
         # Sort by (task ascending, tps ascending)
         csv_rows.sort(key=lambda r: (r["task"], r["tps"]))
 
-        # Compute avg rows: mean accuracy per unique TPS across all tasks
-        tps_to_accuracies: dict[float, list[float]] = {}
-        for r in csv_rows:
-            tps_to_accuracies.setdefault(r["tps"], []).append(r["accuracy"])
-
+        # Compute avg rows: one per config, with mean TPS and mean accuracy
         avg_rows: list[dict] = []
-        for tps_val in sorted(tps_to_accuracies.keys()):
-            accuracies = tps_to_accuracies[tps_val]
-            avg_accuracy = sum(accuracies) / len(accuracies)
-            avg_rows.append({"task": "avg", "tps": tps_val, "accuracy": avg_accuracy})
+        for _config_key, entries in sorted(
+            config_tasks.items(),
+            key=lambda item: sum(e[0] for e in item[1]) / len(item[1]),
+        ):
+            mean_tps = sum(e[0] for e in entries) / len(entries)
+            mean_accuracy = sum(e[1] for e in entries) / len(entries)
+            avg_rows.append({"task": "avg", "tps": mean_tps, "accuracy": mean_accuracy})
 
         all_rows = csv_rows + avg_rows
         total_rows = len(all_rows)
