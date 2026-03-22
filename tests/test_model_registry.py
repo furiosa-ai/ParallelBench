@@ -13,6 +13,7 @@ from parallelbench.models.registry import ModelRegistry
 import parallelbench.models.api.mercury_model  # noqa: F401
 import parallelbench.models.local.dream.dream_model  # noqa: F401
 import parallelbench.models.local.trado.trado_model  # noqa: F401
+import parallelbench.models.local.sdar.sdar_model  # noqa: F401
 import parallelbench.models.local.llada.llada_model  # noqa: F401
 import parallelbench.models.api.anthropic_model  # noqa: F401
 
@@ -42,6 +43,8 @@ except ImportError:
         ("Gen-Verse/TraDo-4B-Instruct", "TradoModel"),
         ("Gen-Verse/TraDo-8B-Instruct", "TradoModel"),
         ("Gen-Verse/TraDo-8B-Thinking", "TradoModel"),
+        ("JetLM/SDAR-1.7B-Chat", "SdarModel"),
+        ("some-sdar-model", "SdarModel"),
         ("GSAI-ML/LLaDA-8B-Instruct", "LladaModel"),
         ("GSAI-ML/LLaDA-1.5", "LladaModel"),
         ("claude-3-haiku", "AnthropicModel"),

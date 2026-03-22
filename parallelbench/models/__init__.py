@@ -30,7 +30,13 @@ from parallelbench.models.unmasking_registry import (
 if TYPE_CHECKING:
     from parallelbench.models.base_model import ApiModel, BaseModel, LocalModel
     from parallelbench.models.registry import ModelRegistry
-    from parallelbench.models.local import DreamModel, LladaModel, SeddModel
+    from parallelbench.models.local import (
+        DreamModel,
+        LladaModel,
+        SdarModel,
+        SeddModel,
+        TradoModel,
+    )
     from parallelbench.models.api import AnthropicModel, MercuryModel
     from parallelbench.models.local.transformers_model import TransformersModel
     from parallelbench.models.local.vllm_model import vllmModel
@@ -43,7 +49,9 @@ __all__ = [
     "ModelRegistry",
     "DreamModel",
     "LladaModel",
+    "SdarModel",
     "SeddModel",
+    "TradoModel",
     "AnthropicModel",
     "MercuryModel",
     "TransformersModel",
@@ -72,7 +80,9 @@ _LAZY_IMPORTS = {
     "ModelRegistry": "parallelbench.models.registry",
     "DreamModel": "parallelbench.models.local",
     "LladaModel": "parallelbench.models.local",
+    "SdarModel": "parallelbench.models.local",
     "SeddModel": "parallelbench.models.local",
+    "TradoModel": "parallelbench.models.local",
     "AnthropicModel": "parallelbench.models.api",
     "MercuryModel": "parallelbench.models.api",
     "TransformersModel": "parallelbench.models.local.transformers_model",

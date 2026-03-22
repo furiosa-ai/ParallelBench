@@ -13,8 +13,8 @@ Module for TraDo (Transformer Diffusion) models.
 - **Loading:** Uses `AutoModelForCausalLM(trust_remote_code=True)` with a dummy `LossKwargs` injected into `transformers.utils` before loading
 
 ### Additional Fix: `trado_model.py`
-- Changed `alg_threshold` default from `0.85` to `None`
-- **Reason:** Default `0.85` caused `DllmGenerationConfig._validate_unmasking()` to raise `ValueError` for topk-type methods (e.g., `confidence_topk`) which require `alg_threshold` to be `None`
+- `alg_threshold` default set to `0.85` to match the default `unmasking="confidence_threshold"` method
+- **Reason:** `DllmGenerationConfig._validate_unmasking()` requires `alg_threshold` to be non-None for threshold-type methods. The value `0.85` matches the fallback in `to_generation_kwargs()`
 
 ## Supported Models
 - `Gen-Verse/TraDo-4B-Instruct`
@@ -23,4 +23,4 @@ Module for TraDo (Transformer Diffusion) models.
 
 ## TODO
 - [ ] Once the HF repo author removes the `LossKwargs` import, remove the monkey-patch code
-- [ ] Related PR: https://huggingface.co/JetLM/SDAR-1.7B-Chat/discussions/1 (same architecture)
+- [ ] Related PR: <https://huggingface.co/JetLM/SDAR-1.7B-Chat/discussions/1> (same architecture)

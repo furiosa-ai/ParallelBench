@@ -20,7 +20,7 @@ from .trado_model_utils import block_diffusion_generate
 class TradoGenerationConfig(DllmGenerationConfig):
     unmasking: str = "confidence_threshold"
     block_length: int = 128
-    alg_threshold: Optional[float] = None
+    alg_threshold: Optional[float] = 0.85
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
