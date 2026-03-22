@@ -5,11 +5,11 @@
 </p>
 
 <p align="center">
-      <a href="https://scholar.google.com/citations?user=Q-ARWkwAAAAJ&hl=eh" target="_blank">Wonjun Kang</a><sup>*1,5</sup>, 
-      <a href="https://kevingalim.com" target="_blank">Kevin Galim</a><sup>*1</sup>, 
-      <a href="https://scholar.google.com/citations?user=IXJcR1gAAAAJ&hl=en" target="_blank">Seunghyuk Oh</a><sup>*1</sup>, 
-      <a href="https://scholar.google.com/citations?user=XJXKp60AAAAJ&hl=en" target="_blank">Minjae Lee</a><sup>1</sup>, 
-      <a href="https://yzeng58.github.io/zyc_cv/" target="_blank">Yuchen Zeng</a><sup>2,3</sup>, 
+      <a href="https://scholar.google.com/citations?user=Q-ARWkwAAAAJ&hl=eh" target="_blank">Wonjun Kang</a><sup>*1,5</sup>,
+      <a href="https://kevingalim.com" target="_blank">Kevin Galim</a><sup>*1</sup>,
+      <a href="https://scholar.google.com/citations?user=IXJcR1gAAAAJ&hl=en" target="_blank">Seunghyuk Oh</a><sup>*1</sup>,
+      <a href="https://scholar.google.com/citations?user=XJXKp60AAAAJ&hl=en" target="_blank">Minjae Lee</a><sup>1</sup>,
+      <a href="https://yzeng58.github.io/zyc_cv/" target="_blank">Yuchen Zeng</a><sup>2,3</sup>,
       <a href="https://scholar.google.com/citations?user=jkXzD7YAAAAJ&hl=en" target="_blank">Shuibai Zhang</a><sup>2</sup>,<br>
       <a href="https://scholar.google.com/citations?user=si-368wAAAAJ&hl=en" target="_blank">Coleman Hooper</a><sup>4</sup>,
       <a href="https://yuezhouhu.github.io/" target="_blank">Yuezhou Hu</a><sup>4</sup>,
@@ -41,18 +41,20 @@ The following works have evaluated their methods using ParallelBench. Check out 
 We are currently working to support **new models** and implement **advanced unmasking methods**. If you are conducting dLLM research and would like to **contribute new models or methods**, please open an issue.
 
 **New Models**
-- [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
-- [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
+- [ ] [Fast-dLLM v2](https://github.com/NVlabs/Fast-dLLM)
+- [ ] [LLaDA-MoE](https://github.com/ML-GSAI/LLaDA), [LLaDA2.x](https://github.com/inclusionAI/LLaDA2.X)
+- [ ] [SDAR](https://github.com/JetAstra/SDAR)
+- [ ] [TraDo](https://github.com/Gen-Verse/dLLM-RL)
 
 **Advanced Unmasking Methods**
 
-- [WINO](https://github.com/Feng-Hong/WINO-DLLM?tab=readme-ov-file)
-- [DUS](https://github.com/omerlux/DUS)
-- [APD](https://github.com/danielmisrael/apd)
-- [SlowFast Sampling](https://github.com/LiangrunFlora/Slow-Fast-Sampling)
-- [EB-Sampler](https://arxiv.org/abs/2505.24857v1)
-- [KLASS](https://github.com/shkim0116/KLASS)
-- [Uncode](https://github.com/NEUIR/Uncode?tab=readme-ov-file) (formerly, PC-Sampler)
+- [x] [WINO](https://github.com/Feng-Hong/WINO-DLLM?tab=readme-ov-file)
+- [x] [DUS](https://github.com/omerlux/DUS)
+- [ ] [APD](https://github.com/danielmisrael/apd)
+- [x] [SlowFast Sampling](https://github.com/LiangrunFlora/Slow-Fast-Sampling)
+- [ ] [EB-Sampler](https://arxiv.org/abs/2505.24857v1)
+- [x] [KLASS](https://github.com/shkim0116/KLASS)
+- [ ] [Uncode](https://github.com/NEUIR/Uncode?tab=readme-ov-file) (formerly, PC-Sampler)
 
 ## 🔎 Overview
 <p align="center">
