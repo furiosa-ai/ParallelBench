@@ -98,6 +98,8 @@ def fused_flex_attention(query, key, value, attention_mask, **kwargs):
             key = key.repeat_interleave(repeat_factor, dim=1)
             value = value.repeat_interleave(repeat_factor, dim=1)
         scale = kwargs.get("scale", None)
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(dtype=query.dtype)
         attn_output = torch.nn.functional.scaled_dot_product_attention(
             query, key, value, attn_mask=attention_mask, scale=scale
         )
