@@ -36,6 +36,8 @@
 The following works have evaluated their methods using ParallelBench. Check out how they tackle the speed-quality trade-off of parallel decoding!
 - [Enabling Approximate Joint Sampling in Diffusion LMs](https://arxiv.org/abs/2509.22738)
 - [Corrective Diffusion Language Models](https://arxiv.org/abs/2512.15596)
+- [Dependency-Aware Parallel Decoding via Attention for Diffusion LLMs](https://arxiv.org/abs/2603.12996)
+- [Polestar-Cache: Reconciling Parallel Decoding and Accuracy in Diffusion LLMs via Token Drift-Aware KV Cache Recalibration](https://openreview.net/forum?id=e3ITaLZ4ct)
 
 ## 🗺️ Roadmap
 We are currently working to support **new models** and implement **advanced unmasking methods**. If you are conducting dLLM research and would like to **contribute new models or methods**, please open an issue.
