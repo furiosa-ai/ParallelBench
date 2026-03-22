@@ -59,6 +59,9 @@ class SdarModel(LocalModel):
         from .configuration_sdar import SDARConfig
 
         config = SDARConfig.from_pretrained(model_name)
+        # Use SDPA attention: flex_attention expects BlockMask objects
+        # but block_diffusion_utils passes regular 4D tensors as attention_mask
+        config._attn_implementation = "sdpa"
         self.model = SDARForCausalLM.from_pretrained(
             model_name,
             config=config,
