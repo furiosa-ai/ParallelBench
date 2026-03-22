@@ -82,23 +82,24 @@ if is_torch_flex_attn_available():
 logger = logging.get_logger(__name__)
 
 
-@torch.compile(fullgraph=True, mode="max-autotune-no-cudagraphs")
-def _fused_flex_attention_compiled(query, key, value, attention_mask, **kwargs):
-    return flex_attention(query, key, value, block_mask=attention_mask, **kwargs)
-
-
 def fused_flex_attention(query, key, value, attention_mask, **kwargs):
-    # block_diffusion_utils passes regular 4D tensors as attention_mask,
-    # but flex_attention requires BlockMask objects. Fall back to SDPA
-    # for regular tensors.
+    # Original uses @torch.compile + flex_attention(block_mask=...) which
+    # requires BlockMask objects. block_diffusion_utils passes regular 4D
+    # tensors, so we remove @torch.compile and handle both paths:
     if isinstance(attention_mask, BlockMask):
-        return _fused_flex_attention_compiled(
-            query, key, value, attention_mask, **kwargs
-        )
+        return flex_attention(query, key, value, block_mask=attention_mask, **kwargs)
     else:
+        # Regular tensor mask from block_diffusion_utils.
+        # Expand KV heads for GQA before SDPA.
+        num_q_heads = query.shape[1]
+        num_kv_heads = key.shape[1]
+        if num_q_heads != num_kv_heads:
+            repeat_factor = num_q_heads // num_kv_heads
+            key = key.repeat_interleave(repeat_factor, dim=1)
+            value = value.repeat_interleave(repeat_factor, dim=1)
         scale = kwargs.get("scale", None)
         attn_output = torch.nn.functional.scaled_dot_product_attention(
-            query, key, value, attn_mask=attention_mask, scale=scale, enable_gqa=True
+            query, key, value, attn_mask=attention_mask, scale=scale
         )
         return attn_output, None
 
