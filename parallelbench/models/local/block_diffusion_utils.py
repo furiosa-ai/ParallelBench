@@ -193,6 +193,15 @@ def block_diffusion_generate(
                     else:
                         raise ValueError("No mask tokens found in the current block.")
 
+            elif unmasking == "random":
+                random_confidence = torch.where(
+                    mask_index, torch.rand_like(x0_p), -torch.inf
+                )
+                transfer_index = torch.zeros_like(x0, dtype=torch.bool)
+                for j in range(random_confidence.shape[0]):
+                    _, idx = torch.topk(random_confidence[j], num_transfer_tokens[step])
+                    transfer_index[j, idx] = True
+
             elif unmasking == "confidence_topk":
                 confidence = torch.where(mask_index, x0_p, -torch.inf)
                 transfer_index = torch.zeros_like(x0, dtype=torch.bool)

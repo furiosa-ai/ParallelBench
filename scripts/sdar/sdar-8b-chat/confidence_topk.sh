@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Run SDAR-1.7B-Chat with confidence top-k across k values.
+# Run SDAR-8B-Chat with confidence top-k across k values.
 #
 # Sweeps k = 1, 2, 4, 8, 16, 32 with unmasking=confidence_topk.
 #
 # Usage:
-#   bash scripts/sdar/sdar-1.7b-chat/confidence_topk.sh                    # single GPU
-#   bash scripts/sdar/sdar-1.7b-chat/confidence_topk.sh --num_processes 2  # multi GPU
+#   bash scripts/sdar/sdar-8b-chat/confidence_topk.sh                    # single GPU
+#   bash scripts/sdar/sdar-8b-chat/confidence_topk.sh --num_processes 2  # multi GPU
 
 set -euo pipefail
 
@@ -21,7 +21,7 @@ for K in 1 2 4 8 16 32; do
 
     uv run accelerate launch ${EXTRA_ARGS} -m parallelbench.cli.eval \
         --model parallelbench_sdar \
-        --model_args model_path=JetLM/SDAR-1.7B-Chat \
+        --model_args model_path=JetLM/SDAR-8B-Chat \
         --gen_kwargs k=${K},unmasking=confidence_topk \
         --tasks parallelbench_all \
         --include_path parallelbench/tasks \

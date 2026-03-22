@@ -82,12 +82,12 @@ def test_trado_default_alg_threshold():
 
 def test_trado_valid_methods():
     config = TradoGenerationConfig()
-    assert config.valid_methods == {"confidence_topk", "confidence_threshold"}
+    assert config.valid_methods == {"random", "confidence_topk", "confidence_threshold"}
 
 
-def test_trado_invalid_method_random_raises():
+def test_trado_invalid_method_origin_raises():
     with pytest.raises(ValueError, match="Unsupported unmasking method"):
-        TradoGenerationConfig(unmasking="random")
+        TradoGenerationConfig(unmasking="origin")
 
 
 def test_trado_to_generation_kwargs_format():
