@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run SDAR-8B-Chat with confidence top-k across k values.
 #
-# Sweeps k = 1, 2, 4, 8, 16, 32 with unmasking=confidence_topk.
+# Sweeps k = 1, 2, 4 with block_length=4, unmasking=confidence_topk.
 #
 # Usage:
 #   bash scripts/sdar/sdar-8b-chat/confidence_topk.sh                    # single GPU
@@ -13,7 +13,7 @@ EXTRA_ARGS="${*}"
 OUTPUT_DIR="results"
 export PB_RUN_NAME="${PB_RUN_NAME:-$(date +%Y%m%d_%H%M%S)_all}"
 
-for K in 1 2 4 8 16 32; do
+for K in 1 2 4; do
     echo ""
     echo "============================================"
     echo "Running k=${K} with confidence top-k"

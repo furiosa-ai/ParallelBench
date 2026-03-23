@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run TraDo-8B-Instruct with confidence threshold across alg_threshold values.
 #
-# Sweeps alg_threshold = 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 with unmasking=confidence_threshold.
+# Sweeps alg_threshold = 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 with block_length=4.
 #
 # Usage:
 #   bash scripts/trado/trado-8b-instruct/confidence_threshold.sh                    # single GPU
