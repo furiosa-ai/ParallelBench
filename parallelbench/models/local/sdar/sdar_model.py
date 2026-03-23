@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -61,11 +62,13 @@ class SdarModel(LocalModel):
         from .configuration_sdar import SDARConfig
 
         config = SDARConfig.from_pretrained(model_name)
+        local_rank = os.environ.get("LOCAL_RANK")
+        device_map = f"cuda:{local_rank}" if local_rank is not None else "cuda"
         self.model = SDARForCausalLM.from_pretrained(
             model_name,
             config=config,
             torch_dtype=torch.bfloat16,
-            device_map="auto",
+            device_map=device_map,
         )
         self.model.eval()
 

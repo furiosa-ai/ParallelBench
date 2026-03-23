@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -77,12 +78,13 @@ class TradoModel(LocalModel):
     def __init__(self, model_name):
         self._patch_missing_imports()
 
-        # Use AutoModelForCausalLM to load the model
+        local_rank = os.environ.get("LOCAL_RANK")
+        device_map = f"cuda:{local_rank}" if local_rank is not None else "cuda"
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
-            device_map="auto",
+            device_map=device_map,
         )
         self.model.eval()
 
