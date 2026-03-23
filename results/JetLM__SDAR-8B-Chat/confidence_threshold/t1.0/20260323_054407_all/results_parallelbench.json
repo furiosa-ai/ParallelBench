@@ -1,0 +1,1247 @@
+{
+  "results": {
+    "parallelbench_all": {
+      "score,none": 47.1764705882353,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7844554262536092,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 57.470588235294116,
+      "nfe_stderr,none": "N/A",
+      "alias": "ParallelBench"
+    },
+    "parallelbench_puzzles": {
+      "score,none": 33.50000000000001,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Puzzles"
+    },
+    "parallelbench_puzzles_latin_square_n4": {
+      "alias": "  - parallelbench_puzzles_latin_square_n4",
+      "score,none": 55.00000000000001,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 55.00000000000001,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 100.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 18.65,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "alias": "  - parallelbench_puzzles_sudoku_n4",
+      "score,none": 12.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 12.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 198.12,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 6.71,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing": {
+      "score,none": 27.2,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Text Writing"
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "alias": "  - parallelbench_text_writing_paraphrasing",
+      "inv_bleu_score,none": 20.52347858410592,
+      "inv_bleu_score_stderr,none": "N/A",
+      "bertscore_score,none": 46.79756134748459,
+      "bertscore_score_stderr,none": "N/A",
+      "grammar_score,none": 48.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 48.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 46.68,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 9.39,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_summarization": {
+      "alias": "  - parallelbench_text_writing_summarization",
+      "rouge1_score,none": 15.132522808595814,
+      "rouge1_score_stderr,none": "N/A",
+      "rouge2_score,none": 8.313663968967424,
+      "rouge2_score_stderr,none": "N/A",
+      "rougeL_score,none": 12.847072524689224,
+      "rougeL_score_stderr,none": "N/A",
+      "grammar_score,none": 25.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 25.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 102.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 4.75,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "alias": "  - parallelbench_text_writing_words_to_sentence_easy",
+      "inclusion_score,none": 5.0,
+      "inclusion_score_stderr,none": "N/A",
+      "grammar_score,none": 5.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 5.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 28.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 3.17,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "alias": "  - parallelbench_text_writing_words_to_sentence_hard",
+      "inclusion_score,none": 50.0,
+      "inclusion_score_stderr,none": "N/A",
+      "grammar_score,none": 56.99999999999999,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 56.99999999999999,
+      "score_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 28.6,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 21.29,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "alias": "  - parallelbench_text_writing_words_to_sentence_medium",
+      "inclusion_score,none": 2.0,
+      "inclusion_score_stderr,none": "N/A",
+      "grammar_score,none": 1.0,
+      "grammar_score_stderr,none": "N/A",
+      "score,none": 1.0,
+      "score_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 28.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 1.32,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line": {
+      "score,none": 59.9,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780487,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Waiting Line"
+    },
+    "parallelbench_waiting_line_copy": {
+      "alias": "  - parallelbench_waiting_line_copy",
+      "score,none": 100.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 100.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 134.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 20.0,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "alias": "  - parallelbench_waiting_line_insert_index",
+      "score,none": 100.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 99.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 158.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 23.96,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "alias": "  - parallelbench_waiting_line_insert_random",
+      "score,none": 100.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 98.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 154.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 23.97,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "alias": "  - parallelbench_waiting_line_remove_index",
+      "score,none": 95.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 94.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 134.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 15.98,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "alias": "  - parallelbench_waiting_line_remove_random",
+      "score,none": 0.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 0.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 122.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 0.0,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "alias": "  - parallelbench_waiting_line_replace_index",
+      "score,none": 0.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 0.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 154.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 0.0,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "alias": "  - parallelbench_waiting_line_replace_random",
+      "score,none": 100.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 100.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 146.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 20.0,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_reverse": {
+      "alias": "  - parallelbench_waiting_line_reverse",
+      "score,none": 100.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 100.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 170.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 20.0,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "alias": "  - parallelbench_waiting_line_shuffle",
+      "score,none": 0.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 0.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 154.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 0.0,
+      "output_length_stderr,none": "N/A"
+    },
+    "parallelbench_waiting_line_sort": {
+      "alias": "  - parallelbench_waiting_line_sort",
+      "score,none": 4.0,
+      "score_stderr,none": "N/A",
+      "score_strict,none": 4.0,
+      "score_strict_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780488,
+      "tokens_per_step_stderr,none": "N/A",
+      "input_length,none": 142.0,
+      "input_length_stderr,none": "N/A",
+      "output_length,none": 20.0,
+      "output_length_stderr,none": "N/A"
+    }
+  },
+  "groups": {
+    "parallelbench_all": {
+      "score,none": 47.1764705882353,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7844554262536092,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 57.470588235294116,
+      "nfe_stderr,none": "N/A",
+      "alias": "ParallelBench"
+    },
+    "parallelbench_puzzles": {
+      "score,none": 33.50000000000001,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Puzzles"
+    },
+    "parallelbench_text_writing": {
+      "score,none": 27.2,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7901234567901235,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 81.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Text Writing"
+    },
+    "parallelbench_waiting_line": {
+      "score,none": 59.9,
+      "score_stderr,none": "N/A",
+      "tokens_per_step,none": 0.7804878048780487,
+      "tokens_per_step_stderr,none": "N/A",
+      "nfe,none": 41.0,
+      "nfe_stderr,none": "N/A",
+      "alias": " - ParallelBench - Waiting Line"
+    }
+  },
+  "group_subtasks": {
+    "parallelbench_puzzles": [
+      "parallelbench_puzzles_sudoku_n4",
+      "parallelbench_puzzles_latin_square_n4"
+    ],
+    "parallelbench_text_writing": [
+      "parallelbench_text_writing_paraphrasing",
+      "parallelbench_text_writing_summarization",
+      "parallelbench_text_writing_words_to_sentence_easy",
+      "parallelbench_text_writing_words_to_sentence_medium",
+      "parallelbench_text_writing_words_to_sentence_hard"
+    ],
+    "parallelbench_waiting_line": [
+      "parallelbench_waiting_line_copy",
+      "parallelbench_waiting_line_reverse",
+      "parallelbench_waiting_line_sort",
+      "parallelbench_waiting_line_shuffle",
+      "parallelbench_waiting_line_insert_index",
+      "parallelbench_waiting_line_insert_random",
+      "parallelbench_waiting_line_remove_index",
+      "parallelbench_waiting_line_remove_random",
+      "parallelbench_waiting_line_replace_index",
+      "parallelbench_waiting_line_replace_random"
+    ],
+    "parallelbench_all": [
+      "parallelbench_waiting_line",
+      "parallelbench_text_writing",
+      "parallelbench_puzzles"
+    ]
+  },
+  "configs": {
+    "parallelbench_puzzles_latin_square_n4": {
+      "task": "parallelbench_puzzles_latin_square_n4",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "puzzles/latin_square_n4",
+        "flex_config": {
+          "size": 4,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "task": "parallelbench_puzzles_sudoku_n4",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "puzzles/sudoku_n4",
+        "flex_config": {
+          "size": 4,
+          "num_holes": 8,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "task": "parallelbench_text_writing_paraphrasing",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/paraphrasing"
+      }
+    },
+    "parallelbench_text_writing_summarization": {
+      "task": "parallelbench_text_writing_summarization",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/summarization"
+      }
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "task": "parallelbench_text_writing_words_to_sentence_easy",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/words_to_sentence_easy",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 5,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "task": "parallelbench_text_writing_words_to_sentence_hard",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/words_to_sentence_hard",
+        "flex_config": {
+          "min_length": 8,
+          "max_length": 12,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "task": "parallelbench_text_writing_words_to_sentence_medium",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 0,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 64,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "text_writing/words_to_sentence_medium",
+        "flex_config": {
+          "min_length": 5,
+          "max_length": 8,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_copy": {
+      "task": "parallelbench_waiting_line_copy",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/copy",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "task": "parallelbench_waiting_line_insert_index",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/insert_index",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "task": "parallelbench_waiting_line_insert_random",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/insert_random",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "task": "parallelbench_waiting_line_remove_index",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/remove_index",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "task": "parallelbench_waiting_line_remove_random",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/remove_random",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "task": "parallelbench_waiting_line_replace_index",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/replace_index",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "task": "parallelbench_waiting_line_replace_random",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/replace_random",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_reverse": {
+      "task": "parallelbench_waiting_line_reverse",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/reverse",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "task": "parallelbench_waiting_line_shuffle",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/shuffle",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    },
+    "parallelbench_waiting_line_sort": {
+      "task": "parallelbench_waiting_line_sort",
+      "dataset_path": "furiosa-ai/ParallelBench",
+      "test_split": "test",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "num_fewshot": 1,
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n\n"
+        ],
+        "do_sample": false,
+        "max_tokens": 32,
+        "alg_threshold": 1.0,
+        "unmasking": "confidence_threshold"
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "parallelbench_task": "waiting_line/sort",
+        "flex_config": {
+          "min_length": 3,
+          "max_length": 6,
+          "num_samples": 100
+        }
+      }
+    }
+  },
+  "versions": {
+    "parallelbench_puzzles_latin_square_n4": 0.1,
+    "parallelbench_puzzles_sudoku_n4": 0.1,
+    "parallelbench_text_writing_paraphrasing": 0.1,
+    "parallelbench_text_writing_summarization": 0.1,
+    "parallelbench_text_writing_words_to_sentence_easy": 0.1,
+    "parallelbench_text_writing_words_to_sentence_hard": 0.1,
+    "parallelbench_text_writing_words_to_sentence_medium": 0.1,
+    "parallelbench_waiting_line_copy": 0.1,
+    "parallelbench_waiting_line_insert_index": 0.1,
+    "parallelbench_waiting_line_insert_random": 0.1,
+    "parallelbench_waiting_line_remove_index": 0.1,
+    "parallelbench_waiting_line_remove_random": 0.1,
+    "parallelbench_waiting_line_replace_index": 0.1,
+    "parallelbench_waiting_line_replace_random": 0.1,
+    "parallelbench_waiting_line_reverse": 0.1,
+    "parallelbench_waiting_line_shuffle": 0.1,
+    "parallelbench_waiting_line_sort": 0.1
+  },
+  "n-shot": {
+    "parallelbench_puzzles_latin_square_n4": 1,
+    "parallelbench_puzzles_sudoku_n4": 1,
+    "parallelbench_text_writing_paraphrasing": 0,
+    "parallelbench_text_writing_summarization": 0,
+    "parallelbench_text_writing_words_to_sentence_easy": 0,
+    "parallelbench_text_writing_words_to_sentence_hard": 0,
+    "parallelbench_text_writing_words_to_sentence_medium": 0,
+    "parallelbench_waiting_line_copy": 1,
+    "parallelbench_waiting_line_insert_index": 1,
+    "parallelbench_waiting_line_insert_random": 1,
+    "parallelbench_waiting_line_remove_index": 1,
+    "parallelbench_waiting_line_remove_random": 1,
+    "parallelbench_waiting_line_replace_index": 1,
+    "parallelbench_waiting_line_replace_random": 1,
+    "parallelbench_waiting_line_reverse": 1,
+    "parallelbench_waiting_line_shuffle": 1,
+    "parallelbench_waiting_line_sort": 1
+  },
+  "higher_is_better": {
+    "parallelbench_all": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_puzzles": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_puzzles_latin_square_n4": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_text_writing": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_text_writing_summarization": {
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "inclusion_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "inclusion_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "inclusion_score": true,
+      "grammar_score": true,
+      "score": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null,
+      "inv_bleu_score": true,
+      "bertscore_score": true,
+      "grammar_score": true,
+      "rouge1_score": true,
+      "rouge2_score": true,
+      "rougeL_score": true,
+      "inclusion_score": true
+    },
+    "parallelbench_waiting_line_copy": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_reverse": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    },
+    "parallelbench_waiting_line_sort": {
+      "score": true,
+      "score_strict": true,
+      "nfe": false,
+      "tokens_per_step": true,
+      "input_length": null,
+      "output_length": null
+    }
+  },
+  "n-samples": {
+    "parallelbench_waiting_line_copy": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_reverse": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_sort": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_shuffle": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_insert_index": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_insert_random": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_remove_index": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_remove_random": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_replace_index": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_waiting_line_replace_random": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_paraphrasing": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_summarization": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_words_to_sentence_easy": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_words_to_sentence_medium": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_text_writing_words_to_sentence_hard": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_puzzles_sudoku_n4": {
+      "original": 100,
+      "effective": 100
+    },
+    "parallelbench_puzzles_latin_square_n4": {
+      "original": 100,
+      "effective": 100
+    }
+  },
+  "config": {
+    "model": "parallelbench_sdar",
+    "model_args": "model_path=JetLM/SDAR-8B-Chat",
+    "batch_size": "1",
+    "batch_sizes": [],
+    "device": null,
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {
+      "alg_threshold": 1.0,
+      "unmasking": "confidence_threshold"
+    },
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "v2.0.0-20-g02c1671",
+  "date": 1774276749.1892993,
+  "pretty_env_info": "PyTorch version: 2.8.0+cu128\nIs debug build: False\nCUDA used to build PyTorch: 12.8\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (x86_64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Mar  3 2026, 12:15:18) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.8.0-100-generic-x86_64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 12.0.140\nCUDA_MODULE_LOADING set to: LAZY\nGPU models and configuration: \nGPU 0: NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition\nGPU 1: NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition\n\nNvidia driver version: 580.126.09\ncuDNN version: Could not collect\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           52 bits physical, 57 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  24\nOn-line CPU(s) list:                     0-23\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Xeon(R) w5-3423\nCPU family:                              6\nModel:                                   143\nThread(s) per core:                      2\nCore(s) per socket:                      12\nSocket(s):                               1\nStepping:                                8\nCPU(s) scaling MHz:                      37%\nCPU max MHz:                             4200.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                4224.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cat_l2 cdp_l3 intel_ppin cdp_l2 ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect user_shstk avx_vnni avx512_bf16 wbnoinvd dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req vnmi avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg tme avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b enqcmd fsrm md_clear serialize tsxldtrk pconfig arch_lbr ibt amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities ibpb_exit_to_user\nVirtualization:                          VT-x\nL1d cache:                               576 KiB (12 instances)\nL1i cache:                               384 KiB (12 instances)\nL2 cache:                                24 MiB (12 instances)\nL3 cache:                                30 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-23\nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n\nVersions of relevant libraries:\n[pip3] Could not collect\n[conda] Could not collect",
+  "transformers_version": "4.57.6",
+  "upper_git_hash": null,
+  "task_hashes": {
+    "parallelbench_waiting_line_copy": "6a2aab9daa0d722fe64b009035dabad7d61af570a565f9beaffae685d5a1ccee",
+    "parallelbench_waiting_line_reverse": "77be0c192d5049b5126ef157fcce163600b2890d0519255f9dc7e57798d3e0fe",
+    "parallelbench_waiting_line_sort": "afd101e2134b5a9946403089f27e4c555d0d08b99c38d864046ad826249d7bf6",
+    "parallelbench_waiting_line_shuffle": "ddf8eed833c5e27e45282005964e75d7c46ce9cf7e5f873d7172de5206a2ad3f",
+    "parallelbench_waiting_line_insert_index": "2558517335e31c93be18fc3049ae75bacbbae97b9334d21a11448a45ed639956",
+    "parallelbench_waiting_line_insert_random": "ee3c43703a09b1fcd8fb5f45b7c4e74e1777e20b0fb5240178c261644a6d81d2",
+    "parallelbench_waiting_line_remove_index": "1660b2fc2b48999e74e75a79d675853888f69351c9737c4e6c142b5ad15bc6f0",
+    "parallelbench_waiting_line_remove_random": "85a86832a9a443434d6ea373d15953b06655e0154e1324504ebc91f0bfdd04d0",
+    "parallelbench_waiting_line_replace_index": "2a4d0da8a6c1c9c06551294f299df53daca987999f259cda6a3146701f0787ba",
+    "parallelbench_waiting_line_replace_random": "b1dac8387fe10740ce5722da76f01975ce6fc12ea6e0034f97131513b7e6faeb",
+    "parallelbench_text_writing_paraphrasing": "bebefc5c4c0e6f11481bcdb32635461493625f83c18e629b426276af8bbd153a",
+    "parallelbench_text_writing_summarization": "fbba66a86670661467d637918f08af05922852530a4c41229c51e58d25d62eb8",
+    "parallelbench_text_writing_words_to_sentence_easy": "231e5a46fedb28f4d45865c7f0dea63a49417ae1e0adc315d4efd5d1811cdc4a",
+    "parallelbench_text_writing_words_to_sentence_medium": "9a91acf2434448514261a39adbb21a8d64490424f1489da4bc6bc8b3060e42da",
+    "parallelbench_text_writing_words_to_sentence_hard": "9594536471bd5bcc20e897dc11b651e6133577675d86ed2077ff0073872e62b2",
+    "parallelbench_puzzles_sudoku_n4": "8348365266a285922f78bd5b8d0ce175eb80d45caca3e1e17affc96a5536f214",
+    "parallelbench_puzzles_latin_square_n4": "4cb6b153c462617d951e5a2448d3e48290470760424dc12a606a3da4c76b2130"
+  },
+  "model_source": "parallelbench_sdar",
+  "model_name": "JetLM/SDAR-8B-Chat",
+  "model_name_sanitized": "JetLM__SDAR-8B-Chat",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": true,
+  "chat_template": "",
+  "chat_template_sha": null,
+  "start_time": 3491664.617534142,
+  "end_time": 3493761.050706962,
+  "total_evaluation_time_seconds": "2096.433172820136"
+}
