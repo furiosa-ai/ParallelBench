@@ -113,23 +113,12 @@ class SdarModel(LocalModel):
             self.model.device
         )
 
-        # Adjust max_tokens to compensate for prompt padding to block_length.
-        # Padding extends the prompt but doesn't add useful generation space,
-        # so max_tokens must grow by the padding amount.
-        block_length = gen_config.get("block_length", 128)
-        prompt_length = input_ids.shape[1]
-        pad_length = (block_length - prompt_length % block_length) % block_length
-        if pad_length > 0:
-            gen_config = {
-                **gen_config,
-                "max_tokens": gen_config.get("max_tokens", 128) + pad_length,
-            }
-
         gen_config = SdarGenerationConfig(**gen_config)
 
         block_length = gen_config.block_length
         # pad input_ids to be multiple of block_length
         if input_ids.shape[1] % block_length != 0:
+            pad_length = block_length - (input_ids.shape[1] % block_length)
             input_ids = F.pad(
                 input_ids, (0, pad_length), value=self.tokenizer.pad_token_id
             )
