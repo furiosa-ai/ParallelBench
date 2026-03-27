@@ -21,14 +21,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Callable, Optional, Tuple, Union, List
+from typing import Optional, Tuple, Union
 
 import torch
 from torch import nn
 from einops import rearrange
 
 from transformers.activations import ACT2FN
-from transformers.cache_utils import Cache, DynamicCache, SlidingWindowCache, StaticCache
+from transformers.cache_utils import (
+    Cache,
+    DynamicCache,
+    SlidingWindowCache,
+    StaticCache,
+)
 from transformers.generation import GenerationMixin
 from transformers.integrations import use_kernel_forward_from_hub
 from transformers.modeling_attn_mask_utils import AttentionMaskConverter
@@ -37,43 +42,68 @@ from transformers.modeling_layers import GradientCheckpointingLayer
 from transformers.modeling_outputs import (
     BaseModelOutputWithPast,
     CausalLMOutputWithPast,
-    QuestionAnsweringModelOutput,
-    SequenceClassifierOutputWithPast,
-    TokenClassifierOutput,
 )
 from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS, dynamic_rope_update
-from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS, PreTrainedModel
+from transformers.modeling_utils import PreTrainedModel
 from transformers.processing_utils import Unpack
-from transformers.utils import TransformersKwargs, auto_docstring, can_return_tuple, is_torch_flex_attn_available, logging
+from transformers.utils import (
+    TransformersKwargs,
+    auto_docstring,
+    can_return_tuple,
+    is_torch_flex_attn_available,
+    logging,
+)
 from .configuration_sdar import SDARConfig
 # Removed: fused_linear_diffusion_cross_entropy (training-only, not needed for inference)
 
 from flash_attn.ops.triton.layer_norm import rms_norm_fn as flash_rms_norm
 
-import torch.nn.functional as F
 try:
-    from flash_attn import flash_attn_func, flash_attn_varlen_func
-    from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input
-except:
+    pass
+except Exception:  # noqa: E722
     pass
 
 try:
     from liger_kernel.ops.swiglu import LigerSiLUMulFunction  # noqa: F401
+
     liger_kernel_is_available = True
 except ImportError:
     liger_kernel_is_available = False
 
 
 if is_torch_flex_attn_available():
-    from torch.nn.attention.flex_attention import BlockMask, create_block_mask, flex_attention
-    from transformers.integrations.flex_attention import make_flex_block_causal_mask
+    from torch.nn.attention.flex_attention import (
+        BlockMask,
+        create_block_mask,
+        flex_attention,
+    )
 
 
 logger = logging.get_logger(__name__)
 
-@torch.compile(fullgraph=True, mode="max-autotune-no-cudagraphs")
+
 def fused_flex_attention(query, key, value, attention_mask, **kwargs):
-    return flex_attention(query, key, value, block_mask=attention_mask, **kwargs)
+    # Original uses @torch.compile + flex_attention(block_mask=...) which
+    # requires BlockMask objects. block_diffusion_utils passes regular 4D
+    # tensors, so we remove @torch.compile and handle both paths:
+    if isinstance(attention_mask, BlockMask):
+        return flex_attention(query, key, value, block_mask=attention_mask, **kwargs)
+    else:
+        # Regular tensor mask from block_diffusion_utils.
+        # Expand KV heads for GQA before SDPA.
+        num_q_heads = query.shape[1]
+        num_kv_heads = key.shape[1]
+        if num_q_heads != num_kv_heads:
+            repeat_factor = num_q_heads // num_kv_heads
+            key = key.repeat_interleave(repeat_factor, dim=1)
+            value = value.repeat_interleave(repeat_factor, dim=1)
+        scale = kwargs.get("scale", None)
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(dtype=query.dtype)
+        attn_output = torch.nn.functional.scaled_dot_product_attention(
+            query, key, value, attn_mask=attention_mask, scale=scale
+        )
+        return attn_output, None
 
 
 @use_kernel_forward_from_hub("RMSNorm")
@@ -88,15 +118,16 @@ class SDARRMSNorm(nn.Module):
 
     def forward(self, hidden_states):
         return flash_rms_norm(
-            hidden_states, weight=self.weight, bias=None, eps=self.variance_epsilon)
-        '''
+            hidden_states, weight=self.weight, bias=None, eps=self.variance_epsilon
+        )
+        """
         input_dtype = hidden_states.dtype
         hidden_states = hidden_states.to(torch.float32)
         variance = hidden_states.pow(2).mean(-1, keepdim=True)
         hidden_states = hidden_states * \
             torch.rsqrt(variance + self.variance_epsilon)
         return self.weight * hidden_states.to(input_dtype)
-        '''
+        """
 
     def extra_repr(self):
         return f"{tuple(self.weight.shape)}, eps={self.variance_epsilon}"
@@ -108,27 +139,25 @@ class SDARMLP(nn.Module):
         self.config = config
         self.hidden_size = config.hidden_size
         self.intermediate_size = config.intermediate_size
-        self.gate_proj = nn.Linear(
-            self.hidden_size, self.intermediate_size, bias=False)
-        self.up_proj = nn.Linear(
-            self.hidden_size, self.intermediate_size, bias=False)
-        self.down_proj = nn.Linear(
-            self.intermediate_size, self.hidden_size, bias=False)
+        self.gate_proj = nn.Linear(self.hidden_size, self.intermediate_size, bias=False)
+        self.up_proj = nn.Linear(self.hidden_size, self.intermediate_size, bias=False)
+        self.down_proj = nn.Linear(self.intermediate_size, self.hidden_size, bias=False)
         self.act_fn = ACT2FN[config.hidden_act]
 
     def forward(self, x):
         if liger_kernel_is_available:
-            return self.down_proj(LigerSiLUMulFunction.apply(self.gate_proj(x), self.up_proj(x)))
+            return self.down_proj(
+                LigerSiLUMulFunction.apply(self.gate_proj(x), self.up_proj(x))
+            )
         else:
-            down_proj = self.down_proj(self.act_fn(
-                self.gate_proj(x)) * self.up_proj(x))
+            down_proj = self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x))
             return down_proj
 
 
 def rotate_half(x):
     """Rotates half the hidden dims of the input."""
     x1 = x[..., : x.shape[-1] // 2]
-    x2 = x[..., x.shape[-1] // 2:]
+    x2 = x[..., x.shape[-1] // 2 :]
     return torch.cat((-x2, x1), dim=-1)
 
 
@@ -168,7 +197,8 @@ def repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
     if n_rep == 1:
         return hidden_states
     hidden_states = hidden_states[:, :, None, :, :].expand(
-        batch, num_key_value_heads, n_rep, slen, head_dim)
+        batch, num_key_value_heads, n_rep, slen, head_dim
+    )
     return hidden_states.reshape(batch, num_key_value_heads * n_rep, slen, head_dim)
 
 
@@ -190,10 +220,12 @@ def eager_attention_forward(
         causal_mask = attention_mask[:, :, :, : key_states.shape[-2]]
         attn_weights = attn_weights + causal_mask
 
-    attn_weights = nn.functional.softmax(
-        attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(
+        query.dtype
+    )
     attn_weights = nn.functional.dropout(
-        attn_weights, p=dropout, training=module.training)
+        attn_weights, p=dropout, training=module.training
+    )
     attn_output = torch.matmul(attn_weights, value_states)
     attn_output = attn_output.transpose(1, 2).contiguous()
 
@@ -208,8 +240,11 @@ class SDARAttention(nn.Module):
         self.config = config
         self.layer_idx = layer_idx
         self.head_dim = getattr(
-            config, "head_dim", config.hidden_size // config.num_attention_heads)
-        self.num_key_value_groups = config.num_attention_heads // config.num_key_value_heads
+            config, "head_dim", config.hidden_size // config.num_attention_heads
+        )
+        self.num_key_value_groups = (
+            config.num_attention_heads // config.num_key_value_heads
+        )
         self.scaling = self.head_dim**-0.5
         self.attention_dropout = config.attention_dropout
         self.is_causal = True
@@ -219,16 +254,24 @@ class SDARAttention(nn.Module):
         self.num_key_value_heads = config.num_key_value_heads
 
         self.q_proj = nn.Linear(
-            config.hidden_size, config.num_attention_heads * self.head_dim, bias=config.attention_bias
+            config.hidden_size,
+            config.num_attention_heads * self.head_dim,
+            bias=config.attention_bias,
         )
         self.k_proj = nn.Linear(
-            config.hidden_size, config.num_key_value_heads * self.head_dim, bias=config.attention_bias
+            config.hidden_size,
+            config.num_key_value_heads * self.head_dim,
+            bias=config.attention_bias,
         )
         self.v_proj = nn.Linear(
-            config.hidden_size, config.num_key_value_heads * self.head_dim, bias=config.attention_bias
+            config.hidden_size,
+            config.num_key_value_heads * self.head_dim,
+            bias=config.attention_bias,
         )
         self.o_proj = nn.Linear(
-            config.num_attention_heads * self.head_dim, config.hidden_size, bias=config.attention_bias
+            config.num_attention_heads * self.head_dim,
+            config.hidden_size,
+            bias=config.attention_bias,
         )
         # unlike olmo, only on the head dim!
         self.q_norm = SDARRMSNorm(self.head_dim, eps=config.rms_norm_eps)
@@ -255,28 +298,33 @@ class SDARAttention(nn.Module):
         bsz, q_len = input_shape
         hidden_shape = (*input_shape, -1, self.head_dim)
 
-        query_states = self.q_norm(self.q_proj(
-            hidden_states).view(hidden_shape)).transpose(1, 2)
-        key_states = self.k_norm(self.k_proj(
-            hidden_states).view(hidden_shape)).transpose(1, 2)
-        value_states = self.v_proj(hidden_states).view(
-            hidden_shape).transpose(1, 2)
+        query_states = self.q_norm(
+            self.q_proj(hidden_states).view(hidden_shape)
+        ).transpose(1, 2)
+        key_states = self.k_norm(
+            self.k_proj(hidden_states).view(hidden_shape)
+        ).transpose(1, 2)
+        value_states = self.v_proj(hidden_states).view(hidden_shape).transpose(1, 2)
 
         cos, sin = position_embeddings
         query_states, key_states = apply_rotary_pos_emb(
-            query_states, key_states, cos, sin)
+            query_states, key_states, cos, sin
+        )
 
         if past_key_value is not None and kwargs.get("store_kv", False):
             # sin and cos are specific to RoPE models; cache_position needed for the static cache
             key_states, value_states = past_key_value.update(
-                key_states, value_states, self.layer_idx)
-        elif past_key_value is not None and not kwargs.get("store_kv", False) and len(past_key_value) > self.layer_idx:
+                key_states, value_states, self.layer_idx
+            )
+        elif (
+            past_key_value is not None
+            and not kwargs.get("store_kv", False)
+            and len(past_key_value) > self.layer_idx
+        ):
             # only retrive, do not store kv
             past_key_states, past_value_states = past_key_value[self.layer_idx]
-            key_states = torch.cat(
-                [past_key_states, key_states], dim=-2)
-            value_states = torch.cat(
-                [past_value_states, value_states], dim=-2)
+            key_states = torch.cat([past_key_states, key_states], dim=-2)
+            value_states = torch.cat([past_value_states, value_states], dim=-2)
 
         attn_output, attn_weights = fused_flex_attention(
             query=query_states,
@@ -285,12 +333,13 @@ class SDARAttention(nn.Module):
             attention_mask=attention_mask,
             enable_gqa=True,
             scale=self.scaling,
-            return_lse=True
+            return_lse=True,
         )
-        attn_weights = attn_weights.to(
-            value_states.dtype) if attn_weights is not None else None
-        attn_output = rearrange(attn_output, 'b h l d -> b l (h d)')
-        
+        attn_weights = (
+            attn_weights.to(value_states.dtype) if attn_weights is not None else None
+        )
+        attn_output = rearrange(attn_output, "b h l d -> b l (h d)")
+
         attn_output = self.o_proj(attn_output)
         return attn_output, attn_weights  # , attn_weights
 
@@ -301,10 +350,10 @@ class SDARDecoderLayer(GradientCheckpointingLayer):
         self.hidden_size = config.hidden_size
         self.self_attn = SDARAttention(config=config, layer_idx=layer_idx)
         self.mlp = SDARMLP(config)
-        self.input_layernorm = SDARRMSNorm(
-            config.hidden_size, eps=config.rms_norm_eps)
+        self.input_layernorm = SDARRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
         self.post_attention_layernorm = SDARRMSNorm(
-            config.hidden_size, eps=config.rms_norm_eps)
+            config.hidden_size, eps=config.rms_norm_eps
+        )
         if (
             config.sliding_window and config._attn_implementation != "flash_attention_2"
         ):  # diff with Llama is this warning
@@ -324,10 +373,11 @@ class SDARDecoderLayer(GradientCheckpointingLayer):
         store_kv: Optional[bool] = False,
         cache_position: Optional[torch.LongTensor] = None,
         # necessary, but kept here for BC
-        position_embeddings: Optional[Tuple[torch.Tensor,
-                                            torch.Tensor]] = None,
+        position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
         **kwargs: Unpack[FlashAttentionKwargs],
-    ) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]:
+    ) -> Tuple[
+        torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]
+    ]:
         residual = hidden_states
         hidden_states = self.input_layernorm(hidden_states)
 
@@ -394,7 +444,8 @@ class SDARRotaryEmbedding(nn.Module):
         # BC: "rope_type" was originally "type"
         if hasattr(config, "rope_scaling") and config.rope_scaling is not None:
             self.rope_type = config.rope_scaling.get(
-                "rope_type", config.rope_scaling.get("type"))
+                "rope_type", config.rope_scaling.get("type")
+            )
         else:
             self.rope_type = "default"
         self.max_seq_len_cached = config.max_position_embeddings
@@ -403,8 +454,7 @@ class SDARRotaryEmbedding(nn.Module):
         self.config = config
         self.rope_init_fn = ROPE_INIT_FUNCTIONS[self.rope_type]
 
-        inv_freq, self.attention_scaling = self.rope_init_fn(
-            self.config, device)
+        inv_freq, self.attention_scaling = self.rope_init_fn(self.config, device)
         self.register_buffer("inv_freq", inv_freq, persistent=False)
         self.original_inv_freq = self.inv_freq
 
@@ -412,15 +462,23 @@ class SDARRotaryEmbedding(nn.Module):
     # power user: used with advanced RoPE types (e.g. dynamic rope)
     @dynamic_rope_update
     def forward(self, x, position_ids):
-        inv_freq_expanded = self.inv_freq[None, :, None].float().expand(
-            position_ids.shape[0], -1, 1).to(x.device)
+        inv_freq_expanded = (
+            self.inv_freq[None, :, None]
+            .float()
+            .expand(position_ids.shape[0], -1, 1)
+            .to(x.device)
+        )
         position_ids_expanded = position_ids[:, None, :].float()
 
-        device_type = x.device.type if isinstance(
-            x.device.type, str) and x.device.type != "mps" else "cpu"
+        device_type = (
+            x.device.type
+            if isinstance(x.device.type, str) and x.device.type != "mps"
+            else "cpu"
+        )
         with torch.autocast(device_type=device_type, enabled=False):  # Force float32
-            freqs = (inv_freq_expanded.float() @
-                     position_ids_expanded.float()).transpose(1, 2)
+            freqs = (
+                inv_freq_expanded.float() @ position_ids_expanded.float()
+            ).transpose(1, 2)
             emb = torch.cat((freqs, freqs), dim=-1)
             cos = emb.cos() * self.attention_scaling
             sin = emb.sin() * self.attention_scaling
@@ -436,10 +494,13 @@ class SDARModel(SDARPreTrainedModel):
         self.vocab_size = config.vocab_size
 
         self.embed_tokens = nn.Embedding(
-            config.vocab_size, config.hidden_size, self.padding_idx)
+            config.vocab_size, config.hidden_size, self.padding_idx
+        )
         self.layers = nn.ModuleList(
-            [SDARDecoderLayer(config, layer_idx)
-             for layer_idx in range(config.num_hidden_layers)]
+            [
+                SDARDecoderLayer(config, layer_idx)
+                for layer_idx in range(config.num_hidden_layers)
+            ]
         )
         self.norm = SDARRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
         self.rotary_emb = SDARRotaryEmbedding(config=config)
@@ -470,15 +531,22 @@ class SDARModel(SDARPreTrainedModel):
         cache_position: Optional[torch.LongTensor] = None,
         **flash_attn_kwargs: Unpack[FlashAttentionKwargs],
     ) -> BaseModelOutputWithPast:
-        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+        output_attentions = (
+            output_attentions
+            if output_attentions is not None
+            else self.config.output_attentions
+        )
         output_hidden_states = (
-            output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+            output_hidden_states
+            if output_hidden_states is not None
+            else self.config.output_hidden_states
         )
         use_cache = use_cache if use_cache is not None else self.config.use_cache
 
         if (input_ids is None) ^ (inputs_embeds is not None):
             raise ValueError(
-                "You must specify exactly one of input_ids or inputs_embeds")
+                "You must specify exactly one of input_ids or inputs_embeds"
+            )
 
         if self.gradient_checkpointing and self.training and use_cache:
             logger.warning_once(
@@ -489,7 +557,8 @@ class SDARModel(SDARPreTrainedModel):
         # TODO (joao): remove this exception in v4.56 -- it exists for users that try to pass a legacy cache
         if not isinstance(past_key_values, (type(None), Cache)):
             raise ValueError(
-                "The `past_key_values` should be either a `Cache` object or `None`.")
+                "The `past_key_values` should be either a `Cache` object or `None`."
+            )
 
         if inputs_embeds is None:
             inputs_embeds = self.embed_tokens(input_ids)
@@ -498,10 +567,13 @@ class SDARModel(SDARPreTrainedModel):
             past_key_values = DynamicCache()
 
         if cache_position is None:
-            past_seen_tokens = past_key_values.get_seq_length(
-            ) if past_key_values is not None else 0
+            past_seen_tokens = (
+                past_key_values.get_seq_length() if past_key_values is not None else 0
+            )
             cache_position = torch.arange(
-                past_seen_tokens, past_seen_tokens + inputs_embeds.shape[1], device=inputs_embeds.device
+                past_seen_tokens,
+                past_seen_tokens + inputs_embeds.shape[1],
+                device=inputs_embeds.device,
             )
 
         if position_ids is None:
@@ -565,8 +637,9 @@ class SDARModel(SDARPreTrainedModel):
     ):
         if self.config._attn_implementation == "flash_attention_2":
             if attention_mask is not None and past_key_values is not None:
-                is_padding_right = attention_mask[:, -
-                                                  1].sum().item() != input_tensor.size()[0]
+                is_padding_right = (
+                    attention_mask[:, -1].sum().item() != input_tensor.size()[0]
+                )
                 if is_padding_right:
                     raise ValueError(
                         "You are attempting to perform batched generation with padding_side='right'"
@@ -583,7 +656,10 @@ class SDARModel(SDARPreTrainedModel):
                 attention_mask = create_block_mask(
                     # 2d bool tensor, shape: [2*seqlen, 2*seqlen]
                     lambda b, h, q_idx, kv_idx: attention_mask[q_idx, kv_idx],
-                    B=None, H=None, Q_LEN=seq_len_q, KV_LEN=seq_len_kv,
+                    B=None,
+                    H=None,
+                    Q_LEN=seq_len_q,
+                    KV_LEN=seq_len_kv,
                 )
             else:
                 # Here we pass in flex mask computed externally
@@ -593,11 +669,11 @@ class SDARModel(SDARPreTrainedModel):
         # For SDPA, when possible, we will rely on its `is_causal` argument instead of its `attn_mask` argument, in
         # order to dispatch on Flash Attention 2. This feature is not compatible with static cache, as SDPA will fail
         # to infer the attention mask.
-        past_seen_tokens = past_key_values.get_seq_length(
-        ) if past_key_values is not None else 0
+        past_seen_tokens = (
+            past_key_values.get_seq_length() if past_key_values is not None else 0
+        )
         using_static_cache = isinstance(past_key_values, StaticCache)
-        using_sliding_window_cache = isinstance(
-            past_key_values, SlidingWindowCache)
+        using_sliding_window_cache = isinstance(past_key_values, SlidingWindowCache)
 
         # When output attentions is True, sdpa implementation's forward method calls the eager implementation's forward
         if (
@@ -650,7 +726,8 @@ class SDARModel(SDARPreTrainedModel):
             # using left padding. This is required by F.scaled_dot_product_attention memory-efficient attention path.
             # Details: https://github.com/pytorch/pytorch/issues/110213
             causal_mask = AttentionMaskConverter._unmask_unattended(
-                causal_mask, min_dtype)
+                causal_mask, min_dtype
+            )
 
         return causal_mask
 
@@ -693,36 +770,45 @@ class SDARModel(SDARPreTrainedModel):
         else:
             min_dtype = torch.finfo(dtype).min
             causal_mask = torch.full(
-                (sequence_length, target_length), fill_value=min_dtype, dtype=dtype, device=cache_position.device
+                (sequence_length, target_length),
+                fill_value=min_dtype,
+                dtype=dtype,
+                device=cache_position.device,
             )
-            diagonal_attend_mask = torch.arange(target_length, device=cache_position.device) > cache_position.reshape(
-                -1, 1
-            )
+            diagonal_attend_mask = torch.arange(
+                target_length, device=cache_position.device
+            ) > cache_position.reshape(-1, 1)
             text_config = config.get_text_config()
-            if getattr(text_config, "use_sliding_window", True) and text_config.sliding_window is not None:
+            if (
+                getattr(text_config, "use_sliding_window", True)
+                and text_config.sliding_window is not None
+            ):
                 # if we have sliding window, we should not attend to tokens beyond sliding window length, so we mask them out also
                 # the check is needed to verify is current checkpoint was trained with sliding window or not
-                if not isinstance(past_key_values, SlidingWindowCache) or sequence_length > target_length:
-                    sliding_attend_mask = torch.arange(target_length, device=cache_position.device) <= (
-                        cache_position.reshape(-1, 1) -
-                        text_config.sliding_window
-                    )
+                if (
+                    not isinstance(past_key_values, SlidingWindowCache)
+                    or sequence_length > target_length
+                ):
+                    sliding_attend_mask = torch.arange(
+                        target_length, device=cache_position.device
+                    ) <= (cache_position.reshape(-1, 1) - text_config.sliding_window)
                     diagonal_attend_mask.bitwise_or_(sliding_attend_mask)
             causal_mask *= diagonal_attend_mask
-            causal_mask = causal_mask[None, None,
-                                      :, :].expand(batch_size, 1, -1, -1)
+            causal_mask = causal_mask[None, None, :, :].expand(batch_size, 1, -1, -1)
             if attention_mask is not None:
-                causal_mask = causal_mask.clone()  # copy to contiguous memory for in-place edit
+                causal_mask = (
+                    causal_mask.clone()
+                )  # copy to contiguous memory for in-place edit
                 if attention_mask.shape[-1] > target_length:
                     attention_mask = attention_mask[:, :target_length]
                 mask_length = attention_mask.shape[-1]
-                padding_mask = causal_mask[:, :, :, :mask_length] + attention_mask[:, None, None, :].to(
-                    causal_mask.device
-                )
+                padding_mask = causal_mask[:, :, :, :mask_length] + attention_mask[
+                    :, None, None, :
+                ].to(causal_mask.device)
                 padding_mask = padding_mask == 0
-                causal_mask[:, :, :, :mask_length] = causal_mask[:, :, :, :mask_length].masked_fill(
-                    padding_mask, min_dtype
-                )
+                causal_mask[:, :, :, :mask_length] = causal_mask[
+                    :, :, :, :mask_length
+                ].masked_fill(padding_mask, min_dtype)
         return causal_mask
 
 
@@ -736,8 +822,7 @@ class SDARForCausalLM(SDARPreTrainedModel, GenerationMixin):
         super().__init__(config)
         self.model = SDARModel(config)
         self.vocab_size = config.vocab_size
-        self.lm_head = nn.Linear(
-            config.hidden_size, config.vocab_size, bias=False)
+        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
         # Initialize weights and apply final processing
         self.post_init()
@@ -762,8 +847,8 @@ class SDARForCausalLM(SDARPreTrainedModel, GenerationMixin):
 
     def prepare_for_bd_training(self, inputs_ids, position_ids, prompt_mask):
         bsz, seq_len = inputs_ids.shape
-        num_tokens = calculate_token_nums(position_ids) # List[torch.Tensor]
-        noisy_inputs_ids, logits_to_keep_half, p_mask = forward_add_noise_packed(
+        num_tokens = calculate_token_nums(position_ids)  # noqa: F821  # List[torch.Tensor]
+        noisy_inputs_ids, logits_to_keep_half, p_mask = forward_add_noise_packed(  # noqa: F821
             inputs_ids=inputs_ids,
             num_tokens_list=num_tokens,
             prompt_mask=prompt_mask,
@@ -771,8 +856,12 @@ class SDARForCausalLM(SDARPreTrainedModel, GenerationMixin):
         )
         router_noisy_part_list = []
         for i in range(bsz):
-            cur_router_noisy_part = (torch.arange(num_tokens[i].shape[0] *2) % 2 == 0).to(inputs_ids.device)
-            cur_router_noisy_part = cur_router_noisy_part.repeat_interleave(num_tokens[i].repeat_interleave(2))
+            cur_router_noisy_part = (
+                torch.arange(num_tokens[i].shape[0] * 2) % 2 == 0
+            ).to(inputs_ids.device)
+            cur_router_noisy_part = cur_router_noisy_part.repeat_interleave(
+                num_tokens[i].repeat_interleave(2)
+            )
             router_noisy_part_list.append(cur_router_noisy_part)
         router_noisy_part = torch.stack(router_noisy_part_list, dim=0)
 
@@ -780,10 +869,12 @@ class SDARForCausalLM(SDARPreTrainedModel, GenerationMixin):
         concat_inputs_ids = inputs_ids.repeat(1, 2)
         # concated logits_to_keep: (bsz, seq_len x 2)
         logits_to_keep = torch.zeros(
-                    bsz, 2 * seq_len, dtype=torch.bool, device=inputs_ids.device)
+            bsz, 2 * seq_len, dtype=torch.bool, device=inputs_ids.device
+        )
         # concated position_ids: (bsz, seq_len x 2)
         concat_position_ids = torch.zeros(
-                    bsz, 2 * seq_len, dtype=position_ids.dtype, device=position_ids.device)
+            bsz, 2 * seq_len, dtype=position_ids.dtype, device=position_ids.device
+        )
         for i in range(bsz):
             concat_inputs_ids[i][router_noisy_part[i]] = noisy_inputs_ids[i]
             concat_inputs_ids[i][~router_noisy_part[i]] = inputs_ids[i]
@@ -794,14 +885,25 @@ class SDARForCausalLM(SDARPreTrainedModel, GenerationMixin):
             concat_position_ids[i][~router_noisy_part[i]] = position_ids[i]
 
         # create flex_attention mask
-        attention_mask = block_attn_mask(num_tokens, self.config.block_size, inputs_ids.device)
+        attention_mask = block_attn_mask(  # noqa: F821
+            num_tokens, self.config.block_size, inputs_ids.device
+        )
         flex_attention_mask_3d = create_block_mask(
-                            lambda b, h, q_idx, kv_idx: attention_mask[b, q_idx, kv_idx],
-                            B=attention_mask.size(0), H=None,
-                            Q_LEN=attention_mask.size(1), KV_LEN=attention_mask.size(2),
+            lambda b, h, q_idx, kv_idx: attention_mask[b, q_idx, kv_idx],
+            B=attention_mask.size(0),
+            H=None,
+            Q_LEN=attention_mask.size(1),
+            KV_LEN=attention_mask.size(2),
         )
 
-        return concat_inputs_ids, concat_position_ids, flex_attention_mask_3d, logits_to_keep_half, logits_to_keep, p_mask
+        return (
+            concat_inputs_ids,
+            concat_position_ids,
+            flex_attention_mask_3d,
+            logits_to_keep_half,
+            logits_to_keep,
+            p_mask,
+        )
 
     @can_return_tuple
     @auto_docstring
@@ -842,21 +944,29 @@ class SDARForCausalLM(SDARPreTrainedModel, GenerationMixin):
         >>> tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
         "Hey, are you conscious? Can you talk to me?\nI'm not conscious, but I can talk to you."
         ```"""
-        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
-        output_hidden_states = (
-            output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+        output_attentions = (
+            output_attentions
+            if output_attentions is not None
+            else self.config.output_attentions
         )
-        
+        output_hidden_states = (
+            output_hidden_states
+            if output_hidden_states is not None
+            else self.config.output_hidden_states
+        )
+
         outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,
             position_ids=position_ids,
+            past_key_values=past_key_values,
+            use_cache=use_cache,
             output_attentions=output_attentions,
             output_hidden_states=output_hidden_states,
             return_dict=True,
             cache_position=cache_position,
-            **kwargs
-            )
+            **kwargs,
+        )
         hidden_states = outputs.last_hidden_state
 
         if logits_to_keep is not None:
@@ -864,7 +974,9 @@ class SDARForCausalLM(SDARPreTrainedModel, GenerationMixin):
             num_keep = logits_to_keep.sum(dim=1)
             assert torch.all(num_keep == num_keep[0])
             N = int(num_keep[0].item())
-            hidden_states = hidden_states[logits_to_keep].view(B, N, H).contiguous()   # [B, N, H]
+            hidden_states = (
+                hidden_states[logits_to_keep].view(B, N, H).contiguous()
+            )  # [B, N, H]
         logits = self.lm_head(hidden_states)
         loss = None
         # if labels is not None:

@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -19,13 +20,22 @@ from .trado_model_utils import block_diffusion_generate
 @dataclass
 class TradoGenerationConfig(DllmGenerationConfig):
     unmasking: str = "confidence_threshold"
-    block_length: int = 128
+    block_length: int = 4
     alg_threshold: Optional[float] = None
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
 
     valid_methods: set = field(default_factory=lambda: set(TRADO_VALID_METHODS))
+
+    def __post_init__(self):
+        # Auto-populate alg_threshold for threshold methods before parent validation
+        if self.alg_threshold is None and self.unmasking in self.valid_methods:
+            from parallelbench.models.unmasking_registry import get_method_type
+
+            if get_method_type(self.unmasking) == "threshold":
+                self.alg_threshold = 0.85
+        super().__post_init__()
 
     def to_generation_kwargs(self):
         gen_kwargs = {
@@ -68,12 +78,13 @@ class TradoModel(LocalModel):
     def __init__(self, model_name):
         self._patch_missing_imports()
 
-        # Use AutoModelForCausalLM to load the model
+        local_rank = os.environ.get("LOCAL_RANK")
+        device_map = f"cuda:{local_rank}" if local_rank is not None else "cuda"
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
-            device_map="auto",
+            device_map=device_map,
         )
         self.model.eval()
 
@@ -117,11 +128,12 @@ class TradoModel(LocalModel):
         else:
             prompt = messages
 
-        gen_config = TradoGenerationConfig(**gen_config)
-
         input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
             self.model.device
         )
+
+        gen_config = TradoGenerationConfig(**gen_config)
+
         block_length = gen_config.block_length
         assert (
             block_length == 4

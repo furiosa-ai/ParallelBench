@@ -38,6 +38,17 @@ class SdarWrapper(DLLMBase):
         return SdarModel(model_name=self.model_path)
 
     def _build_generation_config(self, gen_kwargs: dict) -> dict:
+        # Default block_length=4 for SDAR block diffusion.
+        # Derive steps from k manually since the parent's derive_topk
+        # would set block_length=max_tokens which is wrong for block diffusion.
+        gen_kwargs.setdefault("block_length", "4")
+        if "k" in gen_kwargs and "steps" not in gen_kwargs:
+            max_tokens = int(gen_kwargs.get("max_tokens", 128))
+            k = int(float(gen_kwargs["k"]))
+            gen_kwargs["steps"] = str(max_tokens // k)
+        elif "steps" not in gen_kwargs:
+            # For threshold/non-k methods, cap steps at max_tokens
+            gen_kwargs["steps"] = gen_kwargs.get("max_tokens", "128")
         config = super()._build_generation_config(gen_kwargs)
         if self._top_p is not None:
             config["top_p"] = self._top_p

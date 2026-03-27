@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -18,13 +19,22 @@ from parallelbench.models.local.block_diffusion_utils import block_diffusion_gen
 @dataclass
 class SdarGenerationConfig(DllmGenerationConfig):
     unmasking: str = "confidence_threshold"
-    block_length: int = 128
+    block_length: int = 4
     alg_threshold: Optional[float] = None
 
     top_p: Optional[float] = None
     top_k: Optional[float] = None
 
     valid_methods: set = field(default_factory=lambda: set(SDAR_VALID_METHODS))
+
+    def __post_init__(self):
+        # Auto-populate alg_threshold for threshold methods before parent validation
+        if self.alg_threshold is None and self.unmasking in self.valid_methods:
+            from parallelbench.models.unmasking_registry import get_method_type
+
+            if get_method_type(self.unmasking) == "threshold":
+                self.alg_threshold = 0.85
+        super().__post_init__()
 
     def to_generation_kwargs(self):
         gen_kwargs = {
@@ -44,17 +54,21 @@ class SdarGenerationConfig(DllmGenerationConfig):
 @ModelRegistry.register(lambda name: "sdar" in name.lower())
 class SdarModel(LocalModel):
     def __init__(self, model_name):
-        # Load SDAR using local patched modeling file to avoid
-        # missing fused_linear_diffusion_cross_entropy.py in HF repo
+        # Load SDAR using local patched modeling file.
+        # The patched version replaces @torch.compile'd fused_flex_attention
+        # with a dual-path function that falls back to SDPA for regular tensor
+        # masks (block_diffusion_utils passes 4D tensors, not BlockMask objects).
         from .modeling_sdar_patched import SDARForCausalLM
         from .configuration_sdar import SDARConfig
 
         config = SDARConfig.from_pretrained(model_name)
+        local_rank = os.environ.get("LOCAL_RANK")
+        device_map = f"cuda:{local_rank}" if local_rank is not None else "cuda"
         self.model = SDARForCausalLM.from_pretrained(
             model_name,
             config=config,
             torch_dtype=torch.bfloat16,
-            device_map="auto",
+            device_map=device_map,
         )
         self.model.eval()
 
@@ -98,11 +112,12 @@ class SdarModel(LocalModel):
         else:
             prompt = messages
 
-        gen_config = SdarGenerationConfig(**gen_config)
-
         input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids.to(
             self.model.device
         )
+
+        gen_config = SdarGenerationConfig(**gen_config)
+
         block_length = gen_config.block_length
         # pad input_ids to be multiple of block_length
         if input_ids.shape[1] % block_length != 0:
