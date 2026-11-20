@@ -67,8 +67,8 @@ These methods have placeholder scripts that exit with an error message. Sweep pa
 | Method | Full Name | Models | Paper | Code |
 |--------|-----------|--------|-------|------|
 | eb_sampler | Entropy Bounded Sampler | LLaDA 1.5, Dream 7B | [EB-Sampler](https://arxiv.org/abs/2505.24857) | — |
-| pc_sampler_confidence | Position-aware Calibration Sampler (Confidence) | LLaDA 1.5 | [PC-Sampler](https://arxiv.org/abs/2508.13021) | — |
-| pc_sampler_random | Position-aware Calibration Sampler (Random) | LLaDA 1.5 | [PC-Sampler](https://arxiv.org/abs/2508.13021) | — |
+| pc_sampler_confidence | Position-aware Calibration Sampler (Confidence) | LLaDA 1.5 | [PC-Sampler / UNCODE (ACL 2026)](https://aclanthology.org/2026.acl-long.311/) | [NEUIR/Uncode](https://github.com/NEUIR/Uncode) |
+| pc_sampler_random | Position-aware Calibration Sampler (Random) | LLaDA 1.5 | [PC-Sampler / UNCODE (ACL 2026)](https://aclanthology.org/2026.acl-long.311/) | [NEUIR/Uncode](https://github.com/NEUIR/Uncode) |
 | apd | Adaptive Parallel Decoding | Dream 7B | [APD](https://arxiv.org/abs/2506.00413) | [github.com/danielmisrael/apd](https://github.com/danielmisrael/apd) |
 
 ## Scripts
